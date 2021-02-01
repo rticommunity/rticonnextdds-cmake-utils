@@ -297,54 +297,59 @@
 # ^^^^^^^^
 # Simple Connext DDS application
 # ::
-#   cmake_minimum_required(VERSION 3.3.2)
+#   cmake_minimum_required(VERSION 3.11)
 #   project (example)
 #   set(CMAKE_MODULE_PATH
 #       ${CMAKE_MODULE_PATH}
-#       "/home/rti/rti_connext_dds-5.3.0/resource/cmake")
+#       "/home/rti/rti_connext_dds-6.0.0/resource/cmake")
 #
-#   find_package(RTIConnextDDS EXACT "5.3.0" REQUIRED)
-#   add_definitions(${CONNEXTDDS_COMPILE_DEFINITIONS})
-#   include_directories("src" ${CONNEXTDDS_INCLUDE_DIRS})
+#   find_package(RTIConnextDDS EXACT "6.0.0" REQUIRED)
 #
 #   set(SOURCES_PUB
-#       src/HelloWorld_publisher.c
-#       src/HelloWorld.c
-#       src/HelloWorldPlugin.c
-#       src/HelloWorldSupport.c)
+#       "src/HelloWorld_publisher.c"
+#       "src/HelloWorld.c"
+#       "src/HelloWorldPlugin.c"
+#       "src/HelloWorldSupport.c"
+#   )
 #
 #   add_executable(HelloWorld_c_publisher ${SOURCES_PUB})
 #   target_link_libraries(HelloWorld_c_publisher
 #       PUBLIC
-#           RTIConnextDDS::c_api)
+#           RTIConnextDDS::c_api
+#   )
 #
 #
 # Simple Routing Service adapter
 # ::
-#   cmake_minimum_required(VERSION 3.3.0)
+#   cmake_minimum_required(VERSION 3.11)
 #   project (example)
 #   set(CMAKE_MODULE_PATH
 #       ${CMAKE_MODULE_PATH}
-#       "/home/rti/rti_connext_dds-5.3.0/resource/cmake")
+#       "/home/rti/rti_connext_dds-6.0.0/resource/cmake")
 #
 #   find_package(RTIConnextDDS
-#       EXACT "5.3.0"
+#       EXACT "6.0.0"
 #       REQUIRED
 #       COMPONENTS
-#           routing_service)
-#   add_definitions("${CONNEXTDDS_COMPILE_DEFINITIONS}")
-#   include_directories("src" ${CONNEXTDDS_INCLUDE_DIRS})
+#           routing_service
+#   )
 #
 #   set(LIBRARIES
 #       ${ROUTING_SERVICE_API_LIBRARIES_RELEASE_STATIC}
-#       ${CONNEXTDDS_EXTERNAL_LIBS})
+#       ${CONNEXTDDS_EXTERNAL_LIBS}
+#   )
 #
-#   set(SOURCES_LIB src/FileAdapter.c src/LineConversion.c src/osapi.c)
+#   set(SOURCES_LIB
+#       "src/FileAdapter.c"
+#       "src/LineConversion.c"
+#       "src/osapi.c"
+#   )
 #
 #   add_library(shapestransf ${SOURCES_LIB})
 #   target_link_libraries(shapestransf
 #       PUBLIC
-#           RTIConnextDDS::routing_service)
+#           RTIConnextDDS::routing_service
+#   )
 #
 # Supported platforms
 # ^^^^^^^^^^^^^^^^^^^
@@ -362,7 +367,7 @@
 # use to define lower logging levels than ``STATUS`` mode. All this modes will
 # show messages of current level and higher. The following modes are available:
 #
-# - ``STATUS`` 
+# - ``STATUS``
 #   Default mode. This will olnly show messages with same or higher logging
 #   level than CMake ``STATUS``.
 # - ``VERBOSE``
@@ -626,7 +631,7 @@ if(NOT CONNEXTDDS_ARCH)
 
         foreach(architecture_name ${architectures_installed})
             # Because the lib folder contains both target libraries and
-            # java jar files, here we exclude the "java" in our algorithm
+            # Java JAR files, here we exclude the "java" in our algorithm
             # to guess the appropriate CONNEXTDDS_ARCH variable.
             if(architecture_name STREQUAL "java")
                 continue()
