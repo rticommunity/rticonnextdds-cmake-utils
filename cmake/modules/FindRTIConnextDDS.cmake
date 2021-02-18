@@ -14,13 +14,22 @@
 # ^^^^^^^^^^
 # This module sets variables for the following components that are part of RTI
 # Connext DDS:
-#
 # - core (default, always provided)
 # - messaging_api
-# - security_plugins
+# - distributed_loger
+# - metp
 # - routing_service
+# - assign_transformation
+# - security_plugins
 # - monitoring_libraries
-# - distributed_logger
+# - nddstls
+# - transport_tcp
+# - transport_tls
+# - transport_wan
+# - recording_service
+# - rtixml2
+# - low_bandwidth_plugins
+# - rtizrtps
 #
 # Core is always selected, because the rest of components depend on it.
 # However, the rest of components must be explicitly selected in the
@@ -71,7 +80,7 @@
 # - ``RTIConnextDDS::messaging_cpp_api``
 #   The Request Reply CPP API library if found (rticonnextmsgcpp).
 # - ``RTIConnextDDS::messaging_cpp2_api``
-#   The Request Reply C API library if found (rticonnextmsgcpp2).
+#   The Request Reply CPP2 API library if found (rticonnextmsgcpp2).
 # - ``RTIConnextDDS::nddstls``
 #   The tls library if found (nddstls).
 # - ``RTIConnextDDS::transport_tcp``
@@ -1602,7 +1611,7 @@ if(low_bandwidth_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "LOW_BANDWIDTH_DISCOVERY_STATIC"
     )
 
-        # Find all flavors of librtilbedisc
+    # Find all flavors of librtilbedisc
     set(rtilbedisc_libs
         "rtilbedisc"
         "nddsc"
