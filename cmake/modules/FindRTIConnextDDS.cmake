@@ -454,14 +454,15 @@ if(NOT CONNEXTDDS_DIR)
     # Is a patch
     if(PACKAGE_FIND_VERSION_COUNT EQUAL 4)
         set(folder_version
-            "${PACKAGE_FIND_VERSION_MAJOR}.${PACKAGE_FIND_VERSION_MINOR}.${PACKAGE_FIND_VERSION_PATCH}")
+            "${PACKAGE_FIND_VERSION_MAJOR}.${PACKAGE_FIND_VERSION_MINOR}.${PACKAGE_FIND_VERSION_PATCH}"
+        )
         connextdds_log_debug("The required ConnextDDS version is a patch")
     else()
         set(folder_version ${RTIConnextDDS_FIND_VERSION})
     endif()
     connextdds_log_verbose("ConnextDDS version ${folder_version}")
 
-    if (CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
+    if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
         set(connextdds_root_hints
             "$ENV{HOME}/rti_connext_dds-${folder_version}"
         )
@@ -502,8 +503,10 @@ endif()
 # We require having an rti_versions file under the installation directory
 # as we will use it to verify that the version is appropriate.
 find_path(CONNEXTDDS_DIR
-    NAMES rti_versions.xml
+    NAMES
+        "rti_versions.xml"
     HINTS
+        ENV CONNEXTDDS_DIR
         ENV NDDSHOME
         "${NDDSHOME}"
         ${connextdds_root_hints}
@@ -515,7 +518,8 @@ find_path(CONNEXTDDS_DIR
 if(NOT CONNEXTDDS_DIR)
     set(error
         "CONNEXTDDS_DIR not specified. Please set -DCONNEXTDDS_DIR= to "
-        "your RTI Connext DDS installation directory")
+        "your RTI Connext DDS installation directory"
+    )
     message(FATAL_ERROR ${error})
 endif()
 
@@ -530,7 +534,8 @@ connextdds_log_debug("Codegen script ${codegen_name}")
 find_path(RTICODEGEN_DIR
     NAME "${codegen_name}"
     HINTS
-        "${CONNEXTDDS_DIR}/bin")
+        "${CONNEXTDDS_DIR}/bin"
+)
 
 if(NOT RTICODEGEN_DIR)
     set(warning
@@ -542,12 +547,16 @@ else()
     set(RTICODEGEN
         "${RTICODEGEN_DIR}/${codegen_name}"
         CACHE PATH
-        "Path to RTI Codegen")
+        "Path to RTI Codegen"
+    )
 
     # Execute RTI Code Generator to get the version
     connextdds_log_debug("Get the Codegen version: '${RTICODEGEN} -version'")
-    execute_process(COMMAND ${RTICODEGEN} -version
-        OUTPUT_VARIABLE codegen_version_string)
+    execute_process(
+        COMMAND
+            ${RTICODEGEN} -version
+        OUTPUT_VARIABLE codegen_version_string
+    )
     connextdds_log_debug("Command output:")
     connextdds_log_debug("${codegen_version_string}")
 
@@ -564,7 +573,8 @@ if(NOT CONNEXTDDS_ARCH)
     if(CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
         string(REGEX REPLACE "^([0-9]+).*$" "\\1"
             major_version
-            ${CMAKE_CXX_COMPILER_VERSION})
+            ${CMAKE_CXX_COMPILER_VERSION}
+        )
         set(version_compiler "${major_version}.0")
         connextdds_log_debug("Compiler version: ${version_compiler}")
 
@@ -573,7 +583,8 @@ if(NOT CONNEXTDDS_ARCH)
         connextdds_log_debug("Kernel version: ${kernel_version}")
 
         set(guessed_architecture
-             "x64Darwin${kernel_version}${version_compiler}")
+             "x64Darwin${kernel_version}${version_compiler}"
+        )
 
     elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
         if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86")
@@ -589,7 +600,8 @@ if(NOT CONNEXTDDS_ARCH)
 
         string(REGEX MATCH "[0-9][0-9][0-9][0-9]"
              vs_year
-             "${CMAKE_GENERATOR}")
+             "${CMAKE_GENERATOR}"
+        )
         connextdds_log_debug("Visual Studio year: ${vs_year}")
         set(guessed_architecture "${connextdds_host_arch}VS${vs_year}")
     elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
@@ -598,7 +610,8 @@ if(NOT CONNEXTDDS_ARCH)
         else()
             string(REGEX REPLACE "^([0-9]+)\\.([0-9]+).*$" "\\1"
                 kernel_version
-                "${CMAKE_SYSTEM_VERSION}")
+                "${CMAKE_SYSTEM_VERSION}"
+            )
         endif()
 
         connextdds_log_debug("Kernel version: ${kernel_version}")
@@ -868,7 +881,9 @@ function(get_all_library_variables
             string(TOUPPER ${build_mode} upper_build_mode)
 
             if(${mode_library_found})
-                set(lib_var "${result_var_name}_LIBRARIES_${upper_build_mode}_${upper_link_mode}")
+                set(lib_var
+                    "${result_var_name}_LIBRARIES_${upper_build_mode}_${upper_link_mode}"
+                )
                 set(${lib_var} ${libraries} PARENT_SCOPE)
                 connextdds_log_debug("\t${lib_var} = ${libraries}")
                 set(${lib_var}_FOUND TRUE PARENT_SCOPE)
@@ -895,7 +910,8 @@ function(get_all_library_variables
     set(${result_var_name}_LIBRARIES
         ${result_var_name}_LIBRARIES_${build_mode}_${link_mode})
     connextdds_log_debug(
-        "====================================================================")
+        "===================================================================="
+    )
 endfunction()
 
 
@@ -1006,6 +1022,27 @@ function(create_connext_imported_target)
     endforeach()
 endfunction()
 
+#####################################################################
+# Get the version                                                   #
+#####################################################################
+# In the header files, there is a variable that contains the BUILD ID of the
+# release. From the BUILD ID, we can get the version.
+set(regex_for_build "NDDSCORE_BUILD_.*_RTI_.*")
+file(STRINGS
+    "${CONNEXTDDS_DIR}/include/ndds/core_version/core_version_buildid.h"
+    build_id_line
+    REGEX ${regex_for_build}
+)
+string(REGEX MATCH
+    ${regex_for_build}
+    CONNEXTDDS_BUILD_ID
+    "${build_id_line}"
+)
+string(REGEX MATCH
+    "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"
+    RTICONNEXTDDS_VERSION
+    "${CONNEXTDDS_BUILD_ID}"
+)
 
 #####################################################################
 # Platform-specific Definitions                                     #
@@ -1029,7 +1066,8 @@ elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
         set(connextdds_host_arch ${connextdds_host_arch} "x64Win64")
     else()
         message(FATAL_ERROR
-            "${CMAKE_HOST_SYSTEM} is not supported as host architecture")
+            "${CMAKE_HOST_SYSTEM} is not supported as host architecture"
+        )
     endif()
 elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
     if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
@@ -1038,7 +1076,8 @@ elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
         set(connextdds_host_arch ${connextdds_host_arch} "i86Linux")
     else()
         message(FATAL_ERROR
-            "${CMAKE_HOST_SYSTEM} is not supported as host architecture")
+            "${CMAKE_HOST_SYSTEM} is not supported as host architecture"
+        )
     endif()
 else()
     message(FATAL_ERROR
@@ -1047,47 +1086,69 @@ endif()
 
 if(CONNEXTDDS_ARCH MATCHES "Linux")
     # Linux Platforms
-    set(CONNEXTDDS_EXTERNAL_LIBS -ldl -lm -lpthread -lrt)
-    set(CONNEXTDDS_COMPILE_DEFINITIONS RTI_UNIX RTI_LINUX)
+    set(CONNEXTDDS_EXTERNAL_LIBS
+        "-ldl"
+        "-lm"
+        "-lpthread"
+        "-lrt"
+    )
+    set(CONNEXTDDS_COMPILE_DEFINITIONS
+        "RTI_UNIX"
+        "RTI_LINUX"
+    )
 
     if(CONNEXTDDS_ARCH MATCHES "x64Linux")
-        set(CONNEXTDDS_COMPILE_DEFINITIONS
-            ${CONNEXTDDS_COMPILE_DEFINITIONS}
-            RTI_64BIT)
+        list(APPEND CONNEXTDDS_COMPILE_DEFINITIONS
+            "RTI_64BIT"
+        )
     endif()
 elseif(CONNEXTDDS_ARCH MATCHES "Win")
     # Windows Platforms
-    set(CONNEXTDDS_EXTERNAL_LIBS ws2_32 netapi32 version)
+    set(CONNEXTDDS_EXTERNAL_LIBS
+        "ws2_32"
+        "netapi32"
+        "version"
+    )
 
     set(CONNEXTDDS_COMPILE_DEFINITIONS
-        WIN32_LEAN_AND_MEAN
-        WIN32
-        _WINDOWS
-        RTI_WIN32
-        _BIND_TO_CURRENT_MFC_VERSION=1
-        _BIND_TO_CURRENT_CRT_VERSION=1
-        _SCL_SECURE_NO_WARNINGS
-        _CRT_SECURE_NO_WARNING)
+        "WIN32_LEAN_AND_MEAN"
+        "WIN32"
+        "_WINDOWS"
+        "RTI_WIN32"
+        "_BIND_TO_CURRENT_MFC_VERSION=1"
+        "_BIND_TO_CURRENT_CRT_VERSION=1"
+        "_SCL_SECURE_NO_WARNINGS"
+        "_CRT_SECURE_NO_WARNING"
+    )
 
     # When building against ConnextDDS's shared libraries, users need to also
     # add the CONNEXTDDS_DLL_EXPORT_MACRO to their definitions.
-    set(CONNEXTDDS_DLL_EXPORT_MACRO NDDS_DLL_VARIABLE)
+    set(CONNEXTDDS_DLL_EXPORT_MACRO "NDDS_DLL_VARIABLE")
 
 elseif(CONNEXTDDS_ARCH MATCHES "Darwin")
     # Darwin Platforms
     set(CONNEXTDDS_EXTERNAL_LIBS "")
 
     set(CONNEXTDDS_COMPILE_DEFINITIONS
-        RTI_UNIX
-        RTI_DARWIN
-        RTI_DARWIN10
-        RTI_64BIT)
+        "RTI_UNIX"
+        "RTI_DARWIN"
+        "RTI_DARWIN10"
+        "RTI_64BIT"
+    )
 elseif(CONNEXTDDS_ARCH MATCHES "Android")
-    set(CONNEXTDDS_EXTERNAL_LIBS -llog -lc -lm)
-    set(CONNEXTDDS_COMPILE_DEFINITIONS RTI_UNIX LINUX RTI_ANDROID)
+    set(CONNEXTDDS_EXTERNAL_LIBS
+        "-llog"
+        "-lc"
+        "-lm"
+    )
+    set(CONNEXTDDS_COMPILE_DEFINITIONS
+        "RTI_UNIX"
+        "LINUX RTI_ANDROID"
+    )
 else()
     message(FATAL_ERROR
-        "${CONNEXTDDS_ARCH} architecture is unsupported by this module")
+        "${CONNEXTDDS_ARCH} architecture is unsupported by this module"
+    )
 endif()
 
 
@@ -1103,22 +1164,26 @@ list(APPEND rti_versions_field_names_host
     "host_files"
     "core_release_docs"
     "core_api_docs"
-    "core_jars")
+    "core_jars"
+)
 
 list(APPEND rti_versions_field_names_target
-    "target_libraries")
+    "target_libraries"
+)
 
 # Define CONNEXTDDS_INCLUDE_DIRS
 find_path(CONNEXTDDS_INCLUDE_DIRS
     NAMES
-        ndds_c.h
+        "ndds_c.h"
     PATHS
-        "${CONNEXTDDS_DIR}/include/ndds")
+        "${CONNEXTDDS_DIR}/include/ndds"
+)
 
 set(CONNEXTDDS_INCLUDE_DIRS
     "${CONNEXTDDS_DIR}/include"
     ${CONNEXTDDS_INCLUDE_DIRS}
-    "${CONNEXTDDS_DIR}/include/ndds/hpp")
+    "${CONNEXTDDS_INCLUDE_DIRS}/hpp"
+)
 
 # Find all flavors of nddscore
 get_all_library_variables("nddscore" "CONNEXTDDS_CORE")
@@ -1149,7 +1214,8 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     # Find all flavors of rtidlc
     set(distributed_logger_c_libs "rtidlc" "nddsc" "nddscore")
     get_all_library_variables("${distributed_logger_c_libs}"
-        "DISTRIBUTED_LOGGER_C")
+        "DISTRIBUTED_LOGGER_C"
+    )
 
     # Find all flavors of rtidlcpp
     set(distributed_logger_cpp_libs
@@ -1157,9 +1223,11 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "librtidlc"
         "nddscpp"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${distributed_logger_cpp_libs}"
-        "DISTRIBUTED_LOGGER_CPP")
+        "DISTRIBUTED_LOGGER_CPP"
+    )
 
 
     if(DISTRIBUTED_LOGGER_C_FOUND AND DISTRIBUTED_LOGGER_CPP_FOUND)
@@ -1183,7 +1251,8 @@ if(metp IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     set(metp_libs
         "nddsmetp"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${metp_libs}" "METP")
 
     if(METP_FOUND)
@@ -1200,24 +1269,29 @@ endif()
 if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     # Add fields associated with the routing_service component
     list(APPEND rti_versions_field_names_host
-            "routing_service_host"
-            "routing_service")
+        "routing_service_host"
+        "routing_service"
+    )
     if(RTIConnextDDS_FIND_VERSION VERSION_GREATER 5.3.0.8)
         list(APPEND rti_versions_field_names_host
-                "routing_service_sdk_jars")
+            "routing_service_sdk_jars"
+        )
     endif()
 
     list(APPEND rti_versions_field_names_target
-            "routing_service_sdk")
+        "routing_service_sdk"
+    )
 
     # Find all flavors of librtirsinfrastructure
     set(rtirsinfrastructure_libs
         "rtirsinfrastructure"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables(
         "${rtirsinfrastructure_libs}"
-        "ROUTING_SERVICE_INFRASTRUCTURE")
+        "ROUTING_SERVICE_INFRASTRUCTURE"
+    )
 
     set(addon_dependencies)
     if(RTIConnextDDS_metp_FOUND)
@@ -1236,7 +1310,8 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "rtixml2"
         "rticonnextmsgc"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${routing_service_libs}" "ROUTING_SERVICE_API")
 
     if(WIN32 AND ROUTING_SERVICE_API_RELEASE_STATIC AND
@@ -1263,10 +1338,12 @@ if(assign_transformation IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "rtirsassigntransf"
         "rtiroutingservice"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables(
         "${assign_transformation_libs}"
-        "ASSIGN_TRANSFORMATION")
+        "ASSIGN_TRANSFORMATION"
+    )
 
     if(ASSIGN_TRANSFORMATION_FOUND)
         set(RTIConnextDDS_assign_transformation_FOUND TRUE)
@@ -1315,18 +1392,21 @@ endif()
 if(security_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     list(APPEND rti_versions_field_names_host
         "secure_base"
-        "secure_host")
+        "secure_host"
+    )
 
     list(APPEND rti_versions_field_names_target
-        "secure_target_libraries")
+        "secure_target_libraries"
+    )
 
     # Find all flavors of libnddssecurity
     set(security_plugins_libs
         "nddssecurity"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables(
-        "${security_plugins_libs}" 
+        "${security_plugins_libs}"
         "SECURITY_PLUGINS"
     )
 
@@ -1386,7 +1466,8 @@ if(nddstls IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     set(nddstls_libs
         "nddstls"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${nddstls_libs}" "NDDSTLS")
 
     if(NDDSTLS_FOUND)
@@ -1404,7 +1485,8 @@ if(transport_tcp IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     set(transport_tcp_libs
         "nddstransporttcp"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${transport_tcp_libs}" "TRANSPORT_TCP")
 
     if(TRANSPORT_TCP_FOUND)
@@ -1422,7 +1504,8 @@ if(transport_tls IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     set(transport_tls_libs
         "nddstransporttls"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${transport_tls_libs}" "TRANSPORT_TLS")
 
     if(TRANSPORT_TLS_FOUND)
@@ -1441,7 +1524,8 @@ if(transport_wan IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "nddstransportwan"
         "nddstransporttls"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${transport_wan_libs}" "TRANSPORT_WAN")
 
     if(TRANSPORT_WAN_FOUND)
@@ -1466,10 +1550,12 @@ if(recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "rticonnextmsgc"
         "rtixml2"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables(
         "${recording_service_libs}"
-        "RECORDING_SERVICE_API")
+        "RECORDING_SERVICE_API"
+    )
 
     if(RECORDING_SERVICE_API_FOUND)
         set(RTIConnextDDS_recording_service_FOUND TRUE)
@@ -1490,7 +1576,8 @@ if(rtixml2 IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     set(rtixml2_libs
         "rtixml2"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${rtixml2_libs}" "RTIXML2")
 
     if(RTIXML2_FOUND)
@@ -1508,44 +1595,51 @@ if(low_bandwidth_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     set(discovery_static_libs
         "nddsdiscoverystatic"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables(
         "${discovery_static_libs}"
-        "LOW_BANDWIDTH_DISCOVERY_STATIC")
+        "LOW_BANDWIDTH_DISCOVERY_STATIC"
+    )
 
         # Find all flavors of librtilbedisc
     set(rtilbedisc_libs
         "rtilbedisc"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${rtilbedisc_libs}" "LOW_BANDWIDTH_EDISC")
 
     # Find all flavors of librtilbpdisc
     set(rtilbpdisc_libs
         "rtilbpdisc"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${rtilbpdisc_libs}" "LOW_BANDWIDTH_PDISC")
 
     # Find all flavors of librtilbrtps
     set(rtilbrtps_libs
         "rtilbrtps"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${rtilbrtps_libs}" "LOW_BANDWIDTH_RTPS")
 
     # Find all flavors of librtilbsm
     set(rtilbsm_libs
         "rtilbsm"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${rtilbsm_libs}" "LOW_BANDWIDTH_SM")
 
     # Find all flavors of librtilbst
     set(rtilbst_libs
         "rtilbst"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${rtilbst_libs}" "LOW_BANDWIDTH_ST")
 
     if(LOW_BANDWIDTH_DISCOVERY_STATIC_FOUND AND LOW_BANDWIDTH_EDISC_FOUND AND
@@ -1565,7 +1659,8 @@ if(rtizrtps IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     set(rtizrtps_libs
         "rtizrtps"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${rtizrtps_libs}" "RTIZRTPS")
 
     if(RTIZRTPS_FOUND)
@@ -1576,27 +1671,8 @@ if(rtizrtps IN_LIST RTIConnextDDS_FIND_COMPONENTS)
 endif()
 
 #####################################################################
-# Version Variables                                                 #
+# Version checks                                                    #
 #####################################################################
-
-# In the header files, there is a variable that contains the BUILD ID of the
-# release. From the BUILD ID, we can get the version.
-set(regex_for_build "NDDSCORE_BUILD_.*_RTI_REL")
-file(STRINGS
-    "${CONNEXTDDS_DIR}/include/ndds/core_version/core_version_buildid.h"
-    build_id_line
-    REGEX ${regex_for_build}
-)
-string(REGEX MATCH
-    ${regex_for_build}
-    CONNEXTDDS_BUILD_ID
-    "${build_id_line}"
-)
-string(REGEX MATCH
-    "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"
-    RTICONNEXTDDS_VERSION
-    "${CONNEXTDDS_BUILD_ID}")
-
 if(ENABLE_VERSION_CONSISTENCY_CHECK)
     # Verify that all the components specified have the same version
     file(READ "${CONNEXTDDS_DIR}/rti_versions.xml" xml_file)
@@ -1613,7 +1689,8 @@ if(ENABLE_VERSION_CONSISTENCY_CHECK)
             connextdds_check_component_field_version(
                 ${field}
                 ${xml_file}
-                CONNEXTDDS_ARCH)
+                CONNEXTDDS_ARCH
+            )
     endforeach()
 endif()
 
@@ -1747,7 +1824,7 @@ if(RTIConnextDDS_FOUND)
 
     # Modern CPP Messaging API
     create_connext_imported_target(
-        TARGET "messaging_cpp_api"
+        TARGET "messaging_cpp2_api"
         VAR "MESSAGING_CPP2_API"
         DEPENDENCIES
             RTIConnextDDS::cpp2_api
