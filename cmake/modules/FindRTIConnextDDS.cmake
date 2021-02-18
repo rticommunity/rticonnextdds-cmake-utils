@@ -391,8 +391,9 @@ include(CMakeParseArguments)
 #####################################################################
 
 # These two macros allow better code tracing with debug and verbose messages
-# using new CMake 3.15 message types. If cmake 3.14 or lower is in use, default
-# messages will be displayed starting with ``DEBUG`` or ``VERBOSE`` instead.
+# using new CMake 3.15 message types. If CMake 3.14 or lower is in use,
+# default messages will be displayed starting with ``DEBUG`` or ``VERBOSE``
+# instead.
 #
 # Arguments:
 # - message: provides the text message
@@ -402,7 +403,7 @@ if("${CMAKE_MINOR_VERSION}" GREATER_EQUAL "15")
     endmacro()
 
     macro(connextdds_log_debug message)
-        message(DEBUG   "  DEBUG ${message}")
+        message(DEBUG "DEBUG ${message}")
     endmacro()
 else()
     set(CONNEXTDDS_LOG_LEVEL_LIST "STATUS" "VERBOSE" "DEBUG")
@@ -456,7 +457,6 @@ endmacro()
 # Find RTI Connext DDS installation. We provide some hints that include the
 # CONNEXTDDS_DIR variable, the $NDDSHOME environment variable, and the
 # default installation directories.
-
 if(NOT CONNEXTDDS_DIR)
     connextdds_log_verbose("CONNEXTDDS_DIR not specified")
 
@@ -515,9 +515,12 @@ find_path(CONNEXTDDS_DIR
     NAMES
         "rti_versions.xml"
     HINTS
+        "${NDDSHOME}"
         ENV CONNEXTDDS_DIR
         ENV NDDSHOME
-        "${NDDSHOME}"
+        # ``FindRTIConnextDDS.cmake`` is located under ``resources/cmake`` in
+        # the ConnextDDS installation
+        "${CMAKE_CURRENT_LIST_DIR}/../../"
         ${connextdds_root_hints}
     PATHS
         ${connextdds_root_paths_expanded}
@@ -544,6 +547,7 @@ find_path(RTICODEGEN_DIR
     NAME "${codegen_name}"
     HINTS
         "${CONNEXTDDS_DIR}/bin"
+        ENV RTICODEGEN_DIR
 )
 
 if(NOT RTICODEGEN_DIR)
@@ -551,12 +555,14 @@ if(NOT RTICODEGEN_DIR)
         "Codegen was not found. Please, check if rtiddsgen is under your "
         "NDDSHOME/bin directory or provide it to CMake using -DRTICODEGEN_DIR"
     )
-        message(WARNING ${warning})
+    message(WARNING ${warning})
 else()
-    set(RTICODEGEN
-        "${RTICODEGEN_DIR}/${codegen_name}"
-        CACHE PATH
-        "Path to RTI Codegen"
+    find_program(RTICODEGEN
+        NAME
+            "${codegen_name}"
+        HINTS
+            ${RTICODEGEN_DIR}
+        DOC "Path to RTI Codegen"
     )
 
     # Execute RTI Code Generator to get the version
@@ -582,7 +588,7 @@ if(NOT CONNEXTDDS_ARCH)
     if(CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
         string(REGEX REPLACE "^([0-9]+).*$" "\\1"
             major_version
-            ${CMAKE_CXX_COMPILER_VERSION}
+            "${CMAKE_CXX_COMPILER_VERSION}"
         )
         set(version_compiler "${major_version}.0")
         connextdds_log_debug("Compiler version: ${version_compiler}")
@@ -640,7 +646,7 @@ if(NOT CONNEXTDDS_ARCH)
     connextdds_log_verbose("Guessed RTI architecture: ${guessed_architecture}")
 
     if(ENV{CONNEXTDDS_ARCH})
-        set(CONNEXTDDS_ARCH $ENV{CONNEXTDDS_ARCH})
+        file(TO_CMAKE_PATH "$ENV{CONNEXTDDS_ARCH}" CONNEXTDDS_ARCH)
     elseif(EXISTS "${CONNEXTDDS_DIR}/lib/${guessed_architecture}")
         set(CONNEXTDDS_ARCH "${guessed_architecture}")
         connextdds_log_debug("${CONNEXTDDS_DIR}/lib/${guessed_architecture} exists")
