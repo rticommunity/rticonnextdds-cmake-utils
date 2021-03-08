@@ -59,6 +59,10 @@
 # - ``RTIConnextDDS::routing_service``
 #   The same as RTIConnextDDS::routing_service_c. Maintained for backward
 #   compatibility.
+# - ``RTIConnextDDS::routing_service_cpp``
+#   The same as RTIConnextDDS::routing_service_cpp.
+# - ``RTIConnextDDS::routing_service_cpp2``
+#   The same as RTIConnextDDS::routing_service_cpp2.
 # - ``RTIConnextDDS::assign_transformation``
 #   The assign transformation library if found (includes rtirsassigntransf and
 #   rtiroutingservice).
@@ -1211,24 +1215,29 @@ endif()
 if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     # Add fields associated with the routing_service component
     list(APPEND rti_versions_field_names_host
-            "routing_service_host"
-            "routing_service")
+        "routing_service_host"
+        "routing_service"
+    )
     if(RTIConnextDDS_FIND_VERSION VERSION_GREATER 5.3.0.8)
         list(APPEND rti_versions_field_names_host
-                "routing_service_sdk_jars")
+            "routing_service_sdk_jars"
+        )
     endif()
 
     list(APPEND rti_versions_field_names_target
-            "routing_service_sdk")
+         "routing_service_sdk"
+    )
 
     # Find all flavors of librtirsinfrastructure
     set(rtirsinfrastructure_libs
         "rtirsinfrastructure"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables(
         "${rtirsinfrastructure_libs}"
-        "ROUTING_SERVICE_INFRASTRUCTURE")
+        "ROUTING_SERVICE_INFRASTRUCTURE"
+    )
 
     set(addon_dependencies)
     if(RTIConnextDDS_metp_FOUND)
@@ -1247,7 +1256,8 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "rtixml2"
         "rticonnextmsgc"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables("${routing_service_libs}" "ROUTING_SERVICE_API")
 
     if(WIN32 AND ROUTING_SERVICE_API_RELEASE_STATIC AND
@@ -1363,7 +1373,8 @@ if(security_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         set(CONNEXTDDS_EXTERNAL_LIBS
             ${OPENSSL_SSL_LIBRARY}
             ${OPENSSL_CRYPTO_LIBRARY}
-            ${CONNEXTDDS_EXTERNAL_LIBS})
+            ${CONNEXTDDS_EXTERNAL_LIBS}
+        )
 
         set(RTIConnextDDS_security_plugins_FOUND TRUE)
     else()
@@ -1477,10 +1488,12 @@ if(recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "rticonnextmsgc"
         "rtixml2"
         "nddsc"
-        "nddscore")
+        "nddscore"
+    )
     get_all_library_variables(
         "${recording_service_libs}"
-        "RECORDING_SERVICE_API")
+        "RECORDING_SERVICE_API"
+    )
 
     if(RECORDING_SERVICE_API_FOUND)
         set(RTIConnextDDS_recording_service_FOUND TRUE)
@@ -1897,41 +1910,60 @@ if(RTIConnextDDS_FOUND)
     )
 
     # Routing Service C API
-    set(dependencies RTIConnextDDS::c_api)
+    set(dependencies RTIConnextDDS::routing_service_infrastructure)
 
     if(TARGET RTIConnextDDS::distributed_logger_c)
-        set(dependencies
-            ${dependencies}
+        list(APPEND dependencies
             RTIConnextDDS::distributed_logger_c
         )
     endif()
 
     if(TARGET RTIConnextDDS::metp)
-        set(dependencies
-            ${dependencies}
+        list(APPEND dependencies
             RTIConnextDDS::metp
         )
     endif()
 
     if(TARGET RTIConnextDDS::messaging_c_api)
-        set(dependencies
-            ${dependencies}
+        list(APPEND dependencies
             RTIConnextDDS::messaging_c_api
         )
     endif()
 
     if(TARGET RTIConnextDDS::rtixml2)
-        set(dependencies
-            ${dependencies}
+        list(APPEND dependencies
             RTIConnextDDS::rtixml2
         )
     endif()
 
     create_connext_imported_target(
         TARGET "routing_service_c"
-        VAR "ROUTING_SERVICE_API_LIBRARIES"
+        VAR "ROUTING_SERVICE_API"
         DEPENDENCIES
             ${dependencies}
+    )
+
+    # Create an alias for the regular Routing Service libs
+    add_library(RTIConnextDDS::routing_service ALIAS
+        RTIConnextDDS::routing_service_c
+    )
+
+    # The Routing Service CPP libraries are the C libraries + the CPP API
+    create_connext_imported_target(
+        TARGET "routing_service_cpp"
+        VAR "ROUTING_SERVICE_LIBRARIES"
+        DEPENDENCIES
+            RTIConnextDDS::routing_service_c
+            RTIConnextDDS::cpp_api
+    )
+
+    # The Routing Service CPP2 libraries are the C libraries + the CPP2 API
+    create_connext_imported_target(
+        TARGET "routing_service_cpp2"
+        VAR "ROUTING_SERVICE_LIBRARIES"
+        DEPENDENCIES
+            RTIConnextDDS::routing_service_c
+            RTIConnextDDS::cpp2_api
     )
 
     # Routing Service Assign Transformation
