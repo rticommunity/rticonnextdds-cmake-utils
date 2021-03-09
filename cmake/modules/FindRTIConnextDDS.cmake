@@ -1886,15 +1886,15 @@ if(RTIConnextDDS_FOUND)
     # ST
     create_connext_imported_target(
         TARGET "low_bandwidth_st"
-        VAR "LOW_BANDWIDTH_ST_LIBRARIES_RELEASE_STATIC"
+        VAR "LOW_BANDWIDTH_ST"
         DEPENDENCIES
             RTIConnextDDS::c_api
     )
 
-    # RTIRTPS
+    # RTIZRTPS
     create_connext_imported_target(
         TARGET "rtirtps"
-        VAR "RTIRTPS"
+        VAR "RTIZRTPS"
         DEPENDENCIES
             RTIConnextDDS::c_api
     )
@@ -1977,7 +1977,7 @@ if(RTIConnextDDS_FOUND)
     # Recording Service
     create_connext_imported_target(
         TARGET "recording_service"
-        VAR "RECORDING_SERVICE"
+        VAR "RECORDING_SERVICE_API"
         DEPENDENCIES
             RTIConnextDDS::routing_service_c
             RTIConnextDDS::routing_service_infrastructure
