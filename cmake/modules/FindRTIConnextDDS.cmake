@@ -1058,7 +1058,7 @@ string(REGEX MATCH
     "${build_id_line}"
 )
 string(REGEX MATCH
-    "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"
+    "[0-9]+\.[0-9]+\.[0-9]+(\\.[0-9]+)?"
     RTICONNEXTDDS_VERSION
     "${CONNEXTDDS_BUILD_ID}"
 )
