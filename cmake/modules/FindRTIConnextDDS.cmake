@@ -60,9 +60,9 @@
 #   The same as RTIConnextDDS::routing_service_c. Maintained for backward
 #   compatibility.
 # - ``RTIConnextDDS::routing_service_cpp``
-#   The same as RTIConnextDDS::routing_service_cpp.
+#   The same as RTIConnextDDS::routing_service_c but adding the CPP libraries.
 # - ``RTIConnextDDS::routing_service_cpp2``
-#   The same as RTIConnextDDS::routing_service_cpp2.
+#   The same as RTIConnextDDS::routing_service_c but adding the CPP2 libraries.
 # - ``RTIConnextDDS::assign_transformation``
 #   The assign transformation library if found (includes rtirsassigntransf and
 #   rtiroutingservice).
@@ -1951,7 +1951,7 @@ if(RTIConnextDDS_FOUND)
     # The Routing Service CPP libraries are the C libraries + the CPP API
     create_connext_imported_target(
         TARGET "routing_service_cpp"
-        VAR "ROUTING_SERVICE_LIBRARIES"
+        VAR "ROUTING_SERVICE_API"
         DEPENDENCIES
             RTIConnextDDS::routing_service_c
             RTIConnextDDS::cpp_api
@@ -1960,7 +1960,7 @@ if(RTIConnextDDS_FOUND)
     # The Routing Service CPP2 libraries are the C libraries + the CPP2 API
     create_connext_imported_target(
         TARGET "routing_service_cpp2"
-        VAR "ROUTING_SERVICE_LIBRARIES"
+        VAR "ROUTING_SERVICE_API"
         DEPENDENCIES
             RTIConnextDDS::routing_service_c
             RTIConnextDDS::cpp2_api
