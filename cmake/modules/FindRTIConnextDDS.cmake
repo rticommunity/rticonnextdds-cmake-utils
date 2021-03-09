@@ -2016,10 +2016,12 @@ if(RTIConnextDDS_FOUND)
             ${dependencies}
     )
 
-    # Create an alias for the regular Routing Service libs
-    add_library(RTIConnextDDS::routing_service ALIAS
-        RTIConnextDDS::routing_service_c
-    )
+    if(TARGET RTIConnextDDS::routing_service_c)
+        # Create an alias for the regular Routing Service libs
+        add_library(RTIConnextDDS::routing_service ALIAS
+            RTIConnextDDS::routing_service_c
+        )
+    endif()
 
     # The Routing Service CPP libraries are the C libraries + the CPP API
     create_connext_imported_target(
