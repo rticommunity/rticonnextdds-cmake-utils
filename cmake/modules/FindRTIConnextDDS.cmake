@@ -1058,7 +1058,10 @@ string(REGEX MATCH
     "${build_id_line}"
 )
 string(REGEX MATCH
-    "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"
+    # Double scape was added for the last digit because the CMake regex
+    # engine gets the following characters. Doing this, everything works
+    # properly
+    "[0-9]+\.[0-9]+\.[0-9]+(\\.[0-9]+)?"
     RTICONNEXTDDS_VERSION
     "${CONNEXTDDS_BUILD_ID}"
 )
