@@ -99,6 +99,8 @@
 #   rticonnextmsgc and rtixml2).
 # - ``RTIConnextDDS::rtixml2``
 #   The RTI XML2 library if found (rtixml2).
+# - ``RTIConnextDDS::apputils_c``.
+#   The APP Utils C library (rtiapputils).
 # - ``RTIConnextDDS::low_bandwidth_discovery_static``
 #   The Discovery Static library for Low Bandwidth Plugins if found
 #   (nddsdiscoverystatic).
