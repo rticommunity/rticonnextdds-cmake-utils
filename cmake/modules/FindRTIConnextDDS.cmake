@@ -22,12 +22,12 @@
 # - assign_transformation
 # - security_plugins
 # - monitoring_libraries
+# - distributed_logger
 # - nddstls
 # - transport_tcp
 # - transport_tls
 # - transport_wan
 # - recording_service
-# - rtixml2
 # - low_bandwidth_plugins
 # - rtizrtps
 #
@@ -179,29 +179,23 @@
 #   - ``MESSAGING_CPP2``
 #     (e.g, ``MESSAGING_CPP2_API_LIBRARIES_RELEASE_STATIC``)
 #
-# - ``distributed_loger`` component:
-#   - ``DISTRIBUTED_LOGGER_C``
-#     (e.g., ``DISTRIBUTED_LOGGER_C_LIBRARIES_RELEASE_STATIC)
-#   - ``DISTRIBUTED_LOGGER_CPP``
-#     (e.g., ``DISTRIBUTED_LOGGER_CPP_LIBRARIES_RELEASE_STATIC)
-#
-# - ``metp`` component:
-#   - ``METP``
-#     (e.g., ``METP_LIBRARIES_RELEASE_STATIC``)
+# - ``security_plugins`` component:
+#   - ``SECURITY_PLUGINS``
+#     (e.g., ``SECURITY_PLUGINS_LIBRARIES_RELEASE_STATIC``)
 #
 # - ``routing_service`` component:
 #   - ``ROUTING_SERVICE_API``
 #     (e.g., ``ROUTING_SERVICE_API_LIBRARIES_RELEASE_STATIC``)
 #   - ``ROUTING_SERVICE_INFRASTRUCTURE``
 #     (e.g., ``ROUTING_SERVICE_INFRASTRUCTURE_LIBRARIES_RELEASE_STATIC``)
-#
-# - ``assign_transformation`` component:
 #   - ``ASSIGN_TRANSFORMATION``
 #     (e.g., ``ASSIGN_TRANSFORMATION_LIBRARIES_RELEASE_STATIC``)
 #
-# - ``security_plugins`` component:
-#   - ``SECURITY_PLUGINS``
-#     (e.g., ``SECURITY_PLUGINS_LIBRARIES_RELEASE_STATIC``)
+# - ``distributed_loger`` component:
+#   - ``DISTRIBUTED_LOGGER_C``
+#     (e.g., ``DISTRIBUTED_LOGGER_C_LIBRARIES_RELEASE_STATIC)
+#   - ``DISTRIBUTED_LOGGER_CPP``
+#     (e.g., ``DISTRIBUTED_LOGGER_CPP_LIBRARIES_RELEASE_STATIC)
 #
 # - ``monitoring_libraries`` component:
 #   - ``MONITORING_LIBRARIES``
@@ -226,10 +220,6 @@
 # - ``recording_service`` component:
 #   - ``RECORDING_SERVICE_API``
 #     (e.g., ``RECORDING_SERVICE_API_LIBRARIES_RELEASE_STATIC``)
-#
-# - ``rtixml2`` component:
-#   - ``RTIXML2``
-#     (e.g., ``RTIXML2_LIBRARIES_RELEASE_STATIC``)
 #
 # - ``low_bandwidth_plugins`` component:
 #   - ``LOW_BANDWIDTH_DISCOVERY_STATIC``
@@ -1211,16 +1201,53 @@ set(CONNEXTDDS_INCLUDE_DIRS
 get_all_library_variables("nddscore" "CONNEXTDDS_CORE")
 
 # Find all flavors of nddsc and nddscore
-set(c_api_libs "nddsc" "nddscore")
+set(c_api_libs
+    "nddsc"
+    "nddscore"
+)
 get_all_library_variables("${c_api_libs}" "CONNEXTDDS_C_API")
 
 # Find all flavors of nddscpp and nddscore
-set(cpp_api_libs "nddscpp" "nddsc" "nddscore")
+set(cpp_api_libs
+    "nddscpp"
+    "nddsc"
+    "nddscore"
+)
 get_all_library_variables("${cpp_api_libs}" "CONNEXTDDS_CPP_API")
 
 # Find all flavors of nddscpp2 and nddscore
-set(cpp2_api_libs "nddscpp2" "nddsc" "nddscore")
+set(cpp2_api_libs
+    "nddscpp2"
+    "nddsc"
+    "nddscore"
+)
 get_all_library_variables("${cpp2_api_libs}" "CONNEXTDDS_CPP2_API")
+
+# Find all flavors of libnddsmetp
+set(metp_libs
+    "nddsmetp"
+    "nddsc"
+    "nddscore"
+)
+get_all_library_variables("${metp_libs}" "METP")
+
+# Find all flavors of librtixml2
+set(rtixml2_libs
+    "rtixml2"
+    "nddsc"
+    "nddscore"
+)
+get_all_library_variables("${rtixml2_libs}" "RTIXML2")
+
+# Find all flavors of librtiapputilsc
+set(librtiapputilsc_libs
+    "rtiapputilsc"
+    "rtixml2"
+    "nddsc"
+    "nddscore"
+)
+get_all_library_variables("${librtiapputilsc_libs}" "RTIAPPUTILS_C")
+
 
 if(CONNEXTDDS_CORE_FOUND AND CONNEXTDDS_C_API_FOUND)
     set(RTIConnextDDS_core_FOUND TRUE)
@@ -1231,7 +1258,12 @@ endif()
 #####################################################################
 # Distributed Logger Component Variables                            #
 #####################################################################
-if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS)
+# Routing Service depends on Distributed Logger and Recording Service in
+# Routing Service
+if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
+)
 
     # Find all flavors of rtidlc
     set(distributed_logger_c_libs "rtidlc" "nddsc" "nddscore")
@@ -1265,22 +1297,49 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     endif()
 endif()
 
+
 #####################################################################
-# METP Library Component Variables                                  #
+# Messaging Component Variables                                     #
 #####################################################################
-if(metp IN_LIST RTIConnextDDS_FIND_COMPONENTS)
-    # Find all flavors of libnddsmetp
-    set(metp_libs
-        "nddsmetp"
+# Routing Service depends on the Messaging API and Recording Service depends
+# on Routing Service
+if(messaging_api IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
+)
+    list(APPEND rti_versions_field_names_host
+        "request_reply_host"
+    )
+    list(APPEND rti_versions_field_names_target
+        "request_reply"
+    )
+
+    # Find all flavors of librticonnextmsgc
+    set(messaging_c_api_libs "rticonnextmsgc" "nddsc" "nddscore")
+    get_all_library_variables("${messaging_c_api_libs}" "MESSAGING_C_API")
+
+    # Find all flavors of librticonnextmsgcpp
+    set(messaging_cpp_api_libs "rticonnextmsgcpp" "nddscpp" "nddsc" "nddscore")
+    get_all_library_variables("${messaging_cpp_api_libs}" "MESSAGING_CPP_API")
+
+    # Find all flavors of librticonnextmsgcpp2
+    set(messaging_cpp2_api_libs
+        "rticonnextmsgcpp2"
+        "nddscpp2"
         "nddsc"
         "nddscore"
     )
-    get_all_library_variables("${metp_libs}" "METP")
+    get_all_library_variables(
+        "${messaging_cpp2_api_libs}"
+        "MESSAGING_CPP2_API"
+    )
 
-    if(METP_FOUND)
-        set(RTIConnextDDS_metp_FOUND TRUE)
+    if(MESSAGING_C_API_FOUND AND MESSAGING_CPP_API_FOUND AND
+        MESSAGING_CPP2_API_FOUND
+    )
+        set(RTIConnextDDS_messaging_api_FOUND TRUE)
     else()
-        set(RTIConnextDDS_metp_FOUND FALSE)
+        set(RTIConnextDDS_messaging_api_FOUND FALSE)
     endif()
 endif()
 
@@ -1288,7 +1347,10 @@ endif()
 #####################################################################
 # Routing Service Component Variables                               #
 #####################################################################
-if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
+# Recording Service depends on Routing Service
+if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
+)
     # Add fields associated with the routing_service component
     list(APPEND rti_versions_field_names_host
         "routing_service_host"
@@ -1316,12 +1378,20 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     )
 
     set(addon_dependencies)
-    if(RTIConnextDDS_metp_FOUND)
-        set(addon_dependencies "nddsmetp")
+    if(METP_LIBRARIES)
+        list(APPEND addon_dependencies "nddsmetp")
+    endif()
+
+    if(RTIXML2_LIBRARIES)
+        list(APPEND addon_dependencies "rtixml2")
+    endif()
+
+    if(RTIAPPUTILS_C_LIBRARIES)
+        list(APPEND addon_dependencies "apputils_c")
     endif()
 
     if(RTIConnextDDS_distributed_logger_FOUND)
-        set(addon_dependencies "${addon_dependencies}" "rtidlc")
+        list(APPEND addon_dependencies "rtidlc")
     endif()
 
     # Find all flavors of librtiroutingservice
@@ -1329,7 +1399,6 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "rtiroutingservice"
         "rtirsinfrastructure"
         ${addon_dependencies}
-        "rtixml2"
         "rticonnextmsgc"
         "nddsc"
         "nddscore"
@@ -1343,18 +1412,6 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         set(ROUTING_SERVICE_API_FOUND TRUE)
     endif()
 
-    if(ROUTING_SERVICE_API_FOUND)
-        set(RTIConnextDDS_routing_service_FOUND TRUE)
-    else()
-        set(RTIConnextDDS_routing_service_FOUND FALSE)
-    endif()
-
-endif()
-
-#####################################################################
-# Assign Transformation Component Variables                         #
-#####################################################################
-if(assign_transformation IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     # Find all flavors of librtirsassigntransf
     set(assign_transformation_libs
         "rtirsassigntransf"
@@ -1367,46 +1424,14 @@ if(assign_transformation IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "ASSIGN_TRANSFORMATION"
     )
 
-    if(ASSIGN_TRANSFORMATION_FOUND)
-        set(RTIConnextDDS_assign_transformation_FOUND TRUE)
+    if(ROUTING_SERVICE_API_FOUND)
+        set(RTIConnextDDS_routing_service_FOUND TRUE)
     else()
-        set(RTIConnextDDS_assign_transformation_FOUND FALSE)
+        set(RTIConnextDDS_routing_service_FOUND FALSE)
     endif()
+
 endif()
 
-#####################################################################
-# Messaging Component Variables                                     #
-#####################################################################
-if(messaging_api IN_LIST RTIConnextDDS_FIND_COMPONENTS)
-    list(APPEND rti_versions_field_names_host
-            "request_reply_host")
-    list(APPEND rti_versions_field_names_target
-            "request_reply")
-
-    # Find all flavors of librticonnextmsgc
-    set(messaging_c_api_libs "rticonnextmsgc" "nddsc" "nddscore")
-    get_all_library_variables("${messaging_c_api_libs}" "MESSAGING_C_API")
-
-    # Find all flavors of librticonnextmsgcpp
-    set(messaging_cpp_api_libs "rticonnextmsgcpp" "nddscpp" "nddsc" "nddscore")
-    get_all_library_variables("${messaging_cpp_api_libs}" "MESSAGING_CPP_API")
-
-    # Find all flavors of librticonnextmsgcpp2
-    set(messaging_cpp2_api_libs
-        "rticonnextmsgcpp2"
-        "nddscpp2"
-        "nddsc"
-        "nddscore")
-    get_all_library_variables("${messaging_cpp2_api_libs}"
-        "MESSAGING_CPP2_API")
-
-    if(MESSAGING_C_API_FOUND AND MESSAGING_CPP_API_FOUND AND
-        MESSAGING_CPP2_API_FOUND)
-        set(RTIConnextDDS_messaging_api_FOUND TRUE)
-    else()
-        set(RTIConnextDDS_messaging_api_FOUND FALSE)
-    endif()
-endif()
 
 #####################################################################
 # Security Plugins Component Variables                              #
@@ -1587,28 +1612,6 @@ if(recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     endif()
 endif()
 
-#####################################################################
-# rtixml2 Library Component Variables                               #
-#####################################################################
-if(rtixml2 IN_LIST RTIConnextDDS_FIND_COMPONENTS)
-    if(WIN32)
-        message(FATAL_ERROR "rtixml2 component is not supported for Windows")
-    endif()
-
-    # Find all flavors of librtixml2
-    set(rtixml2_libs
-        "rtixml2"
-        "nddsc"
-        "nddscore"
-    )
-    get_all_library_variables("${rtixml2_libs}" "RTIXML2")
-
-    if(RTIXML2_FOUND)
-        set(RTIConnextDDS_rtixml2_FOUND TRUE)
-    else()
-        set(RTIConnextDDS_rtixml2_FOUND FALSE)
-    endif()
-endif()
 
 #####################################################################
 # Low Bandwidth Pluggins Component Variables                        #
@@ -1801,7 +1804,7 @@ if(RTIConnextDDS_FOUND)
             RTIConnextDDS::c_api
     )
 
-    # Metp
+    # RTIXML2
     create_connext_imported_target(
         TARGET "rtixml2"
         VAR "RTIXML2"
@@ -1809,6 +1812,13 @@ if(RTIConnextDDS_FOUND)
             RTIConnextDDS::c_api
     )
 
+    # RTIAPPUTILS_C
+    create_connext_imported_target(
+        TARGET "apputils_c"
+        VAR "RTIAPPUTILS_C"
+        DEPENDENCIES
+            RTIConnextDDS::c_api
+    )
 
     ###################### Distributed Logger targets ######################
     # Distributed Logger C API
@@ -2012,12 +2022,19 @@ if(RTIConnextDDS_FOUND)
         )
     endif()
 
+    if(TARGET RTIConnextDDS::apputils_c)
+        list(APPEND dependencies
+            RTIConnextDDS::apputils_c
+        )
+    endif()
+
     create_connext_imported_target(
         TARGET "routing_service_c"
         VAR "ROUTING_SERVICE_API"
         DEPENDENCIES
             ${dependencies}
     )
+
 
     if(TARGET RTIConnextDDS::routing_service_c)
         # Create an alias for the regular Routing Service libs
