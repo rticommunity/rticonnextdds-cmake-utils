@@ -101,6 +101,8 @@
 #   The RTI XML2 library if found (rtixml2).
 # - ``RTIConnextDDS::apputils_c``.
 #   The APP Utils C library (rtiapputils).
+# - ``RTIConnextDDS::rtisqlite``.
+#   The RTI SQLite library (rtisqlite).
 # - ``RTIConnextDDS::low_bandwidth_discovery_static``
 #   The Discovery Static library for Low Bandwidth Plugins if found
 #   (nddsdiscoverystatic).
@@ -1250,6 +1252,8 @@ set(librtiapputilsc_libs
 )
 get_all_library_variables("${librtiapputilsc_libs}" "RTIAPPUTILS_C")
 
+# Find all flavors of rtisqlite
+get_all_library_variables("rtisqlite" "RTISQLITE")
 
 if(CONNEXTDDS_CORE_FOUND AND CONNEXTDDS_C_API_FOUND)
     set(RTIConnextDDS_core_FOUND TRUE)
@@ -1818,6 +1822,14 @@ if(RTIConnextDDS_FOUND)
     create_connext_imported_target(
         TARGET "apputils_c"
         VAR "RTIAPPUTILS_C"
+        DEPENDENCIES
+            RTIConnextDDS::c_api
+    )
+
+    # RTISQLITE
+    create_connext_imported_target(
+        TARGET "rtisqlite"
+        VAR "RTISQLITE"
         DEPENDENCIES
             RTIConnextDDS::c_api
     )
