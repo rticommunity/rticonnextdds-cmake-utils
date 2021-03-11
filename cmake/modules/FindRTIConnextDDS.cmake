@@ -957,9 +957,11 @@ function(create_connext_imported_target)
 
     if(WIN32
         AND NOT BUILD_SHARED_LIBS
-        AND ${_CONNEXT_TARGET} STREQUAL "routing_service_c")
+        AND ${_CONNEXT_TARGET} STREQUAL "routing_service_c"
+        AND RTICONNEXTDDS_VERSION VERSION_LESS "6.0.0"
+    )
         # ROUTING-276: Routing Service is not available as a static library
-        # for Windows
+        # for Windows until 6.0.0
         return()
     endif()
 
@@ -1409,9 +1411,10 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     get_all_library_variables("${routing_service_libs}" "ROUTING_SERVICE_API")
 
     if(WIN32 AND ROUTING_SERVICE_API_RELEASE_STATIC AND
-            ROUTING_SERVICE_API_DEBUG_STATIC)
+        ROUTING_SERVICE_API_DEBUG_STATIC AND
+        RTICONNEXTDDS_VERSION VERSION_LESS "6.0.0")
         # ROUTING-276: Routing Service is not available as a static library
-        # for Windows
+        # for Windows until 6.0.0
         set(ROUTING_SERVICE_API_FOUND TRUE)
     endif()
 
