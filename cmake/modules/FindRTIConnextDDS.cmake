@@ -1590,9 +1590,15 @@ endif()
 # Recording Service API Component Variables                         #
 #####################################################################
 if(recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
-    # Find all flavors of librtirecordingservice
-    set(recording_service_libs
-        "rtirecordingservice"
+    # Find all flavors of librtirecordingservicecore
+
+    if(RTICONNEXTDDS_VERSION VERSION_GREATER_EQUAL "6.1.0")
+        set(recording_service_libs "rtirecordingservicecore")
+    else()
+        set(recording_service_libs "rtirecordingservice")
+    endif()
+
+    list(APPEND recording_service_libs
         "rtiroutingservice"
         "rtirsinfrastructure"
         "nddscpp2"
@@ -2046,13 +2052,14 @@ if(RTIConnextDDS_FOUND)
             ${dependencies}
     )
 
-
-    if(TARGET RTIConnextDDS::routing_service_c)
-        # Create an alias for the regular Routing Service libs
-        add_library(RTIConnextDDS::routing_service ALIAS
-            RTIConnextDDS::routing_service_c
-        )
-    endif()
+    # We create a similar target to the Routing Service C API but with another
+    # nombre for backward compatibility
+    create_connext_imported_target(
+        TARGET "routing_service"
+        VAR "ROUTING_SERVICE_API"
+        DEPENDENCIES
+            ${dependencies}
+    )
 
     # The Routing Service CPP libraries are the C libraries + the CPP API
     create_connext_imported_target(
