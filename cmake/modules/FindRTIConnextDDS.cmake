@@ -1293,7 +1293,9 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
         set(RTIConnextDDS_distributed_logger_FOUND TRUE)
 
         if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND
-            CMAKE_COMPILER_VERSION VERSION_GREATER "4.6.0")
+            CMAKE_COMPILER_VERSION VERSION_GREATER "4.6.0" AND
+            RTICONNEXTDDS_VERSION VERSION_LESS "6.1.0"
+        )
            set(CONNEXTDDS_EXTERNAL_LIBS
                -Wl,--no-as-needed  ${CONNEXTDDS_EXTERNAL_LIBS})
         endif()
@@ -1361,7 +1363,7 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
         "routing_service_host"
         "routing_service"
     )
-    if(RTIConnextDDS_FIND_VERSION VERSION_GREATER 5.3.0.8)
+    if(RTICONNEXTDDS_VERSION VERSION_GREATER 5.3.0.8)
         list(APPEND rti_versions_field_names_host
             "routing_service_sdk_jars"
         )
