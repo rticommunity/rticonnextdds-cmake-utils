@@ -655,8 +655,6 @@ if(NOT CONNEXTDDS_ARCH)
             RELATIVE "${CONNEXTDDS_DIR}/lib"
             "${CONNEXTDDS_DIR}/lib/*")
 
-        message(STATUS "${architectures_installed}")
-
         foreach(architecture_name ${architectures_installed})
             if(architecture_name STREQUAL "java")
                 # Because the lib folder contains both target libraries and
