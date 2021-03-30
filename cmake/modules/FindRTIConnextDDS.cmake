@@ -656,10 +656,14 @@ if(NOT CONNEXTDDS_ARCH)
             "${CONNEXTDDS_DIR}/lib/*")
 
         foreach(architecture_name ${architectures_installed})
-            # Because the lib folder contains both target libraries and
-            # Java JAR files, here we exclude the "java" in our algorithm
-            # to guess the appropriate CONNEXTDDS_ARCH variable.
             if(architecture_name STREQUAL "java")
+                # Because the lib folder contains both target libraries and
+                # Java JAR files, here we exclude the "java" in our algorithm
+                # to guess the appropriate CONNEXTDDS_ARCH variable.
+                continue()
+            elseif(NOT "${architecture_name}" MATCHES "^[A-Za-z0-9]")
+                # Sometimes, some hidden or temporary folders/files are
+                # created. We skip them
                 continue()
             elseif("${architecture_name}" MATCHES ${CMAKE_HOST_SYSTEM_NAME})
                     if(CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
@@ -1186,18 +1190,20 @@ list(APPEND rti_versions_field_names_target
     "target_libraries"
 )
 
-# Define CONNEXTDDS_INCLUDE_DIRS
-find_path(CONNEXTDDS_INCLUDE_DIRS
+find_path(CONNEXTDDS_BASE_INCLUDE_DIRS
     NAMES
         "ndds_c.h"
     PATHS
         "${CONNEXTDDS_DIR}/include/ndds"
 )
 
-set(CONNEXTDDS_INCLUDE_DIRS
+# Define CONNEXTDDS_INCLUDE_DIRS
+set(CONNEXTDDS_INCLUDE_DIRS)
+
+list(APPEND CONNEXTDDS_INCLUDE_DIRS
     "${CONNEXTDDS_DIR}/include"
-    ${CONNEXTDDS_INCLUDE_DIRS}
-    "${CONNEXTDDS_INCLUDE_DIRS}/hpp"
+    ${CONNEXTDDS_BASE_INCLUDE_DIRS}
+    "${CONNEXTDDS_BASE_INCLUDE_DIRS}/hpp"
 )
 
 # Find all flavors of nddscore
@@ -1479,9 +1485,9 @@ if(security_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
 
         # Add OpenSSL include directories to the list of
         # CONNEXTDDS_INCLUDE_DIRS
-        set(CONNEXTDDS_INCLUDE_DIRS
+        list(APPEND CONNEXTDDS_INCLUDE_DIRS
             "${OPENSSL_INCLUDE_DIR}"
-            ${CONNEXTDDS_INCLUDE_DIRS})
+        )
 
         # Add OpenSSL libraries to the list of CONNEXTDDS_EXTERNAL_LIBS
         set(CONNEXTDDS_EXTERNAL_LIBS
