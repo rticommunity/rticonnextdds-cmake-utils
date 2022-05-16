@@ -1539,7 +1539,8 @@ if(security_plugins_wolfssl IN_LIST RTIConnextDDS_FIND_COMPONENTS)
             find_package(WolfSSL
                 REQUIRED ${CONNEXTDDS_WOLFSSL_VERSION}
                 PATHS
-                    "${CONNEXTDDS_WOLFSSL_DIR}")
+                    "${CONNEXTDDS_WOLFSSL_DIR}"
+            )
         elseif(CONNEXTDDS_WOLFSSL_VERSION)
             find_package(WolfSSL REQUIRED ${CONNEXTDDS_WOLFSSL_VERSION})
         else()
