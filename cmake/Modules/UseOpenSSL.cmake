@@ -596,10 +596,10 @@ function(connextdds_openssl_generate_selfsigned_ca)
                 -out ${_OPENSSL_OUTPUT_CERT_FILE}
         COMMAND
             ${CMAKE_COMMAND} -DCONTENT=01 -DOUTPUT=${cert_dir}/serial
-                -P ${CONNEXTDDS_RESOURCE_DIR}/cmake/Scripts/WriteFile.cmake
+                -P ${CONNEXTDDS_CMAKE_UTILS_DIR}/cmake/Scripts/WriteFile.cmake
         COMMAND
             ${CMAKE_COMMAND} -DCONTENT=01 -DOUTPUT=${_OPENSSL_CRL_NUMBER_FILE}
-                -P ${CONNEXTDDS_RESOURCE_DIR}/cmake/Scripts/WriteFile.cmake
+                -P ${CONNEXTDDS_CMAKE_UTILS_DIR}/cmake/Scripts/WriteFile.cmake
         DEPENDS
             "${ca_key_dep}"
             "${_OPENSSL_CONFIG_FILE}"
@@ -733,10 +733,10 @@ function(connextdds_openssl_generate_signed_ca)
                 -out ${_OPENSSL_OUTPUT_CERT_FILE}
         COMMAND
             ${CMAKE_COMMAND} -DCONTENT=01 -DOUTPUT=${cert_dir}/serial
-                -P ${CONNEXTDDS_RESOURCE_DIR}/cmake/Scripts/WriteFile.cmake
+                -P ${CONNEXTDDS_CMAKE_UTILS_DIR}/cmake/Scripts/WriteFile.cmake
         COMMAND
             ${CMAKE_COMMAND} -DCONTENT=01 -DOUTPUT=${_OPENSSL_CRL_NUMBER_FILE}
-                -P ${CONNEXTDDS_RESOURCE_DIR}/cmake/Scripts/WriteFile.cmake
+                -P ${CONNEXTDDS_CMAKE_UTILS_DIR}/cmake/Scripts/WriteFile.cmake
         DEPENDS
             "${ca_key_dep}"
             "${_OPENSSL_CONFIG_FILE}"
@@ -926,7 +926,7 @@ function(connextdds_openssl_generate_signed_certificate)
                 ${CMAKE_COMMAND}
                     -DOUTPUT=${_OPENSSL_OUTPUT_PEM_FILE}
                     "-DINPUTS=${pem_file_input}"
-                    -P ${CONNEXTDDS_RESOURCE_DIR}/cmake/Scripts/Concatenate.cmake
+                    -P ${CONNEXTDDS_CMAKE_UTILS_DIR}/cmake/Scripts/Concatenate.cmake
             DEPENDS
                 "${pem_file_input}"
             VERBATIM
@@ -997,7 +997,7 @@ function(connextdds_openssl_revoke_certificate)
                     -revoke ${certFile}
             COMMAND
                 ${CMAKE_COMMAND} -DCONTENT=1 -DOUTPUT=${certFile}Revoked
-                    -P ${CONNEXTDDS_RESOURCE_DIR}/cmake/Scripts/WriteFile.cmake
+                    -P ${CONNEXTDDS_CMAKE_UTILS_DIR}/cmake/Scripts/WriteFile.cmake
             DEPENDS
                 "${_OPENSSL_CA_DATABASE_INDEX}"
         )
@@ -1101,7 +1101,7 @@ function(connextdds_openssl_generate_simplified_certificate)
             ${CMAKE_COMMAND}
                 "-DOUTPUT=${_OPENSSL_OUTPUT}"
                 "-DINPUT=${_OPENSSL_INPUT}"
-                -P ${CONNEXTDDS_RESOURCE_DIR}/cmake/Scripts/SimplifyCertificate.cmake
+                -P ${CONNEXTDDS_CMAKE_UTILS_DIR}/cmake/Scripts/SimplifyCertificate.cmake
         DEPENDS
             "${_OPENSSL_INPUT}"
     )
