@@ -144,17 +144,17 @@ pipeline {
 
                         rtDownload(
                             serverId: 'rti-artifactory',
-                            spec: """{
+                            spec: '''{
                                 "files": [
                                 {
                                     "pattern": "connext-ci/pro/weekly/",
-                                    "props": "rti.artifact.architecture=${env.CONNEXTDDS_ARCH};rti.artifact.kind=staging",
+                                    "props": "rti.artifact.architecture=$env.CONNEXTDDS_ARCH;rti.artifact.kind=staging",
                                     "sortBy": ["created"],
                                     "sortOrder": "desc",
                                     "limit": 1,
                                     "flat": true
                                 }]
-                            }""",
+                            }''',
                         )
 
                         // We cannot use the explode option because it is bugged.
