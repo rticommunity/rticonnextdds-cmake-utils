@@ -159,7 +159,7 @@ pipeline {
 
                         // We cannot use the explode option because it is bugged.
                         // https://www.jfrog.com/jira/browse/HAP-1154
-                        sh("tar zxvf connextdds-staging-${env.CONNEXTDDS_ARCH}.tgz unlicensed/")
+                        sh('tar zxvf connextdds-staging-$CONNEXTDDS_ARCH.tgz unlicensed/')
 
                         writeJenkinsOutput()
                     }
