@@ -46,19 +46,7 @@ pipeline {
             }
         }
 
-        stage('Build sequence') {
-            agent {
-                dockerfile {
-                    filename 'resources/docker/Dockerfile.x64Linux'
-                    label 'docker'
-                }
-            }
-
-            environment {
-                RTI_INSTALLATION_PATH = "${WORKSPACE}/unlicensed"
-                RTI_LOGS_FILE = "${WORKSPACE}/output_logs.txt"
-            }
-
+        stage('Checkouts') {
             stages {
                 stage('Checkout Examples repository') {
                     steps {
@@ -93,6 +81,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Checkout CMake Utils repository') {
                     steps {
                         checkout([
@@ -116,6 +105,23 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+
+        stage('Build sequence') {
+            agent {
+                dockerfile {
+                    filename 'resources/docker/Dockerfile.x64Linux'
+                    label 'docker'
+                }
+            }
+
+            environment {
+                RTI_INSTALLATION_PATH = "${WORKSPACE}/unlicensed"
+                RTI_LOGS_FILE = "${WORKSPACE}/output_logs.txt"
+            }
+
+            stages {
                 stage('Download Packages') {
                     steps {
                         writeJenkinsOutput()
