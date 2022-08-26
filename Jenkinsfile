@@ -70,9 +70,9 @@ pipeline {
                         )
                         checkout([
                             $class: 'GitSCM',
-                            branches: [[name: 'master']],
+                            branches: [[name: 'feature/503-cmake-utils-git-submodule']],
                             userRemoteConfigs: [[
-                                url: 'https://github.com/rticommunity/rticonnextdds-examples.git'
+                                url: 'https://github.com/lulivi/rticonnextdds-examples.git'
                             ]],
                             extensions: [[
                                 $class: 'SubmoduleOption',
