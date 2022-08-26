@@ -47,6 +47,8 @@ pipeline {
         }
 
         stage('Checkouts') {
+            agent any
+
             stages {
                 stage('Checkout Examples repository') {
                     steps {
