@@ -86,13 +86,9 @@ pipeline {
 
                 stage('Checkout CMake Utils repository') {
                     steps {
-                        checkout([
-                            $class: 'GitSCM',
-                            extensions: [[
-                                $class: 'RelativeTargetDirectory',
-                                relativeTargetDir: 'resources/cmake/rticonnextdds-cmake-utils',
-                            ]]
-                        ])
+                        dir('resources/cmake/rticonnextdds-cmake-utils/') {
+                            checkout(scm)
+                        }
                     }
 
                     post {
