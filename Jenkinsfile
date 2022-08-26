@@ -55,6 +55,66 @@ pipeline {
             }
         }
 
+        stage('Checkouts') {
+            agent any
+
+            stages {
+                stage('Checkout Examples repository') {
+                    steps {
+                        publishChecks(
+                            name: 'Waiting for executor',
+                            title: 'Passed',
+                            summary: ':white_check_mark: Build started.',
+                            detailsURL: detailsUrl,
+                        )
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: 'feature/503-cmake-utils-git-submodule']],
+                            userRemoteConfigs: [[
+                                url: 'https://github.com/lulivi/rticonnextdds-examples.git'
+                            ]],
+                            extensions: [[
+                                $class: 'SubmoduleOption',
+                                recursiveSubmodules: false,
+                            ]]
+                        ])
+                    }
+
+                    post {
+                        failure {
+                            publishChecks(
+                                name: STAGE_NAME,
+                                title: 'Failed',
+                                summary: ':warning: Failed cloning the Examples repository..',
+                                conclusion: 'FAILURE',
+                                detailsURL: detailsUrl,
+                            )
+                        }
+                    }
+                }
+
+                stage('Checkout CMake Utils repository') {
+                    steps {
+                        dir("${cmakeUtilsRepoDir}") {
+                            checkout(scm)
+                        }
+                    }
+
+                    post {
+                        failure {
+                            publishChecks(
+                                name: STAGE_NAME,
+                                title: 'Failed',
+                                summary: ':warning: Failed cloning the CMake Utils repository.',
+                                conclusion: 'FAILURE',
+                                detailsURL: detailsUrl,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Build sequence') {
             agent {
                 dockerfile {
@@ -69,64 +129,6 @@ pipeline {
             }
 
             stages {
-                stage('Checkouts') {
-                    stages {
-                        stage('Checkout Examples repository') {
-                            steps {
-                                publishChecks(
-                                    name: 'Waiting for executor',
-                                    title: 'Passed',
-                                    summary: ':white_check_mark: Build started.',
-                                    detailsURL: detailsUrl,
-                                )
-                                checkout([
-                                    $class: 'GitSCM',
-                                    branches: [[name: 'feature/503-cmake-utils-git-submodule']],
-                                    userRemoteConfigs: [[
-                                        url: 'https://github.com/lulivi/rticonnextdds-examples.git'
-                                    ]],
-                                    extensions: [[
-                                        $class: 'SubmoduleOption',
-                                        recursiveSubmodules: false,
-                                    ]]
-                                ])
-                            }
-
-                            post {
-                                failure {
-                                    publishChecks(
-                                        name: STAGE_NAME,
-                                        title: 'Failed',
-                                        summary: ':warning: Failed cloning the Examples repository..',
-                                        conclusion: 'FAILURE',
-                                        detailsURL: detailsUrl,
-                                    )
-                                }
-                            }
-                        }
-
-                        stage('Checkout CMake Utils repository') {
-                            steps {
-                                dir("${cmakeUtilsRepoDir}") {
-                                    checkout(scm)
-                                }
-                            }
-
-                            post {
-                                failure {
-                                    publishChecks(
-                                        name: STAGE_NAME,
-                                        title: 'Failed',
-                                        summary: ':warning: Failed cloning the CMake Utils repository.',
-                                        conclusion: 'FAILURE',
-                                        detailsURL: detailsUrl,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
                 stage('Download Packages') {
                     steps {
                         writeJenkinsOutput()
