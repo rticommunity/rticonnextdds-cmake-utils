@@ -140,24 +140,31 @@ pipeline {
                             detailsURL: detailsUrl,
                         )
 
+                        script {
+                            String connextdds_arch = sh(
+                                returnStdout: true,
+                                script: 'echo -n $CONNEXTDDS_ARCH',
+                            )
+                        }
+
                         rtDownload(
                             serverId: 'rti-artifactory',
-                            spec: '''{
+                            spec: """{
                                 "files": [
                                 {
                                     "pattern": "connext-ci/pro/weekly/",
-                                    "props": "rti.artifact.architecture=$CONNEXTDDS_ARCH;rti.artifact.kind=staging",
+                                    "props": "rti.artifact.architecture=${connextdds_arch};rti.artifact.kind=staging",
                                     "sortBy": ["created"],
                                     "sortOrder": "desc",
                                     "limit": 1,
                                     "flat": true
                                 }]
-                            }''',
+                            }""",
                         )
 
                         // We cannot use the explode option because it is bugged.
                         // https://www.jfrog.com/jira/browse/HAP-1154
-                        sh('tar zxvf connextdds-staging-$CONNEXTDDS_ARCH.tgz unlicensed/')
+                        sh("tar zxvf connextdds-staging-${connextdds_arch}.tgz unlicensed/")
 
                         writeJenkinsOutput()
                     }
