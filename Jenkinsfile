@@ -10,18 +10,27 @@
  * to use the software.
  */
 
+/*
+ * Base URL to show in the App page.
+ */
 String detailsUrl = 'https://community.rti.com/'
 
 /*
+ * Relative directory to the CMake utils repository inside the examples
+ * repository
+ */
+String cmakeUtilsRepoDir = 'resources/cmake/rticonnextdds-cmake-utils'
+
+/*
  * Write the current state of Jenkins.
- **/
+ */
 void writeJenkinsOutput() {
     sh('python3 resources/ci_cd/jenkins_output.py')
 }
 
 /*
  * Read the current contents of jenkins_output.md.
- **/
+ */
 String readJenkinsOutput() {
     return readFile('jenkins_output.md')
 }
@@ -86,7 +95,7 @@ pipeline {
 
                 stage('Checkout CMake Utils repository') {
                     steps {
-                        dir('resources/cmake/rticonnextdds-cmake-utils/') {
+                        dir("${cmakeUtilsRepoDir}") {
                             checkout(scm)
                         }
                     }
@@ -109,7 +118,7 @@ pipeline {
         stage('Build sequence') {
             agent {
                 dockerfile {
-                    filename 'resources/docker/Dockerfile.x64Linux'
+                    filename "${cmakeUtilsRepoDir}/resources/docker/Dockerfile.x64Linux"
                     label 'docker'
                 }
             }
