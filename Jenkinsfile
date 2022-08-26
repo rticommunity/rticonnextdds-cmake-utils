@@ -143,7 +143,7 @@ pipeline {
                         )
 
                         script {
-                            String connextdds_arch = sh(
+                            connextdds_arch = sh(
                                 returnStdout: true,
                                 script: 'echo -n $CONNEXTDDS_ARCH',
                             )
