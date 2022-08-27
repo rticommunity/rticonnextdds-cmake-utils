@@ -82,21 +82,21 @@ pipeline {
             }
 
             post {
+                success {
+                    publishChecks(
+                        name: 'Waiting for the build executor',
+                        title: 'Waiting',
+                        summary: ':hourglass: Waiting for next available executor to build...',
+                        status: 'IN_PROGRESS',
+                        detailsURL: detailsUrl,
+                    )
+                }
                 failure {
                     publishChecks(
                         name: 'Waiting for a clone executor',
                         title: 'Failed',
                         summary: ':warning: Failed cloning the repositories.',
                         conclusion: 'FAILURE',
-                        detailsURL: detailsUrl,
-                    )
-                }
-                passed {
-                    publishChecks(
-                        name: 'Waiting for the build executor',
-                        title: 'Waiting',
-                        summary: ':hourglass: Waiting for next available executor to build...',
-                        status: 'IN_PROGRESS',
                         detailsURL: detailsUrl,
                     )
                 }
