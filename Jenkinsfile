@@ -46,21 +46,23 @@ pipeline {
         stage('Executor Check') {
             steps {
                 publishChecks(
-                    name: 'Waiting for executor',
+                    name: 'Waiting for a clone executor',
                     title: 'Waiting',
-                    summary: ':hourglass: Waiting for next available executor...',
+                    summary: ':hourglass: Waiting for next available executor to clone the repositories...',
                     status: 'IN_PROGRESS',
                     detailsURL: detailsUrl,
                 )
             }
         }
 
-        stage('Checkout Examples repository') {
+        stage('Checkout the repositories') {
+            agent any
+
             steps {
                 publishChecks(
-                    name: 'Waiting for executor',
+                    name: 'Waiting for a clone executor',
                     title: 'Passed',
-                    summary: ':white_check_mark: Build started.',
+                    summary: ':white_check_mark: Clone started.',
                     detailsURL: detailsUrl,
                 )
                 checkout([
@@ -74,23 +76,6 @@ pipeline {
                         recursiveSubmodules: false,
                     ]]
                 ])
-            }
-
-            post {
-                failure {
-                    publishChecks(
-                        name: STAGE_NAME,
-                        title: 'Failed',
-                        summary: ':warning: Failed cloning the Examples repository..',
-                        conclusion: 'FAILURE',
-                        detailsURL: detailsUrl,
-                    )
-                }
-            }
-        }
-
-        stage('Checkout CMake Utils repository') {
-            steps {
                 dir("${cmakeUtilsRepoDir}") {
                     checkout(scm)
                 }
@@ -99,10 +84,19 @@ pipeline {
             post {
                 failure {
                     publishChecks(
-                        name: STAGE_NAME,
+                        name: 'Waiting for a clone executor',
                         title: 'Failed',
-                        summary: ':warning: Failed cloning the CMake Utils repository.',
+                        summary: ':warning: Failed cloning the repositories.',
                         conclusion: 'FAILURE',
+                        detailsURL: detailsUrl,
+                    )
+                }
+                passed {
+                    publishChecks(
+                        name: 'Waiting for the build executor',
+                        title: 'Waiting',
+                        summary: ':hourglass: Waiting for next available executor to build...',
+                        status: 'IN_PROGRESS',
                         detailsURL: detailsUrl,
                     )
                 }
@@ -125,6 +119,13 @@ pipeline {
             stages {
                 stage('Download Connext') {
                     steps {
+                        publishChecks(
+                            name: 'Waiting for the build executor',
+                            title: 'Passed',
+                            summary: ':white_check_mark: Build started.',
+                            detailsURL: detailsUrl,
+                        )
+
                         writeJenkinsOutput()
 
                         publishChecks(
@@ -140,11 +141,12 @@ pipeline {
                             set -o pipefail
                             python3 resources/ci_cd/linux_install.py | tee ${env.RTI_LOGS_FILE}
                         """)
-
-                        writeJenkinsOutput()
                     }
 
                     post {
+                        always {
+                            writeJenkinsOutput()
+                        }
                         success {
                             publishChecks(
                                 name: STAGE_NAME,
