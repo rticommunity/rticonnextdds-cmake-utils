@@ -124,12 +124,11 @@ pipeline {
             }
 
             environment {
-                RTI_INSTALLATION_PATH = "${WORKSPACE}/unlicensed"
                 RTI_LOGS_FILE = "${WORKSPACE}/output_logs.txt"
             }
 
             stages {
-                stage('Download Packages') {
+                stage('Download Connext') {
                     steps {
                         writeJenkinsOutput()
 
@@ -142,31 +141,10 @@ pipeline {
                             detailsURL: detailsUrl,
                         )
 
-                        script {
-                            connextdds_arch = sh(
-                                returnStdout: true,
-                                script: 'echo -n $CONNEXTDDS_ARCH',
-                            )
-                        }
-
-                        rtDownload(
-                            serverId: 'rti-artifactory',
-                            spec: """{
-                                "files": [
-                                {
-                                    "pattern": "connext-ci/pro/weekly/",
-                                    "props": "rti.artifact.architecture=${connextdds_arch};rti.artifact.kind=staging",
-                                    "sortBy": ["created"],
-                                    "sortOrder": "desc",
-                                    "limit": 1,
-                                    "flat": true
-                                }]
-                            }""",
-                        )
-
-                        // We cannot use the explode option because it is bugged.
-                        // https://www.jfrog.com/jira/browse/HAP-1154
-                        sh("tar zxvf connextdds-staging-${connextdds_arch}.tgz unlicensed/")
+                        sh("""#!/bin/bash
+                            set -o pipefail
+                            python3 resources/ci_cd/linux_install.py | tee ${env.RTI_LOGS_FILE}
+                        """)
 
                         writeJenkinsOutput()
                     }
@@ -217,7 +195,7 @@ pipeline {
 
                         sh("""#!/bin/bash
                             set -o pipefail
-                            python3 resources/ci_cd/linux_build.py | tee $RTI_LOGS_FILE
+                            python3 resources/ci_cd/linux_build.py | tee ${env.RTI_LOGS_FILE}
                         """)
                     }
 
