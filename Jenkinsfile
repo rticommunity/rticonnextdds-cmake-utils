@@ -137,10 +137,14 @@ pipeline {
                             detailsURL: detailsUrl,
                         )
 
-                        sh("""#!/bin/bash
-                            set -o pipefail
-                            python3 resources/ci_cd/linux_install.py | tee ${env.RTI_LOGS_FILE}
-                        """)
+                        withCredentials([
+                            string(credentialsId: 'minimal_package_url', variable: 'RTI_MIN_PACKAGE_URL')
+                        ]) {
+                            sh("""#!/bin/bash
+                                set -o pipefail
+                                python3 resources/ci_cd/linux_install.py | tee ${env.RTI_LOGS_FILE}
+                            """)
+                        }
                     }
 
                     post {
