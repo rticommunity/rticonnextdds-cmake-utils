@@ -657,7 +657,7 @@ if(NOT CONNEXTDDS_ARCH)
 
     connextdds_log_verbose("Guessed RTI architecture: ${guessed_architecture}")
 
-    if(ENV{CONNEXTDDS_ARCH})
+    if(DEFINED ENV{CONNEXTDDS_ARCH})
         file(TO_CMAKE_PATH "$ENV{CONNEXTDDS_ARCH}" CONNEXTDDS_ARCH)
     elseif(EXISTS "${CONNEXTDDS_DIR}/lib/${guessed_architecture}")
         set(CONNEXTDDS_ARCH "${guessed_architecture}")
