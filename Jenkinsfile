@@ -129,6 +129,15 @@ pipeline {
                                 detailsURL: detailsUrl,
                             )
                         }
+                        aborted {
+                            publishChecks(
+                                name: STAGE_NAME,
+                                title: checkTitleAborted,
+                                summary: ':warning: Aborted cloning the repositories.',
+                                conclusion: checkConclusionCanceled,
+                                detailsURL: detailsUrl,
+                            )
+                        }
                     }
                 }
                 stage('Download Connext') {
