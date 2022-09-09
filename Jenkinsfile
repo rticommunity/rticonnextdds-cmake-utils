@@ -38,7 +38,9 @@ String readJenkinsOutput() {
 /*
  * Static string variables.
  */
-String waitingForExecutorCheckName = 'Waiting for a build executor'
+String waitingForCloneExecutorCheckName = 'Waiting for a clone executor'
+String waitingForBuildExecutorCheckName = 'Waiting for a build executor'
+String checkTitleWaiting = 'Waiting'
 String checkTitlePassed = 'Passed'
 String checkTitleFailed = 'Failed'
 String checkTitleAborted = 'Aborted'
@@ -57,12 +59,85 @@ pipeline {
         stage('Executor Check') {
             steps {
                 publishChecks(
-                    name: waitingForExecutorCheckName,
-                    title: 'Waiting',
+                    name: waitingForCloneExecutorCheckName,
+                    title: checkTitleWaiting,
                     summary: ':hourglass: Waiting for next available executor to clone the repositories...',
                     status: checkStatusInProgress,
                     detailsURL: detailsUrl,
                 )
+            }
+        }
+
+        stage('Clone repositories') {
+            agent {
+                label 'docker'
+            }
+
+            steps {
+                publishChecks(
+                    name: waitingForCloneExecutorCheckName,
+                    title: checkTitlePassed,
+                    summary: ':white_check_mark: Clone started.',
+                    detailsURL: detailsUrl,
+                )
+
+                publishChecks(
+                    name: STAGE_NAME,
+                    title: 'Cloning',
+                    summary: ':sparkles: Cloning the example and cmake-utils repositories...',
+                    status: checkStatusInProgress,
+                    detailsURL: detailsUrl,
+                )
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'master']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/rticommunity/rticonnextdds-examples.git'
+                    ]],
+                    extensions: [[
+                        $class: 'SubmoduleOption',
+                        recursiveSubmodules: false,
+                    ]]
+                ])
+                dir("${cmakeUtilsRepoDir}") {
+                    checkout(scm)
+                }
+            }
+
+            post {
+                success {
+                    publishChecks(
+                        name: STAGE_NAME,
+                        title: checkTitlePassed,
+                        summary: ':white_check_mark: Cloning successfull!',
+                        detailsURL: detailsUrl,
+                    )
+                    publishChecks(
+                        name: waitingForBuildExecutorCheckName,
+                        title: checkTitleWaiting,
+                        summary: ':hourglass: Waiting for next available executor to build the examples...',
+                        status: checkStatusInProgress,
+                        detailsURL: detailsUrl,
+                    )
+                }
+                failure {
+                    publishChecks(
+                        name: STAGE_NAME,
+                        title: checkTitleFailed,
+                        summary: ':warning: Failed cloning the repositories.',
+                        conclusion: checkConclusionFailure,
+                        detailsURL: detailsUrl,
+                    )
+                }
+                aborted {
+                    publishChecks(
+                        name: STAGE_NAME,
+                        title: checkTitleAborted,
+                        summary: ':warning: Aborted cloning the repositories.',
+                        conclusion: checkConclusionCanceled,
+                        detailsURL: detailsUrl,
+                    )
+                }
             }
         }
 
@@ -80,68 +155,15 @@ pipeline {
             }
 
             stages {
-                stage('Checkout the repositories') {
+                stage('Download Connext') {
                     steps {
                         publishChecks(
-                            name: waitingForExecutorCheckName,
+                            name: waitingForBuildExecutorCheckName,
                             title: checkTitlePassed,
-                            summary: ':white_check_mark: Clone started.',
+                            summary: ':hourglass: Build sequence started!',
                             detailsURL: detailsUrl,
                         )
 
-                        publishChecks(
-                            name: STAGE_NAME,
-                            title: 'Cloning',
-                            summary: ':sparkles: Cloning the example and cmake-utils repositories...',
-                            status: checkStatusInProgress,
-                            detailsURL: detailsUrl,
-                        )
-                        checkout([
-                            $class: 'GitSCM',
-                            branches: [[name: 'master']],
-                            userRemoteConfigs: [[
-                                url: 'https://github.com/rticommunity/rticonnextdds-examples.git'
-                            ]],
-                            extensions: [[
-                                $class: 'SubmoduleOption',
-                                recursiveSubmodules: false,
-                            ]]
-                        ])
-                        dir("${cmakeUtilsRepoDir}") {
-                            checkout(scm)
-                        }
-                    }
-                    post {
-                        success {
-                            publishChecks(
-                                name: STAGE_NAME,
-                                title: checkTitlePassed,
-                                summary: ':white_check_mark: Cloning successfull!',
-                                detailsURL: detailsUrl,
-                            )
-                        }
-                        failure {
-                            publishChecks(
-                                name: STAGE_NAME,
-                                title: checkTitleFailed,
-                                summary: ':warning: Failed cloning the repositories.',
-                                conclusion: checkConclusionFailure,
-                                detailsURL: detailsUrl,
-                            )
-                        }
-                        aborted {
-                            publishChecks(
-                                name: STAGE_NAME,
-                                title: checkTitleAborted,
-                                summary: ':warning: Aborted cloning the repositories.',
-                                conclusion: checkConclusionCanceled,
-                                detailsURL: detailsUrl,
-                            )
-                        }
-                    }
-                }
-                stage('Download Connext') {
-                    steps {
                         writeJenkinsOutput()
 
                         publishChecks(
