@@ -1205,9 +1205,9 @@ elseif(CONNEXTDDS_ARCH MATCHES "QNX7")
     endif()
 
     if(CONNEXTDDS_ARCH MATCHES "armv8")
-        list(APPEND CONNEXTDDS_COMPILE_OPTIONS "-Vgcc/5.4.0,gcc_ntoaarch64le")
+        list(APPEND CONNEXTDDS_COMPILE_OPTIONS "-Vgcc,gcc_ntoaarch64le")
     elseif(CONNEXTDDS_ARCH MATCHES "x64")
-        list(APPEND CONNEXTDDS_COMPILE_OPTIONS "-Vgcc/5.4.0,gcc_ntox86_64")
+        list(APPEND CONNEXTDDS_COMPILE_OPTIONS "-Vgcc,gcc_ntox86_64")
     endif()
 else()
     message(FATAL_ERROR
