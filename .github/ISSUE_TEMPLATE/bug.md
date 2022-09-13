@@ -10,8 +10,8 @@ assignees: ''
 
 ### System information
 
-- **Script affected**:
-- **Repository affeced**:
+- **Affected script**:
+- **Affected repository**:
 - **Operating system**:
 - **Compiler**:
 - **Compiler version**:
