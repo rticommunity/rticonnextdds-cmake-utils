@@ -740,7 +740,10 @@ message(STATUS "RTI Connext DDS architecture: ${CONNEXTDDS_ARCH}")
 # invocation, acording to the matching rules defined by CMake.
 #
 # Arguments:
-# - field_name: provides the name of the
+# - field_name: provides the name of the xml tag to search.
+# - rti_versions_file: contents of the rti_versions.xml file.
+# - rti_architectures: list of architectures to search if present in the
+#   rti_versions.xml file
 # Returns:
 # - A warning is shown and the `rtiversion_error` variable will be set if the
 #   component field is not present in rti_versions.xml or the version does not
