@@ -376,9 +376,10 @@
 #
 # Logging in versions lower than CMake 3.15
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# For versions lower than CMake 3.15 ``CMAKE_MINOR_VERSION`` variable should be
-# use to define lower logging levels than ``STATUS`` mode. All this modes will
-# show messages of current level and higher. The following modes are available:
+# For versions lower than CMake 3.15, ``CONNEXTDDS_LOG_LEVEL`` variable should
+# be used to define lower logging levels than ``STATUS`` mode. All this modes
+# will show messages of current level and higher. The following modes are
+# available:
 #
 # - ``STATUS``
 #   Default mode. This will olnly show messages with same or higher logging
