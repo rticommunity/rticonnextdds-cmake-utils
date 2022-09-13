@@ -20,7 +20,7 @@ Fixes #<issue id>
 
 ### Logs
 
-<!-- :warning: Add one `details` tag for each log file required.
+<!-- :warning: Add one `details` tag for each required log file.
 
 <details>
   <summary>Log name</summary>

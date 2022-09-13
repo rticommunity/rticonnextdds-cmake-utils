@@ -34,17 +34,17 @@ assignees: lulivi
 
 ### Steps to reproduce the issue
 
-<!-- :warning: List the steps necessary to face the issue. E.g.:
+<!-- :warning: List the steps necessary to reproduce the issue. E.g.:
 
 1. Set X architecture environment variables.
-2. Create a build directory in the example X.
+2. Create a build directory in example X.
 3. Run the following command:
    ```
-   cmake .. -DCONNEXTDDS_DIR=/home/user/rti_connext_dds-6.1.1/
+   cmake .. -DCONNEXTDDS_DIR=/home/user/rti_connext_dds-x.y.z/
    ```
-4. The problem will popout:
+4. The problem will pop up:
    ```
-   Error: Can't find the library Y
+   Error: Can't find library Y
    ```
 
 -->
