@@ -381,11 +381,10 @@
 # It is compatible with the following platforms listed in the
 # RTI Connext DDS Core Libraries Platform Notes:
 # - Linux platforms: i86, x64 and ARMv8
-# - Darwin platforms: OS X 10.11-10.13
+# - Darwin platforms: OS X 10.13-10.15
 # - Windows platforms: i86 and x64
-# - QNX platforms: x64 and ARMv8
+# - QNX platforms (7.0 and 7.1): x64 and ARMv8
 # - Raspbian Wheezy 7.0 (3.x kernel) on ARMv6 (armv6vfphLinux3.xgcc4.7.2)
-# - Android 5.0 and 5.1 (armv7aAndroid5.0gcc4.9ndkr10e)
 #
 # Logging in versions lower than CMake 3.15
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1194,16 +1193,6 @@ elseif(CONNEXTDDS_ARCH MATCHES "Darwin")
         "RTI_DARWIN"
         "RTI_DARWIN10"
         "RTI_64BIT"
-    )
-elseif(CONNEXTDDS_ARCH MATCHES "Android")
-    set(CONNEXTDDS_EXTERNAL_LIBS
-        "-llog"
-        "-lc"
-        "-lm"
-    )
-    set(CONNEXTDDS_COMPILE_DEFINITIONS
-        "RTI_UNIX"
-        "LINUX RTI_ANDROID"
     )
 elseif(CONNEXTDDS_ARCH MATCHES "QNX7")
     set(CONNEXTDDS_EXTERNAL_LIBS
