@@ -169,7 +169,7 @@ pipeline {
                         publishChecks(
                             name: STAGE_NAME,
                             title: 'Downloading',
-                            summary: ':arrow_down: Downloading RTI Connext DDS libraries...',
+                            summary: ':arrow_down: Downloading RTI Connext libraries...',
                             status: checkStatusInProgress,
                             text: readJenkinsOutput(),
                             detailsURL: detailsUrl,
@@ -193,7 +193,7 @@ pipeline {
                             publishChecks(
                                 name: STAGE_NAME,
                                 title: checkTitlePassed,
-                                summary: ':white_check_mark: RTI Connext DDS libraries downloaded.',
+                                summary: ':white_check_mark: RTI Connext libraries downloaded.',
                                 text: readJenkinsOutput(),
                                 detailsURL: detailsUrl,
                             )
@@ -202,7 +202,7 @@ pipeline {
                             publishChecks(
                                 name: STAGE_NAME,
                                 title: checkTitleFailed,
-                                summary: ':warning: Failed downloading RTI Connext DDS libraries.',
+                                summary: ':warning: Failed downloading RTI Connext libraries.',
                                 conclusion: checkConclusionFailure,
                                 text: readJenkinsOutput(),
                                 detailsURL: detailsUrl,
@@ -212,7 +212,7 @@ pipeline {
                             publishChecks(
                                 name: STAGE_NAME,
                                 title: checkTitleAborted,
-                                summary: ':no_entry: The download of RTI Connext DDS libraries was aborted.',
+                                summary: ':no_entry: The download of RTI Connext libraries was aborted.',
                                 conclusion: checkConclusionCanceled,
                                 text: readJenkinsOutput(),
                                 detailsURL: detailsUrl,
