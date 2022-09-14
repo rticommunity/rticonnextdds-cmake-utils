@@ -20,14 +20,12 @@
 # This module sets variables for the following components that are part of RTI
 # Connext DDS:
 # - core (default, always provided)
-# - messaging_api
-# - distributed_loger
-# - metp
-# - routing_service
-# - assign_transformation
-# - security_plugins
-# - monitoring_libraries
 # - distributed_logger
+# - messaging_api
+# - routing_service
+# - security_plugins
+# - security_plugins_wolfssl
+# - monitoring_libraries
 # - nddstls
 # - transport_tcp
 # - transport_tls
@@ -50,6 +48,8 @@
 # ^^^^^^^^^^^^^^^^
 # This module defines the following `IMPORTED` targets:
 #
+# - ``RTIConnextDDS::core``
+#   The base nddscore library.
 # - ``RTIConnextDDS::c_api``
 #   The nddsc library if found (nddscore will be linked as part of this target).
 # - ``RTIConnextDDS::cpp_api``
@@ -58,12 +58,51 @@
 # - ``RTIConnextDDS::cpp2_api``
 #   The nddscpp2 library if found (nddscore and nddsc will be linked as part
 #   of this target).
+# - ``RTIConnextDDS::metp``
+#   The METP library if found (nddsmetp).
+# - ``RTIConnextDDS::rtixml2``
+#   The RTI XML2 library if found (rtixml2).
+# - ``RTIConnextDDS::apputils_c``.
+#   The APP Utils C library (rtiapputils).
+# - ``RTIConnextDDS::rtisqlite``.
+#   The RTI SQLite library (rtisqlite).
 # - ``RTIConnextDDS::distributed_logger_c``
 #   The C API library for Distributed Logger if found.
 # - ``RTIConnextDDS::distributed_logger_cpp``
 #   The CPP API library for Distributed Logger if found.
-# - ``RTIConnextDDS::metp``
-#   The METP library if found (nddsmetp).
+# - ``RTIConnextDDS::messaging_c_api``
+#   The Request Reply C API library if found (rticonnextmsgc).
+# - ``RTIConnextDDS::messaging_cpp_api``
+#   The Request Reply CPP API library if found (rticonnextmsgcpp).
+# - ``RTIConnextDDS::messaging_cpp2_api``
+#   The Request Reply CPP2 API library if found (rticonnextmsgcpp2).
+# - ``RTIConnextDDS::security_plugins``
+#   The security plugins libraries if found (nddssecurity).
+# - ``RTIConnextDDS::monitoring``
+#   The Monitoring library if found.
+# - ``RTIConnextDDS::nddstls``
+#   The tls library if found (nddstls).
+# - ``RTIConnextDDS::transport_tcp``
+#   The Transport TCP library if found (nddstransporttcp).
+# - ``RTIConnextDDS::transport_tls``
+#   The Transport TLS library if found (nddstransporttls).
+# - ``RTIConnextDDS::transport_wan``
+#   The Transport WAN library if found (nddstransportwan).
+# - ``RTIConnextDDS::low_bandwidth_discovery_static``
+#   The Discovery Static library for Low Bandwidth Plugins if found
+#   (nddsdiscoverystatic).
+# - ``RTIConnextDDS::low_bandwidth_edisc``
+#   The edisc library for Low Bandwidth Plugins if found (rtilbedisc).
+# - ``RTIConnextDDS::low_bandwidth_pdisc``
+#   The pdisc library for Low Bandwidth Plugins if found (rtilbpdisc).
+# - ``RTIConnextDDS::low_bandwidth_rtps``
+#   The rtps library for Low Bandwidth Plugins if found (rtilbrtps).
+# - ``RTIConnextDDS::low_bandwidth_sm``
+#   The sm library for Low Bandwidth Plugins if found (rtilbsm).
+# - ``RTIConnextDDS::low_bandwidth_st``
+#   The st library for Low Bandwidth Plugins if found (rtilbst).
+# - ``RTIConnextDDS::rtizrtps``
+#   The rtizrtps library if found (rtizrtps).
 # - ``RTIConnextDDS::routing_service_infrastructure``
 #   The infrastructure library for Routing Service if found.
 # - ``RTIConnextDDS::routing_service_c``
@@ -80,49 +119,10 @@
 # - ``RTIConnextDDS::assign_transformation``
 #   The assign transformation library if found (includes rtirsassigntransf and
 #   rtiroutingservice).
-# - ``RTIConnextDDS::monitoring``
-#   The Monitoring library if found.
-# - ``RTIConnextDDS::security_plugins``
-#   The security plugins libraries if found (nddssecurity).
-# - ``RTIConnextDDS::messaging_c_api``
-#   The Request Reply C API library if found (rticonnextmsgc).
-# - ``RTIConnextDDS::messaging_cpp_api``
-#   The Request Reply CPP API library if found (rticonnextmsgcpp).
-# - ``RTIConnextDDS::messaging_cpp2_api``
-#   The Request Reply CPP2 API library if found (rticonnextmsgcpp2).
-# - ``RTIConnextDDS::nddstls``
-#   The tls library if found (nddstls).
-# - ``RTIConnextDDS::transport_tcp``
-#   The Transport TCP library if found (nddstransporttcp).
-# - ``RTIConnextDDS::transport_tls``
-#   The Transport TLS library if found (nddstransporttls).
-# - ``RTIConnextDDS::transport_wan``
-#   The Transport WAN library if found (nddstransportwan).
 # - ``RTIConnextDDS::recording_service``
 #   The Recording Service library if found (includes rtirecordingservice,
 #   rtiroutingservice, rtirsinfrastructure, nddscpp2, rtidlc, nddsmetp,
 #   rticonnextmsgc and rtixml2).
-# - ``RTIConnextDDS::rtixml2``
-#   The RTI XML2 library if found (rtixml2).
-# - ``RTIConnextDDS::apputils_c``.
-#   The APP Utils C library (rtiapputils).
-# - ``RTIConnextDDS::rtisqlite``.
-#   The RTI SQLite library (rtisqlite).
-# - ``RTIConnextDDS::low_bandwidth_discovery_static``
-#   The Discovery Static library for Low Bandwidth Plugins if found
-#   (nddsdiscoverystatic).
-# - ``RTIConnextDDS::low_bandwidth_edisc``
-#   The edisc library for Low Bandwidth Plugins if found (rtilbedisc).
-# - ``RTIConnextDDS::low_bandwidth_pdisc``
-#   The pdisc library for Low Bandwidth Plugins if found (rtilbpdisc).
-# - ``RTIConnextDDS::low_bandwidth_rtps``
-#   The rtps library for Low Bandwidth Plugins if found (rtilbrtps).
-# - ``RTIConnextDDS::low_bandwidth_sm``
-#   The sm library for Low Bandwidth Plugins if found (rtilbsm).
-# - ``RTIConnextDDS::low_bandwidth_st``
-#   The st library for Low Bandwidth Plugins if found (rtilbst).
-# - ``RTIConnextDDS::rtizrtps``
-#   The rtizrtps library if found (rtizrtps).
 #
 # Result Variables
 # ^^^^^^^^^^^^^^^^
@@ -179,6 +179,20 @@
 #     (e.g., ``CONNEXTDDS_CPP_API_LIBRARIES_RELEASE_STATIC``)
 #   - ``CONNEXTDDS_CPP2_API``
 #     (e.g., ``CONNEXTDDS_CPP2_API_LIBRARIES_RELEASE_STATIC``)
+#   - ``METP``
+#     (e.g., ``METP_LIBRARIES_RELEASE_STATIC``)
+#   - ``RTIXML2``
+#     (e.g., ``RTIXML2_LIBRARIES_RELEASE_STATIC``)
+#   - ``RTIAPPUTILS_C``
+#     (e.g., ``RTIAPPUTILS_C_LIBRARIES_RELEASE_STATIC``)
+#   - ``RTISQLITE``
+#     (e.g., ``RTISQLITE_LIBRARIES_RELEASE_STATIC``)
+#
+# - ``distributed_loger`` component:
+#   - ``DISTRIBUTED_LOGGER_C``
+#     (e.g., ``DISTRIBUTED_LOGGER_C_LIBRARIES_RELEASE_STATIC)
+#   - ``DISTRIBUTED_LOGGER_CPP``
+#     (e.g., ``DISTRIBUTED_LOGGER_CPP_LIBRARIES_RELEASE_STATIC)
 #
 # - ``messaging_api`` component:
 #   - ``MESSAGING_C``
@@ -188,10 +202,6 @@
 #   - ``MESSAGING_CPP2``
 #     (e.g, ``MESSAGING_CPP2_API_LIBRARIES_RELEASE_STATIC``)
 #
-# - ``security_plugins`` component:
-#   - ``SECURITY_PLUGINS``
-#     (e.g., ``SECURITY_PLUGINS_LIBRARIES_RELEASE_STATIC``)
-#
 # - ``routing_service`` component:
 #   - ``ROUTING_SERVICE_API``
 #     (e.g., ``ROUTING_SERVICE_API_LIBRARIES_RELEASE_STATIC``)
@@ -200,11 +210,9 @@
 #   - ``ASSIGN_TRANSFORMATION``
 #     (e.g., ``ASSIGN_TRANSFORMATION_LIBRARIES_RELEASE_STATIC``)
 #
-# - ``distributed_loger`` component:
-#   - ``DISTRIBUTED_LOGGER_C``
-#     (e.g., ``DISTRIBUTED_LOGGER_C_LIBRARIES_RELEASE_STATIC)
-#   - ``DISTRIBUTED_LOGGER_CPP``
-#     (e.g., ``DISTRIBUTED_LOGGER_CPP_LIBRARIES_RELEASE_STATIC)
+# - ``security_plugins`` component:
+#   - ``SECURITY_PLUGINS``
+#     (e.g., ``SECURITY_PLUGINS_LIBRARIES_RELEASE_STATIC``)
 #
 # - ``monitoring_libraries`` component:
 #   - ``MONITORING_LIBRARIES``
@@ -248,9 +256,9 @@
 #   - ``RTIZRTPS``
 #     (e.g., ``RTIZRTPS_LIBRARIES_RELEASE_STATIC``)
 #
-#   Also, the ``<VAR>_FOUND`` variable is set for each one of the previous
-#   variables (e.g., ``MONITORING_LIBRARIES_RELEASE_STATIC_FOUND`` and
-#   ``MONITORING_LIBRARIES_FOUND`` are set).
+# Also, the ``<VAR>_FOUND`` variable is set for each one of the previous
+# variables (e.g., ``MONITORING_LIBRARIES_RELEASE_STATIC_FOUND`` and
+# ``MONITORING_LIBRARIES_FOUND`` are set).
 #
 # If you are building a simple ConnextDDS application (you are only using
 # the  core libraries), use the following variables:
@@ -258,7 +266,6 @@
 #  - For a C application: CONNEXTDDS_C_API
 #  - For a Traditional C++ application: CONNEXTDDS_CPP_API
 #  - For a Modern C++ application: CONNEXTDDS_CPP2_API
-#
 #
 # Lastly, if you want to use the security plugins (or any other component),
 # add the appropriate variables to your CMake script.
@@ -1861,7 +1868,6 @@ find_package_handle_standard_args(RTIConnextDDS
     VERSION_VAR
         RTICONNEXTDDS_VERSION
     HANDLE_COMPONENTS)
-
 
 #####################################################################
 # Create the imported targets                                       #
