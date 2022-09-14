@@ -35,6 +35,19 @@ String readJenkinsOutput() {
     return readFile('jenkins_output.md')
 }
 
+/*
+ * Static string variables.
+ */
+String waitingForCloneExecutorCheckName = 'Waiting for a clone executor'
+String waitingForBuildExecutorCheckName = 'Waiting for a build executor'
+String checkTitleWaiting = 'Waiting'
+String checkTitlePassed = 'Passed'
+String checkTitleFailed = 'Failed'
+String checkTitleAborted = 'Aborted'
+String checkStatusInProgress = 'IN_PROGRESS'
+String checkConclusionCanceled = 'CANCELED'
+String checkConclusionFailure = 'FAILURE'
+
 pipeline {
     agent none
 
@@ -46,23 +59,33 @@ pipeline {
         stage('Executor Check') {
             steps {
                 publishChecks(
-                    name: 'Waiting for a clone executor',
-                    title: 'Waiting',
+                    name: waitingForCloneExecutorCheckName,
+                    title: checkTitleWaiting,
                     summary: ':hourglass: Waiting for next available executor to clone the repositories...',
-                    status: 'IN_PROGRESS',
+                    status: checkStatusInProgress,
                     detailsURL: detailsUrl,
                 )
             }
         }
 
-        stage('Checkout the repositories') {
-            agent any
+        stage('Clone repositories') {
+            agent {
+                label 'docker'
+            }
 
             steps {
                 publishChecks(
-                    name: 'Waiting for a clone executor',
-                    title: 'Passed',
+                    name: waitingForCloneExecutorCheckName,
+                    title: checkTitlePassed,
                     summary: ':white_check_mark: Clone started.',
+                    detailsURL: detailsUrl,
+                )
+
+                publishChecks(
+                    name: STAGE_NAME,
+                    title: 'Cloning',
+                    summary: ':sparkles: Cloning the example and cmake-utils repositories...',
+                    status: checkStatusInProgress,
                     detailsURL: detailsUrl,
                 )
                 checkout([
@@ -84,19 +107,34 @@ pipeline {
             post {
                 success {
                     publishChecks(
-                        name: 'Waiting for the build executor',
-                        title: 'Waiting',
-                        summary: ':hourglass: Waiting for next available executor to build...',
-                        status: 'IN_PROGRESS',
+                        name: STAGE_NAME,
+                        title: checkTitlePassed,
+                        summary: ':white_check_mark: Cloning successfull!',
+                        detailsURL: detailsUrl,
+                    )
+                    publishChecks(
+                        name: waitingForBuildExecutorCheckName,
+                        title: checkTitleWaiting,
+                        summary: ':hourglass: Waiting for next available executor to build the examples...',
+                        status: checkStatusInProgress,
                         detailsURL: detailsUrl,
                     )
                 }
                 failure {
                     publishChecks(
-                        name: 'Waiting for a clone executor',
-                        title: 'Failed',
+                        name: STAGE_NAME,
+                        title: checkTitleFailed,
                         summary: ':warning: Failed cloning the repositories.',
-                        conclusion: 'FAILURE',
+                        conclusion: checkConclusionFailure,
+                        detailsURL: detailsUrl,
+                    )
+                }
+                aborted {
+                    publishChecks(
+                        name: STAGE_NAME,
+                        title: checkTitleAborted,
+                        summary: ':warning: Aborted cloning the repositories.',
+                        conclusion: checkConclusionCanceled,
                         detailsURL: detailsUrl,
                     )
                 }
@@ -120,9 +158,9 @@ pipeline {
                 stage('Download Connext') {
                     steps {
                         publishChecks(
-                            name: 'Waiting for the build executor',
-                            title: 'Passed',
-                            summary: ':white_check_mark: Build started.',
+                            name: waitingForBuildExecutorCheckName,
+                            title: checkTitlePassed,
+                            summary: ':hourglass: Build sequence started!',
                             detailsURL: detailsUrl,
                         )
 
@@ -131,8 +169,8 @@ pipeline {
                         publishChecks(
                             name: STAGE_NAME,
                             title: 'Downloading',
-                            summary: ':arrow_down: Downloading RTI Connext DDS libraries...',
-                            status: 'IN_PROGRESS',
+                            summary: ':arrow_down: Downloading RTI Connext libraries...',
+                            status: checkStatusInProgress,
                             text: readJenkinsOutput(),
                             detailsURL: detailsUrl,
                         )
@@ -154,8 +192,8 @@ pipeline {
                         success {
                             publishChecks(
                                 name: STAGE_NAME,
-                                title: 'Passed',
-                                summary: ':white_check_mark: RTI Connext DDS libraries downloaded.',
+                                title: checkTitlePassed,
+                                summary: ':white_check_mark: RTI Connext libraries downloaded.',
                                 text: readJenkinsOutput(),
                                 detailsURL: detailsUrl,
                             )
@@ -163,9 +201,9 @@ pipeline {
                         failure {
                             publishChecks(
                                 name: STAGE_NAME,
-                                title: 'Failed',
-                                summary: ':warning: Failed downloading RTI Connext DDS libraries.',
-                                conclusion: 'FAILURE',
+                                title: checkTitleFailed,
+                                summary: ':warning: Failed downloading RTI Connext libraries.',
+                                conclusion: checkConclusionFailure,
                                 text: readJenkinsOutput(),
                                 detailsURL: detailsUrl,
                             )
@@ -173,9 +211,9 @@ pipeline {
                         aborted {
                             publishChecks(
                                 name: STAGE_NAME,
-                                title: 'Aborted',
-                                summary: ':no_entry: The download of RTI Connext DDS libraries was aborted.',
-                                conclusion: 'CANCELED',
+                                title: checkTitleAborted,
+                                summary: ':no_entry: The download of RTI Connext libraries was aborted.',
+                                conclusion: checkConclusionCanceled,
                                 text: readJenkinsOutput(),
                                 detailsURL: detailsUrl,
                             )
@@ -189,7 +227,7 @@ pipeline {
                             name: STAGE_NAME,
                             title: 'Building',
                             summary: ':wrench: Building all the examples...',
-                            status: 'IN_PROGRESS',
+                            status: checkStatusInProgress,
                             text: readJenkinsOutput(),
                             detailsURL: detailsUrl,
                         )
@@ -207,7 +245,7 @@ pipeline {
                         success {
                             publishChecks(
                                 name: STAGE_NAME,
-                                title: 'Passed',
+                                title: checkTitlePassed,
                                 summary: ':white_check_mark: All the examples were built succesfully.',
                                 text: readJenkinsOutput(),
                                 detailsURL: detailsUrl,
@@ -216,9 +254,9 @@ pipeline {
                         failure {
                             publishChecks(
                                 name: STAGE_NAME,
-                                title: 'Failed',
+                                title: checkTitleFailed,
                                 summary: ':warning: There was an error building the examples.',
-                                conclusion: 'FAILURE',
+                                conclusion: checkConclusionFailure,
                                 text: readJenkinsOutput(),
                                 detailsURL: detailsUrl,
                             )
@@ -226,9 +264,9 @@ pipeline {
                         aborted {
                             publishChecks(
                                 name: STAGE_NAME,
-                                title: 'Aborted',
+                                title: checkTitleAborted,
                                 summary: ':no_entry: The examples build was aborted',
-                                conclusion: 'CANCELED',
+                                conclusion: checkConclusionCanceled,
                                 text: readJenkinsOutput(),
                                 detailsURL: detailsUrl,
                             )
@@ -243,10 +281,10 @@ pipeline {
                 }
                 aborted {
                     publishChecks(
-                        name: 'Waiting for executor',
-                        title: 'Aborted',
+                        name: waitingForExecutorCheckName,
+                        title: checkTitleAborted,
                         summary: ':no_entry: The pipeline was aborted',
-                        conclusion: 'CANCELED',
+                        conclusion: checkConclusionCanceled,
                         detailsURL: detailsUrl,
                     )
                 }
