@@ -295,12 +295,18 @@
 #   will try to find OpenSSL in your system using find_package(OpenSSL). If you
 #   want to build against a specific installation of OpenSSL, you must set the
 #   ``CONNEXTDDS_OPENSSL_DIR`` to provide this module with the path to your
-#   installation of OpenSSL.
+#   installation of OpenSSL. This variable has to be populated with the OpenSSL
+#   root directory, e.g.:
+#   <CONNEXTDDS_DIR>/third_party/openssl-<version>/<architecture>/release/
 #
-# - Likewise, if you are building against the security_plugins component and
+#   Besides that, if you are building against the security_plugins component and
 #   you want to ensure that you are using a specific OpenSSL version, you must
 #   set the ``CONNEXTDDS_OPENSSL_VERSION`` so that it can be added to the
 #   find_package(OpenSSL) invocation.
+#
+#   Likewise, if instead of security_plugins you use security_plugins_wolfssl,
+#   you will use the variables ``CONNEXTDDS_WOLFSSL_DIR`` and
+#   ``CONNEXTDDS_WOLFSSL_VERSION``
 #
 # - If you want to build against debug versions of imported targets, you must
 #   enable ``CONNEXTDDS_IMPORTED_TARGETS_DEBUG``. Example:
