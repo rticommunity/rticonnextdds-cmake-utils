@@ -380,11 +380,10 @@
 # ^^^^^^^^^^^^^^^^^^^
 # It is compatible with the following platforms listed in the
 # RTI Connext DDS Core Libraries Platform Notes:
-# - Linux platforms: i86, x64 and ARMv8
-# - Darwin platforms: OS X 10.13-10.15
-# - Windows platforms: i86 and x64
+# - Linux platforms: x64
+# - Darwin platforms: macOS 10.13-10.15
+# - Windows platforms: x64
 # - QNX platforms (7.0 and 7.1): x64 and ARMv8
-# - Raspbian Wheezy 7.0 (3.x kernel) on ARMv6 (armv6vfphLinux3.xgcc4.7.2)
 #
 # Logging in versions lower than CMake 3.15
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
