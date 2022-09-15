@@ -1,7 +1,7 @@
 ---
 name:  FindRTIConnextDDS.cmake issue
 about: 🔺 Create a FindRTIConnextDDS.cmake script related issue
-title: '[FindPackage]'
+title: ''
 labels: find-package,unconfirmed
 assignees: lulivi
 ---
