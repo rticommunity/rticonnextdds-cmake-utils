@@ -378,12 +378,16 @@
 #
 # Supported platforms
 # ^^^^^^^^^^^^^^^^^^^
-# It is compatible with the following platforms listed in the
+# Oficially, this FindPackage supports the following platforms listed in the
 # RTI Connext DDS Core Libraries Platform Notes:
+#
 # - Linux platforms: x64
 # - Darwin platforms: macOS 10.13-10.15
 # - Windows platforms: x64
 # - QNX platforms (7.0 and 7.1): x64 and ARMv8
+#
+# Other platforms and architectures might work, but they are not oficially
+# supported.
 #
 # Logging in versions lower than CMake 3.15
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
