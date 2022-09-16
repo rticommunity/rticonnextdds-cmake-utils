@@ -77,11 +77,11 @@
 # - ``RTIConnextDDS::messaging_cpp2_api``
 #   The Request Reply CPP2 API library if found (rticonnextmsgcpp2).
 # - ``RTIConnextDDS::security_plugins``
-#   The security plugins libraries if found (nddssecurity).
+#   The Security Plugins libraries if found (nddssecurity).
 # - ``RTIConnextDDS::monitoring``
 #   The Monitoring library if found.
 # - ``RTIConnextDDS::nddstls``
-#   The tls library if found (nddstls).
+#   The TLS library if found (nddstls).
 # - ``RTIConnextDDS::transport_tcp``
 #   The Transport TCP library if found (nddstransporttcp).
 # - ``RTIConnextDDS::transport_tls``
@@ -106,9 +106,9 @@
 # - ``RTIConnextDDS::routing_service_infrastructure``
 #   The infrastructure library for Routing Service if found.
 # - ``RTIConnextDDS::routing_service_c``
-#   The C API library for Routing Service if found (includes
-#   rtiroutingservice, rtirsinfrastructure, rtixml2 and rticonnextmsgc. Also
-#   nddsmetp and rticonnextmsgc if found).
+#   The C API library for Routing Service if found (includes rtiroutingservice,
+#   rtirsinfrastructure, rtixml2 and rticonnextmsgc; also nddsmetp and
+#   rticonnextmsgc if found).
 # - ``RTIConnextDDS::routing_service``
 #   The same as RTIConnextDDS::routing_service_c. Maintained for backward
 #   compatibility.
@@ -392,7 +392,7 @@
 # Logging in versions lower than CMake 3.15
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # For versions lower than CMake 3.15, ``CONNEXTDDS_LOG_LEVEL`` variable should
-# be used to define lower logging levels than ``STATUS`` mode. All this modes
+# be used to define logging levels lower than ``STATUS`` mode. All these modes
 # will show messages of current level and higher. The following modes are
 # available:
 #
