@@ -1,11 +1,3 @@
----
-name: General pull-request template
-about: 🔺 Create a pull-request explaining the issue resolved
-title: ''
-labels: ''
-assignees: ''
----
-
 <!-- :warning: Please, try to follow the template -->
 
 Fixes #<issue id>
