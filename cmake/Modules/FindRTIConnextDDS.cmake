@@ -20,14 +20,12 @@
 # This module sets variables for the following components that are part of RTI
 # Connext DDS:
 # - core (default, always provided)
-# - messaging_api
-# - distributed_loger
-# - metp
-# - routing_service
-# - assign_transformation
-# - security_plugins
-# - monitoring_libraries
 # - distributed_logger
+# - messaging_api
+# - routing_service
+# - security_plugins
+# - security_plugins_wolfssl
+# - monitoring_libraries
 # - nddstls
 # - transport_tcp
 # - transport_tls
@@ -50,6 +48,8 @@
 # ^^^^^^^^^^^^^^^^
 # This module defines the following `IMPORTED` targets:
 #
+# - ``RTIConnextDDS::core``
+#   The base nddscore library.
 # - ``RTIConnextDDS::c_api``
 #   The nddsc library if found (nddscore will be linked as part of this target).
 # - ``RTIConnextDDS::cpp_api``
@@ -58,56 +58,36 @@
 # - ``RTIConnextDDS::cpp2_api``
 #   The nddscpp2 library if found (nddscore and nddsc will be linked as part
 #   of this target).
-# - ``RTIConnextDDS::distributed_logger_c``
-#   The C API library for Distributed Logger if found.
-# - ``RTIConnextDDS::distributed_logger_cpp``
-#   The CPP API library for Distributed Logger if found.
 # - ``RTIConnextDDS::metp``
 #   The METP library if found (nddsmetp).
-# - ``RTIConnextDDS::routing_service_infrastructure``
-#   The infrastructure library for Routing Service if found.
-# - ``RTIConnextDDS::routing_service_c``
-#   The C API library for Routing Service if found (includes
-#   rtiroutingservice, rtirsinfrastructure, rtixml2 and rticonnextmsgc. Also
-#   nddsmetp and rticonnextmsgc if found).
-# - ``RTIConnextDDS::routing_service``
-#   The same as RTIConnextDDS::routing_service_c. Maintained for backward
-#   compatibility.
-# - ``RTIConnextDDS::routing_service_cpp``
-#   The same as RTIConnextDDS::routing_service_c but adding the CPP libraries.
-# - ``RTIConnextDDS::routing_service_cpp2``
-#   The same as RTIConnextDDS::routing_service_c but adding the CPP2 libraries.
-# - ``RTIConnextDDS::assign_transformation``
-#   The assign transformation library if found (includes rtirsassigntransf and
-#   rtiroutingservice).
-# - ``RTIConnextDDS::monitoring``
-#   The Monitoring library if found.
-# - ``RTIConnextDDS::security_plugins``
-#   The security plugins libraries if found (nddssecurity).
-# - ``RTIConnextDDS::messaging_c_api``
-#   The Request Reply C API library if found (rticonnextmsgc).
-# - ``RTIConnextDDS::messaging_cpp_api``
-#   The Request Reply CPP API library if found (rticonnextmsgcpp).
-# - ``RTIConnextDDS::messaging_cpp2_api``
-#   The Request Reply CPP2 API library if found (rticonnextmsgcpp2).
-# - ``RTIConnextDDS::nddstls``
-#   The tls library if found (nddstls).
-# - ``RTIConnextDDS::transport_tcp``
-#   The Transport TCP library if found (nddstransporttcp).
-# - ``RTIConnextDDS::transport_tls``
-#   The Transport TLS library if found (nddstransporttls).
-# - ``RTIConnextDDS::transport_wan``
-#   The Transport WAN library if found (nddstransportwan).
-# - ``RTIConnextDDS::recording_service``
-#   The Recording Service library if found (includes rtirecordingservice,
-#   rtiroutingservice, rtirsinfrastructure, nddscpp2, rtidlc, nddsmetp,
-#   rticonnextmsgc and rtixml2).
 # - ``RTIConnextDDS::rtixml2``
 #   The RTI XML2 library if found (rtixml2).
 # - ``RTIConnextDDS::apputils_c``.
 #   The APP Utils C library (rtiapputils).
 # - ``RTIConnextDDS::rtisqlite``.
 #   The RTI SQLite library (rtisqlite).
+# - ``RTIConnextDDS::distributed_logger_c``
+#   The C API library for Distributed Logger if found.
+# - ``RTIConnextDDS::distributed_logger_cpp``
+#   The CPP API library for Distributed Logger if found.
+# - ``RTIConnextDDS::messaging_c_api``
+#   The Request Reply C API library if found (rticonnextmsgc).
+# - ``RTIConnextDDS::messaging_cpp_api``
+#   The Request Reply CPP API library if found (rticonnextmsgcpp).
+# - ``RTIConnextDDS::messaging_cpp2_api``
+#   The Request Reply CPP2 API library if found (rticonnextmsgcpp2).
+# - ``RTIConnextDDS::security_plugins``
+#   The Security Plugins libraries if found (nddssecurity).
+# - ``RTIConnextDDS::monitoring``
+#   The Monitoring library if found.
+# - ``RTIConnextDDS::nddstls``
+#   The TLS library if found (nddstls).
+# - ``RTIConnextDDS::transport_tcp``
+#   The Transport TCP library if found (nddstransporttcp).
+# - ``RTIConnextDDS::transport_tls``
+#   The Transport TLS library if found (nddstransporttls).
+# - ``RTIConnextDDS::transport_wan``
+#   The Transport WAN library if found (nddstransportwan).
 # - ``RTIConnextDDS::low_bandwidth_discovery_static``
 #   The Discovery Static library for Low Bandwidth Plugins if found
 #   (nddsdiscoverystatic).
@@ -123,6 +103,26 @@
 #   The st library for Low Bandwidth Plugins if found (rtilbst).
 # - ``RTIConnextDDS::rtizrtps``
 #   The rtizrtps library if found (rtizrtps).
+# - ``RTIConnextDDS::routing_service_infrastructure``
+#   The infrastructure library for Routing Service if found.
+# - ``RTIConnextDDS::routing_service_c``
+#   The C API library for Routing Service if found (includes rtiroutingservice,
+#   rtirsinfrastructure, rtixml2 and rticonnextmsgc; also nddsmetp and
+#   rticonnextmsgc if found).
+# - ``RTIConnextDDS::routing_service``
+#   The same as RTIConnextDDS::routing_service_c. Maintained for backward
+#   compatibility.
+# - ``RTIConnextDDS::routing_service_cpp``
+#   The same as RTIConnextDDS::routing_service_c but adding the CPP libraries.
+# - ``RTIConnextDDS::routing_service_cpp2``
+#   The same as RTIConnextDDS::routing_service_c but adding the CPP2 libraries.
+# - ``RTIConnextDDS::assign_transformation``
+#   The assign transformation library if found (includes rtirsassigntransf and
+#   rtiroutingservice).
+# - ``RTIConnextDDS::recording_service``
+#   The Recording Service library if found (includes rtirecordingservice,
+#   rtiroutingservice, rtirsinfrastructure, nddscpp2, rtidlc, nddsmetp,
+#   rticonnextmsgc and rtixml2).
 #
 # Result Variables
 # ^^^^^^^^^^^^^^^^
@@ -179,6 +179,20 @@
 #     (e.g., ``CONNEXTDDS_CPP_API_LIBRARIES_RELEASE_STATIC``)
 #   - ``CONNEXTDDS_CPP2_API``
 #     (e.g., ``CONNEXTDDS_CPP2_API_LIBRARIES_RELEASE_STATIC``)
+#   - ``METP``
+#     (e.g., ``METP_LIBRARIES_RELEASE_STATIC``)
+#   - ``RTIXML2``
+#     (e.g., ``RTIXML2_LIBRARIES_RELEASE_STATIC``)
+#   - ``RTIAPPUTILS_C``
+#     (e.g., ``RTIAPPUTILS_C_LIBRARIES_RELEASE_STATIC``)
+#   - ``RTISQLITE``
+#     (e.g., ``RTISQLITE_LIBRARIES_RELEASE_STATIC``)
+#
+# - ``distributed_loger`` component:
+#   - ``DISTRIBUTED_LOGGER_C``
+#     (e.g., ``DISTRIBUTED_LOGGER_C_LIBRARIES_RELEASE_STATIC)
+#   - ``DISTRIBUTED_LOGGER_CPP``
+#     (e.g., ``DISTRIBUTED_LOGGER_CPP_LIBRARIES_RELEASE_STATIC)
 #
 # - ``messaging_api`` component:
 #   - ``MESSAGING_C``
@@ -188,10 +202,6 @@
 #   - ``MESSAGING_CPP2``
 #     (e.g, ``MESSAGING_CPP2_API_LIBRARIES_RELEASE_STATIC``)
 #
-# - ``security_plugins`` component:
-#   - ``SECURITY_PLUGINS``
-#     (e.g., ``SECURITY_PLUGINS_LIBRARIES_RELEASE_STATIC``)
-#
 # - ``routing_service`` component:
 #   - ``ROUTING_SERVICE_API``
 #     (e.g., ``ROUTING_SERVICE_API_LIBRARIES_RELEASE_STATIC``)
@@ -200,11 +210,9 @@
 #   - ``ASSIGN_TRANSFORMATION``
 #     (e.g., ``ASSIGN_TRANSFORMATION_LIBRARIES_RELEASE_STATIC``)
 #
-# - ``distributed_loger`` component:
-#   - ``DISTRIBUTED_LOGGER_C``
-#     (e.g., ``DISTRIBUTED_LOGGER_C_LIBRARIES_RELEASE_STATIC)
-#   - ``DISTRIBUTED_LOGGER_CPP``
-#     (e.g., ``DISTRIBUTED_LOGGER_CPP_LIBRARIES_RELEASE_STATIC)
+# - ``security_plugins`` component:
+#   - ``SECURITY_PLUGINS``
+#     (e.g., ``SECURITY_PLUGINS_LIBRARIES_RELEASE_STATIC``)
 #
 # - ``monitoring_libraries`` component:
 #   - ``MONITORING_LIBRARIES``
@@ -248,9 +256,9 @@
 #   - ``RTIZRTPS``
 #     (e.g., ``RTIZRTPS_LIBRARIES_RELEASE_STATIC``)
 #
-#   Also, the ``<VAR>_FOUND`` variable is set for each one of the previous
-#   variables (e.g., ``MONITORING_LIBRARIES_RELEASE_STATIC_FOUND`` and
-#   ``MONITORING_LIBRARIES_FOUND`` are set).
+# Also, the ``<VAR>_FOUND`` variable is set for each one of the previous
+# variables (e.g., ``MONITORING_LIBRARIES_RELEASE_STATIC_FOUND`` and
+# ``MONITORING_LIBRARIES_FOUND`` are set).
 #
 # If you are building a simple ConnextDDS application (you are only using
 # the  core libraries), use the following variables:
@@ -258,7 +266,6 @@
 #  - For a C application: CONNEXTDDS_C_API
 #  - For a Traditional C++ application: CONNEXTDDS_CPP_API
 #  - For a Modern C++ application: CONNEXTDDS_CPP2_API
-#
 #
 # Lastly, if you want to use the security plugins (or any other component),
 # add the appropriate variables to your CMake script.
@@ -288,12 +295,18 @@
 #   will try to find OpenSSL in your system using find_package(OpenSSL). If you
 #   want to build against a specific installation of OpenSSL, you must set the
 #   ``CONNEXTDDS_OPENSSL_DIR`` to provide this module with the path to your
-#   installation of OpenSSL.
+#   installation of OpenSSL. This variable has to be populated with the OpenSSL
+#   root directory, e.g.:
+#   <CONNEXTDDS_DIR>/third_party/openssl-<version>/<architecture>/release/
 #
-# - Likewise, if you are building against the security_plugins component and
+#   Besides that, if you are building against the security_plugins component and
 #   you want to ensure that you are using a specific OpenSSL version, you must
 #   set the ``CONNEXTDDS_OPENSSL_VERSION`` so that it can be added to the
 #   find_package(OpenSSL) invocation.
+#
+#   Likewise, if instead of security_plugins you use security_plugins_wolfssl,
+#   you will use the variables ``CONNEXTDDS_WOLFSSL_DIR`` and
+#   ``CONNEXTDDS_WOLFSSL_VERSION``
 #
 # - If you want to build against debug versions of imported targets, you must
 #   enable ``CONNEXTDDS_IMPORTED_TARGETS_DEBUG``. Example:
@@ -365,20 +378,23 @@
 #
 # Supported platforms
 # ^^^^^^^^^^^^^^^^^^^
-# It is compatible with the following platforms listed in the
+# Oficially, this FindPackage supports the following platforms listed in the
 # RTI Connext DDS Core Libraries Platform Notes:
-# - Linux platforms: i86, x64 and ARMv8
-# - Darwin platforms: OS X 10.11-10.13
-# - Windows platforms: i86 and x64
-# - QNX platforms: x64 and ARMv8
-# - Raspbian Wheezy 7.0 (3.x kernel) on ARMv6 (armv6vfphLinux3.xgcc4.7.2)
-# - Android 5.0 and 5.1 (armv7aAndroid5.0gcc4.9ndkr10e)
+#
+# - Linux platforms: x64
+# - Darwin platforms: macOS 10.13-10.15
+# - Windows platforms: x64
+# - QNX platforms (7.0 and 7.1): x64 and ARMv8
+#
+# Other platforms and architectures might work, but they are not oficially
+# supported.
 #
 # Logging in versions lower than CMake 3.15
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# For versions lower than CMake 3.15 ``CMAKE_MINOR_VERSION`` variable should be
-# use to define lower logging levels than ``STATUS`` mode. All this modes will
-# show messages of current level and higher. The following modes are available:
+# For versions lower than CMake 3.15, ``CONNEXTDDS_LOG_LEVEL`` variable should
+# be used to define logging levels lower than ``STATUS`` mode. All these modes
+# will show messages of current level and higher. The following modes are
+# available:
 #
 # - ``STATUS``
 #   Default mode. This will olnly show messages with same or higher logging
@@ -740,7 +756,10 @@ message(STATUS "RTI Connext DDS architecture: ${CONNEXTDDS_ARCH}")
 # invocation, acording to the matching rules defined by CMake.
 #
 # Arguments:
-# - field_name: provides the name of the
+# - field_name: provides the name of the xml tag to search.
+# - rti_versions_file: contents of the rti_versions.xml file.
+# - rti_architectures: list of architectures to search if present in the
+#   rti_versions.xml file
 # Returns:
 # - A warning is shown and the `rtiversion_error` variable will be set if the
 #   component field is not present in rti_versions.xml or the version does not
@@ -1177,16 +1196,6 @@ elseif(CONNEXTDDS_ARCH MATCHES "Darwin")
         "RTI_DARWIN"
         "RTI_DARWIN10"
         "RTI_64BIT"
-    )
-elseif(CONNEXTDDS_ARCH MATCHES "Android")
-    set(CONNEXTDDS_EXTERNAL_LIBS
-        "-llog"
-        "-lc"
-        "-lm"
-    )
-    set(CONNEXTDDS_COMPILE_DEFINITIONS
-        "RTI_UNIX"
-        "LINUX RTI_ANDROID"
     )
 elseif(CONNEXTDDS_ARCH MATCHES "QNX7")
     set(CONNEXTDDS_EXTERNAL_LIBS
@@ -1857,7 +1866,6 @@ find_package_handle_standard_args(RTIConnextDDS
     VERSION_VAR
         RTICONNEXTDDS_VERSION
     HANDLE_COMPONENTS)
-
 
 #####################################################################
 # Create the imported targets                                       #
