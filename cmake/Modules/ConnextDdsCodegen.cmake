@@ -433,10 +433,10 @@ function(_connextdds_codegen_get_generated_file_list)
             "${path_base}.cxx"
             "${path_base}Plugin.cxx"
         )
-        set(${_CODEGEN_VAR}_HEADERS
+        set(headers
             "${path_base}.hpp"
             "${path_base}Plugin.hpp"
-            PARENT_SCOPE)
+        )
 
         if(${_CODEGEN_GENERATE_EXAMPLE})
             set(${_CODEGEN_VAR}_PUBLISHER_SOURCE
