@@ -406,6 +406,14 @@
 
 include(CMakeParseArguments)
 
+# Starting wiht CMake 3.12, find_package function calls searches for prefixes
+# specified by the <PackageName>_ROOT variable and its corresponding environment
+# variable. The OLD behaviour is to ignore those kind of variables, so we set
+# the policy to NEW.
+if(POLICY CMP0074)
+    cmake_policy(SET CMP0074 NEW)
+endif()
+
 #####################################################################
 # Logging Macros                                                    #
 #####################################################################
@@ -1506,6 +1514,14 @@ endif()
 #####################################################################
 # Security Plugins Component Variables                              #
 #####################################################################
+if(security_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    AND security_plugins_wolfssl IN_LIST RTIConnextDDS_FIND_COMPONENTS
+)
+    message(FATAL_ERROR
+        "Cannot use security plugins for OpenSSL and wolfSSL at the same time"
+    )
+endif()
+
 if(security_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     list(APPEND rti_versions_field_names_host
         "secure_base"
@@ -1528,10 +1544,9 @@ if(security_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     )
 
     if(SECURITY_PLUGINS_FOUND)
-        # We set the OPENSSL ROOT_DIR whether or not the variable
-        # CONNEXTDDS_OPENSSL_DIR is empty because it will just be used for
-        # searching. An empty path will not have any effect in the search.
-        set(OPENSSL_ROOT_DIR "${CONNEXTDDS_OPENSSL_DIR}")
+        if(DEFINED CONNEXTDDS_OPENSSL_DIR)
+            set(OPENSSL_ROOT_DIR "${CONNEXTDDS_OPENSSL_DIR}")
+        endif()
         find_package(OpenSSL ${CONNEXTDDS_OPENSSL_VERSION} REQUIRED)
 
         # Add OpenSSL include directories to the list of
@@ -1541,10 +1556,9 @@ if(security_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         )
 
         # Add OpenSSL libraries to the list of CONNEXTDDS_EXTERNAL_LIBS
-        set(CONNEXTDDS_EXTERNAL_LIBS
+        list(APPEND CONNEXTDDS_EXTERNAL_LIBS
             ${OPENSSL_SSL_LIBRARY}
             ${OPENSSL_CRYPTO_LIBRARY}
-            ${CONNEXTDDS_EXTERNAL_LIBS}
         )
 
         set(RTIConnextDDS_security_plugins_FOUND TRUE)
@@ -1554,7 +1568,7 @@ if(security_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
 
 endif()
 
-# Find the Security Plugins - this is for the WolfSSL case.
+# Find the Security Plugins - this is for the wolfSSL case.
 if(security_plugins_wolfssl IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     list(APPEND rti_versions_field_names_host
         "secure_base"
@@ -1577,27 +1591,19 @@ if(security_plugins_wolfssl IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     )
 
     if(SECURITY_PLUGINS_FOUND)
-        if(CONNEXTDDS_WOLFSSL_DIR)
-            find_package(WolfSSL
-                REQUIRED ${CONNEXTDDS_WOLFSSL_VERSION}
-                PATHS
-                    "${CONNEXTDDS_WOLFSSL_DIR}"
-            )
-        elseif(CONNEXTDDS_WOLFSSL_VERSION)
-            find_package(WolfSSL REQUIRED ${CONNEXTDDS_WOLFSSL_VERSION})
-        else()
-            find_package(WolfSSL REQUIRED)
+        if(DEFINED CONNEXTDDS_WOLFSSL_DIR)
+            set(WolfSSL_ROOT "${CONNEXTDDS_WOLFSSL_DIR}")
         endif()
+        find_package(WolfSSL ${CONNEXTDDS_WOLFSSL_VERSION} REQUIRED)
 
-        # Add WolfSSL include directories to the list of CONNEXTDDS_INCLUDE_DIRS
+        # Add wolfSSL include directories to the list of CONNEXTDDS_INCLUDE_DIRS
         list(APPEND CONNEXTDDS_INCLUDE_DIRS
             "${wolfSSL_INCLUDE_DIRS}"
         )
 
-        # Add OpenSSL libraries to the list of CONNEXTDDS_EXTERNAL_LIBS
-        set(CONNEXTDDS_EXTERNAL_LIBS
+        # Add wolfSSL libraries to the list of CONNEXTDDS_EXTERNAL_LIBS
+        list(APPEND CONNEXTDDS_EXTERNAL_LIBS
             ${wolfSSL_LIBRARY}
-            ${CONNEXTDDS_EXTERNAL_LIBS}
         )
 
         set(RTIConnextDDS_security_plugins_wolfssl_FOUND TRUE)
@@ -1883,9 +1889,16 @@ if(RTIConnextDDS_FOUND)
 
     set(target_definitions ${CONNEXTDDS_COMPILE_DEFINITIONS})
     if(BUILD_SHARED_LIBS)
-        set(target_definitions
-            ${CONNEXTDDS_COMPILE_DEFINITIONS}
-            ${CONNEXTDDS_DLL_EXPORT_MACRO})
+        list(APPEND target_definitions
+            ${CONNEXTDDS_DLL_EXPORT_MACRO}
+        )
+    else()
+        # RTI_STATIC definition is used in security examples, but we define it
+        # in the core imported target just in case it is spreaded to other
+        # examples.
+        list(APPEND target_definitions
+            "RTI_STATIC"
+        )
     endif()
 
     set_target_properties(RTIConnextDDS::core
@@ -2004,13 +2017,25 @@ if(RTIConnextDDS_FOUND)
     # Security plugins
     set(dependencies RTIConnextDDS::c_api)
 
-    # The OpenSSL imported targets are created by find_package(OpenSSL).
-    if(TARGET OpenSSL::SSL)
-        set(dependencies ${dependencies} OpenSSL::SSL)
-    endif()
-
-    if(TARGET OpenSSL::Crypto)
-        set(dependencies ${dependencies} OpenSSL::Crypto)
+    # The OpenSSL and wolfSSL imported targets are created by
+    # find_package(OpenSSL|wolfSSL). We ensure not linking against OpenSSL if
+    # wolfSSL is found to avoid problems. This could happen if we first search
+    # for OpenSSL and then call the FindPackage asking for Wolf.
+    if(TARGET wolfSSL::wolfSSL)
+        list(APPEND dependencies
+            wolfSSL::wolfSSL
+        )
+    else()
+        if(TARGET OpenSSL::SSL)
+            list(APPEND dependencies
+                OpenSSL::SSL
+            )
+        endif()
+        if(TARGET OpenSSL::Crypto)
+            list(APPEND dependencies
+                OpenSSL::Crypto
+            )
+        endif()
     endif()
 
     create_connext_imported_target(
