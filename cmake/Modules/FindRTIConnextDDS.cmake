@@ -2100,7 +2100,7 @@ if(RTIConnextDDS_FOUND)
 
     # EDISC
     create_connext_imported_target(
-        TARGET "low_bandwidth_discovery_static"
+        TARGET "low_bandwidth_edisc"
         VAR "LOW_BANDWIDTH_EDISC"
         DEPENDENCIES
             RTIConnextDDS::c_api
