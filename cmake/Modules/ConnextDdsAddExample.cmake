@@ -260,6 +260,8 @@ function(connextdds_add_example)
         SOURCES
             $<TARGET_OBJECTS:${prefix}_${lang_var}_obj>
             "${publisher_src}"
+        DEPENDENCIES
+            ${_CONNEXT_DEPENDENCIES}
     )
 
     if(NOT _CONNEXT_DISABLE_SUBSCRIBER)
@@ -274,6 +276,8 @@ function(connextdds_add_example)
             SOURCES
                 $<TARGET_OBJECTS:${prefix}_${lang_var}_obj>
                 "${subscriber_src}"
+            DEPENDENCIES
+                ${_CONNEXT_DEPENDENCIES}
         )
     endif()
 endfunction()
