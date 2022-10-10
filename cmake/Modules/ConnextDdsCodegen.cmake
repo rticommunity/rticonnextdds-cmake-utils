@@ -60,7 +60,7 @@ Arguments:
 
 ``LANG`` (mandatory)
     The language to generate source files for. Expected values are:
-    C, C++, C++03, C++11, C++/CLI, C# and Java.
+    C, C++, C++98, C++03, C++11, C++/CLI, C# and Java.
 
 ``VAR``
     Use ``VAR`` as a prefix instead of using the IDL basename to name return
@@ -369,7 +369,9 @@ function(_connextdds_codegen_get_generated_file_list)
             set(${_CODEGEN_VAR}_SUBSCRIBER_SOURCE PARENT_SCOPE)
         endif()
 
-    elseif("${_CODEGEN_LANG}" STREQUAL "C++")
+    elseif("${_CODEGEN_LANG}" STREQUAL "C++"
+        OR "${_CODEGEN_LANG}" STREQUAL "C++98"
+    )
         set(sources "${path_base}.cxx")
         set(headers "${path_base}.h")
 
@@ -402,7 +404,8 @@ function(_connextdds_codegen_get_generated_file_list)
         endif()
 
     elseif("${_CODEGEN_LANG}" STREQUAL "C#"
-            OR "${_CODEGEN_LANG}" STREQUAL "C++/CLI")
+        OR "${_CODEGEN_LANG}" STREQUAL "C++/CLI"
+    )
         set(${_CODEGEN_VAR}_SOURCES
             "${path_base}.cpp"
             "${path_base}Plugin.cpp"
@@ -428,7 +431,8 @@ function(_connextdds_codegen_get_generated_file_list)
                 PARENT_SCOPE)
         endif()
     elseif("${_CODEGEN_LANG}" STREQUAL "C++03"
-            OR "${_CODEGEN_LANG}" STREQUAL "C++11")
+        OR "${_CODEGEN_LANG}" STREQUAL "C++11"
+    )
         set(sources
             "${path_base}.cxx"
             "${path_base}Plugin.cxx"

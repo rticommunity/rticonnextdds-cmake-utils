@@ -235,9 +235,11 @@ function(connextdds_add_example)
         set(subscriber_src ${${_CONNEXT_IDL}_${lang_var}_SUBSCRIBER_SOURCE})
     else()
         set(ex "c")
-        if("${_CONNEXT_LANG}" STREQUAL "C++" OR
-            "${_CONNEXT_LANG}" STREQUAL "C++03" OR
-            "${_CONNEXT_LANG}" STREQUAL "C++11")
+        if("${_CONNEXT_LANG}" STREQUAL "C++"
+            OR "${_CONNEXT_LANG}" STREQUAL "C++98"
+            OR "${_CONNEXT_LANG}" STREQUAL "C++03"
+            OR "${_CONNEXT_LANG}" STREQUAL "C++11"
+        )
             set(ex "cxx")
         endif()
 
@@ -347,7 +349,9 @@ function(connextdds_call_codegen)
     set(api "c")
     set(c_standard C_STANDARD 90)
     set(cxx_standard CXX_STANDARD 98)
-    if("${_CONNEXT_LANG}" STREQUAL "C++")
+    if("${_CONNEXT_LANG}" STREQUAL "C++"
+        OR "${_CONNEXT_LANG}" STREQUAL "C++98"
+    )
         set(api "cpp")
     elseif("${_CONNEXT_LANG}" STREQUAL "C++03")
         set(api "cpp2")
@@ -457,7 +461,9 @@ function(connextdds_add_application)
     set(api "c")
     set(c_standard C_STANDARD 90)
     set(cxx_standard CXX_STANDARD 98)
-    if("${_CONNEXT_LANG}" STREQUAL "C++")
+    if("${_CONNEXT_LANG}" STREQUAL "C++"
+        OR "${_CONNEXT_LANG}" STREQUAL "C++98"
+    )
         set(api "cpp")
     elseif("${_CONNEXT_LANG}" STREQUAL "C++03")
         set(api "cpp2")
