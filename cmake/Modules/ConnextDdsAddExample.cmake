@@ -30,7 +30,8 @@ CMake targets and set the dependencies.
 ``IDL`` (required):
     Name of the IDL file (without extension).
 ``LANG`` (required):
-    Example language. Valid values are ``C``, ``C++``, ``C++03`` and ``C++11``.
+    Example language. Valid values are ``C``, ``C++``, ``C++98``, ``C++03`` and
+    ``C++11``.
 ``PREFIX``:
     Prefix name for the targets. If not present, the folder of the example name
     will be used as prefix.
