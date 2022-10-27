@@ -472,9 +472,10 @@ function(connextdds_openssl_generate_signed_certificate)
         _OPENSSL_CA_KEY_FILE _OPENSSL_CA_CONFIG_FILE _OPENSSL_CA_CERT_FILE
     )
 
-    # The cert request file is just the cert file with "Cert" replaced by "Req".
+    # The cert request file is just the cert file with "_cert" replaced by
+    # "Req".
     set(certRequestFile)
-    string(REPLACE "Cert" "Req" certRequestFile "${_OPENSSL_OUTPUT_CERT_FILE}")
+    string(REPLACE "_cert" "Req" certRequestFile "${_OPENSSL_OUTPUT_CERT_FILE}")
 
     # Get the directory to create temporal files
     get_filename_component(cert_dir "${_OPENSSL_OUTPUT_CERT_FILE}" DIRECTORY)
