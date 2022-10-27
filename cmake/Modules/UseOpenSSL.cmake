@@ -212,6 +212,8 @@ set(OPENSSL_COMMAND
     ${OPENSSL_EXECUTABLE}
 )
 
+set(CONNEXTDDS_RESOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../..")
+
 function(connextdds_openssl_generate_rsa_key)
     set(options "")
     set(single_args OUTPUT_KEY_FILE PASSWORD KEY_ENCRYPTION NUMBITS)
@@ -442,7 +444,7 @@ endfunction()
 function(connextdds_openssl_generate_signed_certificate)
     set(options INCLUDE_CA_CERT TEXT RSA_PSS_PADDING)
     set(single_value_args
-        OUTPUT_PEM_FILE OUTPUT_CERT_FILE OUTPUT_KEY_FILE
+        OUTPUT_CERT_FILE OUTPUT_KEY_FILE
         CONFIG_FILE DAYS WORKING_DIRECTORY
         RSA_KEY_PASSWORD RSA_KEY_ENCRYPTION RSA_NUMBITS
         ECPARAM_NAME ECPARAM_OUTPUT_FILE
@@ -470,7 +472,6 @@ function(connextdds_openssl_generate_signed_certificate)
     string(REPLACE "Cert" "Req" certRequestFile "${_OPENSSL_OUTPUT_CERT_FILE}")
 
     # Get the directory to create temporal files
-    get_filename_component(pem_dir "${_OPENSSL_OUTPUT_PEM_FILE}" DIRECTORY)
     get_filename_component(cert_dir "${_OPENSSL_OUTPUT_CERT_FILE}" DIRECTORY)
     get_filename_component(key_dir "${_OPENSSL_OUTPUT_KEY_FILE}" DIRECTORY)
 
@@ -581,7 +582,7 @@ function(connextdds_openssl_generate_signed_certificate)
         # Pre-requesites: create folder and database
         COMMAND
             ${CMAKE_COMMAND} -E make_directory
-                ${pem_dir} ${cert_dir} ${key_dir}
+                ${cert_dir} ${key_dir}
         # Create the certificate request
         COMMAND
             ${OPENSSL_COMMAND} req
@@ -611,26 +612,6 @@ function(connextdds_openssl_generate_signed_certificate)
             ${_OPENSSL_CA_CERT_FILE}
             ${_OPENSSL_CA_KEY_FILE}
     )
-
-    if(_OPENSSL_OUTPUT_PEM_FILE)
-        set(pem_file_input
-            ${_OPENSSL_OUTPUT_CERT_FILE}
-            ${append_ca_files}
-            ${_OPENSSL_OUTPUT_KEY_FILE}
-        )
-        add_custom_command(
-            OUTPUT "${_OPENSSL_OUTPUT_PEM_FILE}"
-            # Concatenate the key with the certificate
-            COMMAND
-                ${CMAKE_COMMAND}
-                    -DOUTPUT=${_OPENSSL_OUTPUT_PEM_FILE}
-                    "-DINPUTS=${pem_file_input}"
-                    -P ${CONNEXTDDS_RESOURCE_DIR}/cmake/Scripts/Concatenate.cmake
-            DEPENDS
-                "${pem_file_input}"
-            VERBATIM
-        )
-    endif()
 endfunction()
 
 function(connextdds_openssl_smime_sign)
