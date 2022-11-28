@@ -462,12 +462,12 @@ endif()
 # Arguments:
 # - message: provides the text message
 if("${CMAKE_MINOR_VERSION}" GREATER_EQUAL "15")
-    macro(connextdds_log_verbose message)
-        message(VERBOSE "VERBOSE ${message}")
+    macro(connextdds_log_verbose)
+        message(VERBOSE "VERBOSE " ${ARGN})
     endmacro()
 
-    macro(connextdds_log_debug message)
-        message(DEBUG "DEBUG ${message}")
+    macro(connextdds_log_debug)
+        message(DEBUG "  DEBUG " ${ARGN})
     endmacro()
 else()
     set(CONNEXTDDS_LOG_LEVEL_LIST "STATUS" "VERBOSE" "DEBUG")
@@ -484,15 +484,15 @@ else()
                 "It's default value is STATUS.")
     endif()
 
-    macro(connextdds_log_verbose message)
+    macro(connextdds_log_verbose)
         if("${CONNEXTDDS_LOG_LEVEL}" MATCHES "VERBOSE|DEBUG")
-            message(STATUS "VERBOSE ${message}")
+            message(STATUS "VERBOSE " ${ARGN})
         endif()
     endmacro()
 
-    macro(connextdds_log_debug message)
+    macro(connextdds_log_debug)
         if("${CONNEXTDDS_LOG_LEVEL}" STREQUAL "DEBUG")
-            message(STATUS "  DEBUG ${message}")
+            message(STATUS "  DEBUG " ${ARGN})
         endif()
     endmacro()
 endif()
@@ -1004,6 +1004,9 @@ function(get_all_library_variables
     set(${result_var_name}_LIBRARIES
         ${result_var_name}_LIBRARIES_${build_mode}_${link_mode})
     connextdds_log_debug(
+        "\t${result_var_name}_LIBRARIES=${${result_var_name}_LIBRARIES}"
+    )
+    connextdds_log_debug(
         "===================================================================="
     )
 endfunction()
@@ -1036,6 +1039,11 @@ function(create_connext_imported_target)
         ${ARGN}
     )
 
+    connextdds_log_debug("create_connext_imported_target called")
+    connextdds_log_debug(
+        "===================================================================="
+    )
+
     if(WIN32
         AND NOT BUILD_SHARED_LIBS
         AND ${_CONNEXT_TARGET} STREQUAL "routing_service_c"
@@ -1047,15 +1055,30 @@ function(create_connext_imported_target)
     endif()
 
     set(target_name RTIConnextDDS::${_CONNEXT_TARGET})
+    connextdds_log_debug("\ttarget_name=${target_name}")
+
     if(TARGET ${target_name})
+        connextdds_log_debug("\tThe target already exists. Skipping...")
+        connextdds_log_debug(
+            "=================================================================="
+            "=="
+        )
         return() # Nothing to be done
     endif()
 
     if(NOT ${_CONNEXT_VAR}_FOUND)
+        connextdds_log_debug(
+            "\tNot every library configuration has been found. Skipping..."
+        )
+        connextdds_log_debug(
+            "=================================================================="
+            "=="
+        )
         return() # Nothing to be done
     endif()
 
     set(imported_lib "${_CONNEXT_VAR}_LIBRARIES")
+    connextdds_log_debug("\timported_lib=${imported_lib}")
 
     # Get the library for the non multiconfiguration generators
     if(CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
@@ -1085,6 +1108,9 @@ function(create_connext_imported_target)
         set(location_property IMPORTED_LOCATION)
     endif()
 
+    connextdds_log_debug("\t${location_property}=${imported_lib}_${link_mode}:")
+    connextdds_log_debug("\t\t${module_library}")
+
     # Set properties for all the targets
     set_target_properties(${target_name}
         PROPERTIES
@@ -1110,6 +1136,12 @@ function(create_connext_imported_target)
                 imported_library
             )
 
+            connextdds_log_debug(
+                "\t${location_property}_${build_mode}="
+                "${_CONNEXT_VAR}_LIBRARIES_${build_mode}_${link_mode}"
+            )
+            connextdds_log_debug("\t\t${imported_library}")
+
             set_target_properties(${target_name}
                 PROPERTIES
                     ${location_property}_${build_mode}
@@ -1117,6 +1149,10 @@ function(create_connext_imported_target)
             )
         endforeach()
     endif()
+
+    connextdds_log_debug(
+        "===================================================================="
+    )
 endfunction()
 
 #####################################################################
