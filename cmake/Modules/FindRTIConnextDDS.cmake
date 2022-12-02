@@ -308,9 +308,17 @@
 #   you will use the variables ``CONNEXTDDS_WOLFSSL_DIR`` and
 #   ``CONNEXTDDS_WOLFSSL_VERSION``
 #
-# - If you want to build against debug versions of imported targets, you must
-#   enable ``CONNEXTDDS_IMPORTED_TARGETS_DEBUG``. Example:
+# - By default the imported targets will be provided with the release build
+#   type. If you want to build against debug versions of the imported targets,
+#   you must enable ``CONNEXTDDS_IMPORTED_TARGETS_DEBUG``. Example:
 #       cmake -DCONNEXTDDS_IMPORTED_TARGETS_DEBUG=ON
+#
+# - On the other hand, if you want to link against the global build type
+#   imported targets (the one provided by the ``CMAKE_BUILD_TYPE`` variable) you
+#   will have to enable the option ``CONNEXT_USE_GLOBAL_BUILD_TYPE``. Example:
+#       cmake -DCONNEXT_USE_GLOBAL_BUILD_TYPE=ON
+#   Take into account that if this variable is set,
+#   ``CONNEXTDDS_IMPORTED_TARGETS_DEBUG`` will not have any effect.
 #
 # Note
 # ^^^^
@@ -415,6 +423,34 @@ if(POLICY CMP0074)
 endif()
 
 #####################################################################
+# Global Variables                                                  #
+#####################################################################
+
+option(CONNEXTDDS_IMPORTED_TARGETS_DEBUG
+    "Force the linker to use the Connext debug libraries"
+    OFF
+)
+option(CONNEXT_USE_GLOBAL_BUILD_TYPE
+    "Enforce the Connext libraries build type speficied by the global\
+ CMAKE_BUILD_TYPE variable" 
+    OFF
+)
+set(CONNEXTDDS_LOG_LEVEL
+    "STATUS"
+    CACHE
+    STRING
+    "Set the logging level for the script"
+)
+
+if(CONNEXT_USE_GLOBAL_BUILD_TYPE AND CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
+    message(WARNING
+        "WARNING When using the `CONNEXT_USE_GLOBAL_BUILD_TYPE`, the"
+        " `CONNEXTDDS_IMPORTED_TARGETS_DEBUG` variable will not have any"
+        " effect. Only the global CMAKE_BUILD_TYPE will be taken into account."
+    )
+endif()
+
+#####################################################################
 # Logging Macros                                                    #
 #####################################################################
 
@@ -426,12 +462,12 @@ endif()
 # Arguments:
 # - message: provides the text message
 if("${CMAKE_MINOR_VERSION}" GREATER_EQUAL "15")
-    macro(connextdds_log_verbose message)
-        message(VERBOSE "VERBOSE ${message}")
+    macro(connextdds_log_verbose)
+        message(VERBOSE "VERBOSE " ${ARGN})
     endmacro()
 
-    macro(connextdds_log_debug message)
-        message(DEBUG "DEBUG ${message}")
+    macro(connextdds_log_debug)
+        message(DEBUG "  DEBUG " ${ARGN})
     endmacro()
 else()
     set(CONNEXTDDS_LOG_LEVEL_LIST "STATUS" "VERBOSE" "DEBUG")
@@ -448,15 +484,15 @@ else()
                 "It's default value is STATUS.")
     endif()
 
-    macro(connextdds_log_verbose message)
+    macro(connextdds_log_verbose)
         if("${CONNEXTDDS_LOG_LEVEL}" MATCHES "VERBOSE|DEBUG")
-            message(STATUS "VERBOSE ${message}")
+            message(STATUS "VERBOSE " ${ARGN})
         endif()
     endmacro()
 
-    macro(connextdds_log_debug message)
+    macro(connextdds_log_debug)
         if("${CONNEXTDDS_LOG_LEVEL}" STREQUAL "DEBUG")
-            message(STATUS "  DEBUG ${message}")
+            message(STATUS "  DEBUG " ${ARGN})
         endif()
     endmacro()
 endif()
@@ -968,6 +1004,9 @@ function(get_all_library_variables
     set(${result_var_name}_LIBRARIES
         ${result_var_name}_LIBRARIES_${build_mode}_${link_mode})
     connextdds_log_debug(
+        "\t${result_var_name}_LIBRARIES=${${result_var_name}_LIBRARIES}"
+    )
+    connextdds_log_debug(
         "===================================================================="
     )
 endfunction()
@@ -1000,6 +1039,11 @@ function(create_connext_imported_target)
         ${ARGN}
     )
 
+    connextdds_log_debug("create_connext_imported_target called")
+    connextdds_log_debug(
+        "===================================================================="
+    )
+
     if(WIN32
         AND NOT BUILD_SHARED_LIBS
         AND ${_CONNEXT_TARGET} STREQUAL "routing_service_c"
@@ -1011,15 +1055,30 @@ function(create_connext_imported_target)
     endif()
 
     set(target_name RTIConnextDDS::${_CONNEXT_TARGET})
+    connextdds_log_debug("\ttarget_name=${target_name}")
+
     if(TARGET ${target_name})
+        connextdds_log_debug("\tThe target already exists. Skipping...")
+        connextdds_log_debug(
+            "=================================================================="
+            "=="
+        )
         return() # Nothing to be done
     endif()
 
     if(NOT ${_CONNEXT_VAR}_FOUND)
+        connextdds_log_debug(
+            "\tNot every library configuration has been found. Skipping..."
+        )
+        connextdds_log_debug(
+            "=================================================================="
+            "=="
+        )
         return() # Nothing to be done
     endif()
 
     set(imported_lib "${_CONNEXT_VAR}_LIBRARIES")
+    connextdds_log_debug("\timported_lib=${imported_lib}")
 
     # Get the library for the non multiconfiguration generators
     if(CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
@@ -1049,6 +1108,9 @@ function(create_connext_imported_target)
         set(location_property IMPORTED_LOCATION)
     endif()
 
+    connextdds_log_debug("\t${location_property}=${imported_lib}_${link_mode}:")
+    connextdds_log_debug("\t\t${module_library}")
+
     # Set properties for all the targets
     set_target_properties(${target_name}
         PROPERTIES
@@ -1067,19 +1129,30 @@ function(create_connext_imported_target)
         )
     endif()
 
-    # Set properties per configuration
-    foreach(build_mode "RELEASE" "DEBUG")
+    if(CONNEXT_USE_GLOBAL_BUILD_TYPE)
+        # Set properties per configuration
+        foreach(build_mode "RELEASE" "DEBUG")
+            list(GET ${_CONNEXT_VAR}_LIBRARIES_${build_mode}_${link_mode} 0
+                imported_library
+            )
 
-        list(GET ${_CONNEXT_VAR}_LIBRARIES_${build_mode}_${link_mode} 0
-            imported_library
-        )
+            connextdds_log_debug(
+                "\t${location_property}_${build_mode}="
+                "${_CONNEXT_VAR}_LIBRARIES_${build_mode}_${link_mode}"
+            )
+            connextdds_log_debug("\t\t${imported_library}")
 
-        set_target_properties(${target_name}
-            PROPERTIES
-                ${location_property}_${build_mode}
-                    "${imported_library}"
-        )
-    endforeach()
+            set_target_properties(${target_name}
+                PROPERTIES
+                    ${location_property}_${build_mode}
+                        "${imported_library}"
+            )
+        endforeach()
+    endif()
+
+    connextdds_log_debug(
+        "===================================================================="
+    )
 endfunction()
 
 #####################################################################
