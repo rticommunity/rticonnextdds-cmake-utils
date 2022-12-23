@@ -31,6 +31,8 @@
 # - transport_tls
 # - transport_wan
 # - recording_service
+# - cloud_discovery_service
+# - persistence_service
 # - low_bandwidth_plugins
 # - rtizrtps
 #
@@ -123,6 +125,16 @@
 #   The Recording Service library if found (includes rtirecordingservice,
 #   rtiroutingservice, rtirsinfrastructure, nddscpp2, rtidlc, nddsmetp,
 #   rticonnextmsgc and rtixml2).
+# - ``RTIConnextDDS::cloud_discovery_service_c``
+#   The Cloud Discovery Service library if found (includes rtirecordingservice,
+#   rtiroutingservice, rtirsinfrastructure, nddscpp2, rtidlc, nddsmetp,
+#   rticonnextmsgc and rtixml2).
+# - ``RTIConnextDDS::cloud_discovery_service_cpp``
+#   The same as RTIConnextDDS::cloud_discovery_service_c but adding the CPP
+#   libraries.
+# - ``RTIConnextDDS::persistence_service_c``
+#   The C API for Persistence Service if found (includes nddsc, nddscore,
+#   rtisqlite, also rtidlc if found).
 #
 # Result Variables
 # ^^^^^^^^^^^^^^^^
@@ -237,6 +249,16 @@
 # - ``recording_service`` component:
 #   - ``RECORDING_SERVICE_API``
 #     (e.g., ``RECORDING_SERVICE_API_LIBRARIES_RELEASE_STATIC``)
+#
+# - ``cloud_discovery_service`` component:
+#   - ``CLOUD_DISCOVERY_SERVICE_API_C``
+#     (e.g., ``CLOUD_DISCOVERY_SERVICE_API_C_LIBRARIES_RELEASE_STATIC``)
+#   - ``CLOUD_DISCOVERY_SERVICE_API_CPP``
+#     (e.g., ``CLOUD_DISCOVERY_SERVICE_API_CPP_LIBRARIES_RELEASE_STATIC``)
+#
+# - ``persistence_service`` component:
+#   - ``PERSISTENCE_SERVICE_API_C``
+#     (e.g., ``PERSISTENCE_SERVICE_API_C_LIBRARIES_RELEASE_STATIC``)
 #
 # - ``low_bandwidth_plugins`` component:
 #   - ``LOW_BANDWIDTH_DISCOVERY_STATIC``
@@ -1405,8 +1427,9 @@ endif()
 # Distributed Logger Component Variables                            #
 #####################################################################
 # Routing Service depends on Distributed Logger and Recording Service in
-# Routing Service
+# Routing Service. Also Cloud Discovery Service depends on Routing Service.
 if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
 )
@@ -1452,8 +1475,9 @@ endif()
 # Messaging Component Variables                                     #
 #####################################################################
 # Routing Service depends on the Messaging API and Recording Service depends
-# on Routing Service
+# on Routing Service. Also Cloud Discovery Service depends on Routing Service.
 if(messaging_api IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
 )
@@ -1497,8 +1521,9 @@ endif()
 #####################################################################
 # Routing Service Component Variables                               #
 #####################################################################
-# Recording Service depends on Routing Service
+# Recording Service and Cloud Discovery Service depend on Routing Service
 if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
 )
     # Add fields associated with the routing_service component
@@ -1818,6 +1843,58 @@ if(recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     endif()
 endif()
 
+#####################################################################
+# Cloud Discovery Service API Component Variables                   #
+#####################################################################
+
+if(cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
+
+    set(cloud_discovery_service_api_c_libs
+        "rticlouddiscoveryservice"
+        "rtiroutingservice"
+        "rtirsinfrastructure"
+        "rtiapputilsc"
+        "rtixml2"
+        "nddsc"
+        "nddscore"
+        "rtidlc"
+        "nddsmetp"
+        "rtimonitoring"  # TODO: rtimonitoring2???????
+        "rticonnextmsgc"
+    )
+    get_all_library_variables("${cloud_discovery_service_api_c_libs}"
+        "CLOUD_DISCOVERY_SERVICE_API_C"
+    )
+
+    if(CLOUD_DISCOVERY_SERVICE_API_C) # AND CLOUD_DISCOVERY_SERVICE_API_CPP_FOUND)
+        set(RTIConnextDDS_cloud_discovery_service_FOUND TRUE)
+    else()
+        set(RTIConnextDDS_cloud_discovery_service_FOUND FALSE)
+    endif()
+endif()
+
+#####################################################################
+# Persistence Service API Component Variables                       #
+#####################################################################
+
+if(persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
+    set(persistence_service_api_c_libs
+        "nddsc"
+        "nddscore"
+        "rtidlc"
+        "rtisqlite"
+    )
+
+    get_all_library_variables("${persistence_service_api_c_libs}"
+        "PERSISTENCE_SERVICE_API_C"
+    )
+
+    if(PERSISTENCE_SERVICE_API_C)
+        set(RTIConnextDDS_persistence_service_FOUND TRUE)
+    else()
+        set(RTIConnextDDS_persistence_service_FOUND FALSE)
+    endif()
+endif()
 
 #####################################################################
 # Low Bandwidth Pluggins Component Variables                        #
@@ -2314,4 +2391,36 @@ if(RTIConnextDDS_FOUND)
             RTIConnextDDS::cpp2_api
     )
 
+    # Cloud Discovery Service
+    create_connext_imported_target(
+        TARGET "cloud_discovery_service_c"
+        VAR "CLOUD_DISCOVERY_SERVICE_API_C"
+        DEPENDENCIES
+            RTIConnextDDS::routing_service_c
+    )
+
+    # Cloud Discovery Service CPP libraries are the C libraries + the CPP API
+    create_connext_imported_target(
+        TARGET "cloud_discovery_service_cpp"
+        VAR "CLOUD_DISCOVERY_SERVICE_API_CPP"
+        DEPENDENCIES
+            RTIConnextDDS::cloud_discovery_service_c
+            RTIConnextDDS::cpp_api
+    )
+
+    # Persistence Service C API
+    set(dependencies)
+
+    if(TARGET RTIConnextDDS::distributed_logger_c)
+        list(APPEND dependencies
+            RTIConnextDDS::distributed_logger_c
+        )
+    endif()
+
+    create_connext_imported_target(
+        TARGET "persistence_service_c"
+        VAR "PERSISTENCE_SERVICE_API_C"
+        DEPENDENCIES
+            ${dependencies}
+    )
 endif()
