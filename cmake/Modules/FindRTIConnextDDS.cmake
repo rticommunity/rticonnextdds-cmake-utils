@@ -1859,7 +1859,7 @@ if(cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "nddscore"
         "rtidlc"
         "nddsmetp"
-        "rtimonitoring"  # TODO: rtimonitoring2???????
+        "rtimonitoring"
         "rticonnextmsgc"
     )
     get_all_library_variables("${cloud_discovery_service_api_c_libs}"
