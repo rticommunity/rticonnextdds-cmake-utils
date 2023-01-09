@@ -1426,8 +1426,8 @@ endif()
 #####################################################################
 # Distributed Logger Component Variables                            #
 #####################################################################
-# Routing Service depends on Distributed Logger and Recording Service in
-# Routing Service. Also Cloud Discovery Service depends on Routing Service.
+# Routing Service depends on Distributed Logger. Both Recording Service and
+# Cloud Discovery Service depend on Routing Service.
 if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
@@ -1474,8 +1474,8 @@ endif()
 #####################################################################
 # Messaging Component Variables                                     #
 #####################################################################
-# Routing Service depends on the Messaging API and Recording Service depends
-# on Routing Service. Also Cloud Discovery Service depends on Routing Service.
+# Routing Service depends on the Messaging API. Both Recording Service and
+# Cloud Discovery Service depend on Routing Service.
 if(messaging_api IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
