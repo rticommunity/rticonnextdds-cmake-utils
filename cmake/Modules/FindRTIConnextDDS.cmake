@@ -454,7 +454,7 @@ option(CONNEXTDDS_IMPORTED_TARGETS_DEBUG
 )
 option(CONNEXT_USE_GLOBAL_BUILD_TYPE
     "Enforce the Connext libraries build type speficied by the global\
- CMAKE_BUILD_TYPE variable" 
+ CMAKE_BUILD_TYPE variable"
     OFF
 )
 set(CONNEXTDDS_LOG_LEVEL
@@ -1432,6 +1432,7 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
 )
 
     # Find all flavors of rtidlc
@@ -1866,7 +1867,7 @@ if(cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "CLOUD_DISCOVERY_SERVICE_API_C"
     )
 
-    if(CLOUD_DISCOVERY_SERVICE_API_C) # AND CLOUD_DISCOVERY_SERVICE_API_CPP_FOUND)
+    if(CLOUD_DISCOVERY_SERVICE_API_C_FOUND)
         set(RTIConnextDDS_cloud_discovery_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_cloud_discovery_service_FOUND FALSE)
@@ -1879,6 +1880,7 @@ endif()
 
 if(persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     set(persistence_service_api_c_libs
+        "rtipersistenceservice"
         "nddsc"
         "nddscore"
         "rtidlc"
@@ -1889,7 +1891,7 @@ if(persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         "PERSISTENCE_SERVICE_API_C"
     )
 
-    if(PERSISTENCE_SERVICE_API_C)
+    if(PERSISTENCE_SERVICE_API_C_FOUND)
         set(RTIConnextDDS_persistence_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_persistence_service_FOUND FALSE)
@@ -2414,6 +2416,12 @@ if(RTIConnextDDS_FOUND)
     if(TARGET RTIConnextDDS::distributed_logger_c)
         list(APPEND dependencies
             RTIConnextDDS::distributed_logger_c
+        )
+    endif()
+
+    if(TARGET RTIConnextDDS::rtisqlite)
+        list(APPEND dependencies
+            RTIConnextDDS::rtisqlite
         )
     endif()
 
