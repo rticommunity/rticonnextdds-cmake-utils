@@ -2403,11 +2403,11 @@ if(RTIConnextDDS_FOUND)
 
     # Cloud Discovery Service CPP libraries are the C libraries + the CPP API
     create_connext_imported_target(
-        TARGET "cloud_discovery_service_cpp"
-        VAR "CLOUD_DISCOVERY_SERVICE_API_CPP"
+        TARGET "cloud_discovery_service_cpp2"
+        VAR "CLOUD_DISCOVERY_SERVICE_API_C"
         DEPENDENCIES
             RTIConnextDDS::cloud_discovery_service_c
-            RTIConnextDDS::cpp_api
+            RTIConnextDDS::cpp2_api
     )
 
     # Persistence Service C API
