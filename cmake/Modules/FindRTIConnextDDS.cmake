@@ -1002,7 +1002,7 @@ function(get_all_library_variables
     endif()
 
     set(${result_var_name}_LIBRARIES
-        ${result_var_name}_LIBRARIES_${build_mode}_${link_mode})
+        ${result_var_name}_LIBRARIES_${build_mode}_${link_mode} PARENT_SCOPE)
     connextdds_log_debug(
         "\t${result_var_name}_LIBRARIES=${${result_var_name}_LIBRARIES}"
     )
