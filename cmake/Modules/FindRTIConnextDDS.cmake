@@ -135,6 +135,9 @@
 # - ``RTIConnextDDS::persistence_service_c``
 #   The C API for Persistence Service if found (includes rtipersistenceservice,
 #   nddsc, nddscore, rtisqlite, also rtidlc if found).
+# - ``RTIConnextDDS::web_integration_service_cpp``
+#   The CPP API for Web Integration Service if found (rtiwebintegrationservice,
+#   nddscore, nddsc, nddscpp, rtiapputilsc, rtisqlite if found).
 # Result Variables
 # ^^^^^^^^^^^^^^^^
 # This module will set the following variables in your project:
@@ -259,6 +262,10 @@
 #   - ``PERSISTENCE_SERVICE_API_C``
 #     (e.g., ``PERSISTENCE_SERVICE_API_C_LIBRARIES_RELEASE_STATIC``)
 #
+# - ``web_integration_service`` component:
+#   - ``WEB_INTEGRATION_SERVICE_API_CPP``
+#     (e.g., ``WEB_INTEGRATION_SERVICE_API_CPP_LIBRARIES_RELEASE_STATIC``)
+
 # - ``low_bandwidth_plugins`` component:
 #   - ``LOW_BANDWIDTH_DISCOVERY_STATIC``
 #     (e.g., ``LOW_BANDWIDTH_DISCOVERY_STATIC_LIBRARIES_RELEASE_STATIC``)
@@ -1898,6 +1905,55 @@ if(persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
 endif()
 
 #####################################################################
+# Web Integration Service API Component Variables                   #
+#####################################################################
+
+if(web_integration_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
+
+    set(web_integration_service_api_cpp_libs
+        "rtiwebintegrationservice"
+        "nddscore"
+        "nddsc"
+        "nddscpp"
+        "rtiapputilsc"
+        "rtisqlite"
+    )
+    get_all_library_variables("${web_integration_service_api_cpp_libs}"
+        "WEB_INTEGRATION_SERVICE_API_CPP"
+    )
+
+    if(WEB_INTEGRATION_SERVICE_API_CPP_FOUND)
+        string(TOLOWER "${CMAKE_BUILD_TYPE}" _lower_build_mode)
+        file(GLOB _civetweb_config_dir_list
+            LIST_DIRECTORIES TRUE
+            "${CONNEXTDDS_DIR}/third_party/civetweb-*/${CONNEXTDDS_ARCH}/${_lower_build_mode}/lib/cmake/civetweb/"
+        )
+        list(GET _civetweb_config_dir_list 0 civetweb_DIR)
+        connextdds_log_debug("civetweb CMake config dir: ${civetweb_DIR}")
+        find_package(civetweb REQUIRED CONFIG)
+
+        # Add civetweb include directories to the list of CONNEXTDDS_INCLUDE_DIRS
+        list(APPEND CONNEXTDDS_INCLUDE_DIRS
+            "${civetweb_INCLUDE_DIR}"
+        )
+
+        # Add civetweb library to the list of CONNEXTDDS_EXTERNAL_LIBS
+        string(TOUPPER "${CMAKE_BUILD_TYPE}" _upper_build_mode)
+        get_target_property(civetweb_library civetweb::civetweb-cpp IMPORTED_LOCATION_${_upper_build_mode})
+        list(APPEND CONNEXTDDS_EXTERNAL_LIBS
+            ${civetweb_library}
+        )
+        unset(_lower_build_mode)
+        unset(_upper_build_mode)
+
+        set(RTIConnextDDS_web_integration_service_FOUND TRUE)
+    else()
+        set(RTIConnextDDS_web_integration_service_FOUND FALSE)
+    endif()
+
+endif()
+
+#####################################################################
 # Low Bandwidth Pluggins Component Variables                        #
 #####################################################################
 if(low_bandwidth_plugins IN_LIST RTIConnextDDS_FIND_COMPONENTS)
@@ -2416,12 +2472,13 @@ if(RTIConnextDDS_FOUND)
         DEPENDENCIES
             RTIConnextDDS::distributed_logger_c
             RTIConnextDDS::rtisqlite
-        )
+    )
 
+    # Web Integration Service CPP API
     create_connext_imported_target(
-        TARGET "persistence_service_c"
-        VAR "PERSISTENCE_SERVICE_API_C"
+        TARGET "web_integration_service_cpp"
+        VAR "WEB_INTEGRATION_SERVICE_API_CPP"
         DEPENDENCIES
-            ${dependencies}
+            civetweb::civetweb-cpp
     )
 endif()
