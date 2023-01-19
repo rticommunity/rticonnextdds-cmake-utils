@@ -126,16 +126,15 @@
 #   rtiroutingservice, rtirsinfrastructure, nddscpp2, rtidlc, nddsmetp,
 #   rticonnextmsgc and rtixml2).
 # - ``RTIConnextDDS::cloud_discovery_service_c``
-#   The Cloud Discovery Service library if found (includes rtirecordingservice,
-#   rtiroutingservice, rtirsinfrastructure, nddscpp2, rtidlc, nddsmetp,
-#   rticonnextmsgc and rtixml2).
+#   The Cloud Discovery Service library if found (includes
+#   rticlouddiscoveryservice, rtiroutingservice, rtirsinfrastructure, nddscpp2,
+#   rtidlc, nddsmetp, rticonnextmsgc and rtixml2).
 # - ``RTIConnextDDS::cloud_discovery_service_cpp``
 #   The same as RTIConnextDDS::cloud_discovery_service_c but adding the CPP
 #   libraries.
 # - ``RTIConnextDDS::persistence_service_c``
-#   The C API for Persistence Service if found (includes nddsc, nddscore,
-#   rtisqlite, also rtidlc if found).
-#
+#   The C API for Persistence Service if found (includes rtipersistenceservice,
+#   nddsc, nddscore, rtisqlite, also rtidlc if found).
 # Result Variables
 # ^^^^^^^^^^^^^^^^
 # This module will set the following variables in your project:
@@ -2411,19 +2410,13 @@ if(RTIConnextDDS_FOUND)
     )
 
     # Persistence Service C API
-    set(dependencies)
-
-    if(TARGET RTIConnextDDS::distributed_logger_c)
-        list(APPEND dependencies
+    create_connext_imported_target(
+        TARGET "persistence_service_c"
+        VAR "PERSISTENCE_SERVICE_API_C"
+        DEPENDENCIES
             RTIConnextDDS::distributed_logger_c
-        )
-    endif()
-
-    if(TARGET RTIConnextDDS::rtisqlite)
-        list(APPEND dependencies
             RTIConnextDDS::rtisqlite
         )
-    endif()
 
     create_connext_imported_target(
         TARGET "persistence_service_c"
