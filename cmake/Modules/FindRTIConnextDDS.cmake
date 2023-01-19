@@ -2479,6 +2479,9 @@ if(RTIConnextDDS_FOUND)
         TARGET "web_integration_service_cpp"
         VAR "WEB_INTEGRATION_SERVICE_API_CPP"
         DEPENDENCIES
+            RTIConnextDDS::cpp_api
+            RTIConnextDDS::apputils_c
+            RTIConnextDDS::rtisqlite
             civetweb::civetweb-cpp
     )
 endif()
