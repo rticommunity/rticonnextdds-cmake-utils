@@ -33,6 +33,7 @@
 # - recording_service
 # - cloud_discovery_service
 # - persistence_service
+# - web_integration_service
 # - low_bandwidth_plugins
 # - rtizrtps
 #
@@ -135,9 +136,9 @@
 # - ``RTIConnextDDS::persistence_service_c``
 #   The C API for Persistence Service if found (includes rtipersistenceservice,
 #   nddsc, nddscore, rtisqlite, also rtidlc if found).
-# - ``RTIConnextDDS::web_integration_service_cpp``
-#   The CPP API for Web Integration Service if found (rtiwebintegrationservice,
-#   nddscore, nddsc, nddscpp, rtiapputilsc, rtisqlite if found).
+# - ``RTIConnextDDS::web_integration_service_cpp2``
+#   The CPP2 API for Web Integration Service if found (rtiwebintegrationservice,
+#   nddscore, nddsc, nddscpp, nddscpp2, rtiapputilsc, rtisqlite if found).
 # Result Variables
 # ^^^^^^^^^^^^^^^^
 # This module will set the following variables in your project:
@@ -263,8 +264,8 @@
 #     (e.g., ``PERSISTENCE_SERVICE_API_C_LIBRARIES_RELEASE_STATIC``)
 #
 # - ``web_integration_service`` component:
-#   - ``WEB_INTEGRATION_SERVICE_API_CPP``
-#     (e.g., ``WEB_INTEGRATION_SERVICE_API_CPP_LIBRARIES_RELEASE_STATIC``)
+#   - ``WEB_INTEGRATION_SERVICE_API_CPP2``
+#     (e.g., ``WEB_INTEGRATION_SERVICE_API_CPP2_LIBRARIES_RELEASE_STATIC``)
 
 # - ``low_bandwidth_plugins`` component:
 #   - ``LOW_BANDWIDTH_DISCOVERY_STATIC``
@@ -1909,48 +1910,29 @@ endif()
 #####################################################################
 
 if(web_integration_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
-
-    set(web_integration_service_api_cpp_libs
+    set(web_integration_service_api_cpp2_libs
         "rtiwebintegrationservice"
         "nddscore"
         "nddsc"
         "nddscpp"
+        "nddscpp2"
         "rtiapputilsc"
         "rtisqlite"
     )
-    get_all_library_variables("${web_integration_service_api_cpp_libs}"
-        "WEB_INTEGRATION_SERVICE_API_CPP"
+    get_all_library_variables("${web_integration_service_api_cpp2_libs}"
+        "WEB_INTEGRATION_SERVICE_API_CPP2"
     )
 
-    if(WEB_INTEGRATION_SERVICE_API_CPP_FOUND)
-        string(TOLOWER "${CMAKE_BUILD_TYPE}" _lower_build_mode)
-        file(GLOB _civetweb_config_dir_list
-            LIST_DIRECTORIES TRUE
-            "${CONNEXTDDS_DIR}/third_party/civetweb-*/${CONNEXTDDS_ARCH}/${_lower_build_mode}/lib/cmake/civetweb/"
-        )
-        list(GET _civetweb_config_dir_list 0 civetweb_DIR)
-        connextdds_log_debug("civetweb CMake config dir: ${civetweb_DIR}")
-        find_package(civetweb REQUIRED CONFIG)
-
-        # Add civetweb include directories to the list of CONNEXTDDS_INCLUDE_DIRS
-        list(APPEND CONNEXTDDS_INCLUDE_DIRS
-            "${civetweb_INCLUDE_DIR}"
-        )
+    if(WEB_INTEGRATION_SERVICE_API_CPP2_FOUND)
+        find_package(RTICivetweb REQUIRED)
 
         # Add civetweb library to the list of CONNEXTDDS_EXTERNAL_LIBS
-        string(TOUPPER "${CMAKE_BUILD_TYPE}" _upper_build_mode)
-        get_target_property(civetweb_library civetweb::civetweb-cpp IMPORTED_LOCATION_${_upper_build_mode})
-        list(APPEND CONNEXTDDS_EXTERNAL_LIBS
-            ${civetweb_library}
-        )
-        unset(_lower_build_mode)
-        unset(_upper_build_mode)
+        list(APPEND CONNEXTDDS_EXTERNAL_LIBS "${RTICivetweb-cpp_LIBRARY}")
 
         set(RTIConnextDDS_web_integration_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_web_integration_service_FOUND FALSE)
     endif()
-
 endif()
 
 #####################################################################
@@ -2476,12 +2458,13 @@ if(RTIConnextDDS_FOUND)
 
     # Web Integration Service CPP API
     create_connext_imported_target(
-        TARGET "web_integration_service_cpp"
-        VAR "WEB_INTEGRATION_SERVICE_API_CPP"
+        TARGET "web_integration_service_cpp2"
+        VAR "WEB_INTEGRATION_SERVICE_API_CPP2"
         DEPENDENCIES
             RTIConnextDDS::cpp_api
+            RTIConnextDDS::cpp2_api
             RTIConnextDDS::apputils_c
             RTIConnextDDS::rtisqlite
-            civetweb::civetweb-cpp
+            RTICivetweb::civetweb-cpp
     )
 endif()
