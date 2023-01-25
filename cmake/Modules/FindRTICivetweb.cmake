@@ -16,8 +16,8 @@ FindRTIOCivetweb
 --------------
 
 Find the Civetweb libraries.
-If no RTICivetweb_ROOT is provided it will try to find the libraries in the
-Connext installation.
+If no RTICivetweb_ROOT is provided, FindRTICivetweb will try to find the
+Civetweb libraries in the Connext installation.
 
 The list of paths to search the libraries are:
 
@@ -25,7 +25,7 @@ The list of paths to search the libraries are:
 - Environment variable ``RTICivetweb_ROOT``
 - ``${CONNEXTDDS_DIR}/third_party/civetweb-<version>/${CONNEXTDDS_ARCH}/<build_mode>``
 
-Output variables related to libraries:
+The output variables related to the Civetweb libraries are:
 
 - ``RTICivetweb_LIBRARY``: The C library.
 - ``RTICivetweb-cpp_LIBRARY``: The C++ library.
@@ -96,7 +96,7 @@ find_package_handle_standard_args(RTICivetweb
         RTICivetweb_LIBRARY
         RTICivetweb-cpp_LIBRARY
     FAIL_MESSAGE
-        "Could NOT find Civetweb, try to set the path to Civetweb root folder in the system variable RTICivetweb_ROOT"
+        "Could not find Civetweb, try to set the path to Civetweb root folder in the system variable RTICivetweb_ROOT"
 )
 
 if(RTICivetweb_FOUND)
