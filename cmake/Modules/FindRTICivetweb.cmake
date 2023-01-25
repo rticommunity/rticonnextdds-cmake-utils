@@ -12,7 +12,7 @@
 #[[.rst:
 .. _find_rticivetweb:
 
-FindRTIOCivetweb
+FindRTICivetweb
 --------------
 
 Find the Civetweb libraries.
