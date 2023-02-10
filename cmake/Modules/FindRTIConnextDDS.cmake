@@ -1905,6 +1905,9 @@ if(cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     )
 
     if(CLOUD_DISCOVERY_SERVICE_API_C_FOUND)
+        list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO
+            "RTI_clouddiscoveryservice_core_DLL_VARIABLE"
+        )
         set(RTIConnextDDS_cloud_discovery_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_cloud_discovery_service_FOUND FALSE)
@@ -1929,6 +1932,7 @@ if(persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     )
 
     if(PERSISTENCE_SERVICE_API_C_FOUND)
+        list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO "RTI_persistence_DLL_VARIABLE")
         set(RTIConnextDDS_persistence_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_persistence_service_FOUND FALSE)
@@ -1959,6 +1963,7 @@ if(web_integration_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         # Add civetweb library to the list of CONNEXTDDS_EXTERNAL_LIBS
         list(APPEND CONNEXTDDS_EXTERNAL_LIBS "${RTICivetweb-cpp_LIBRARY}")
 
+        list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO "RTI_wsdds_DLL_VARIABLE")
         set(RTIConnextDDS_web_integration_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_web_integration_service_FOUND FALSE)
