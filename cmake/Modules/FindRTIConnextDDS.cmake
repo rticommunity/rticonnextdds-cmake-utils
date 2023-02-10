@@ -11,12 +11,12 @@
 # inability to use the software.
 #
 # FindRTIConnextDDS
-# -----------------
+# =================
 #
 # Find RTI Connext DDS libraries.
 #
 # Components
-# ^^^^^^^^^^
+# ----------
 # This module sets variables for the following components that are part of RTI
 # Connext DDS:
 # - core (default, always provided)
@@ -48,7 +48,7 @@
 # setting `ENABLE_VERSION_CONSISTENCY_CHECK` to `TRUE`.
 #
 # Imported Targets
-# ^^^^^^^^^^^^^^^^
+# ----------------
 # This module defines the following `IMPORTED` targets:
 #
 # - ``RTIConnextDDS::core``
@@ -140,7 +140,7 @@
 #   The CPP2 API for Web Integration Service if found (rtiwebintegrationservice,
 #   nddscore, nddsc, nddscpp, nddscpp2, rtiapputilsc, rtisqlite if found).
 # Result Variables
-# ^^^^^^^^^^^^^^^^
+# ----------------
 # This module will set the following variables in your project:
 #
 # - ``CONNEXTDDS_COMPILE_DEFINITIONS``
@@ -300,7 +300,7 @@
 # add the appropriate variables to your CMake script.
 #
 # Hints
-# ^^^^^
+# -----
 # If the find_package invocation specifies a version, this module will try
 # to find your Connext DDS installation in the default installation
 # directories. Likewise, the module will try to guess the name of the
@@ -350,13 +350,13 @@
 #   ``CONNEXTDDS_IMPORTED_TARGETS_DEBUG`` will not have any effect.
 #
 # Note
-# ^^^^
+# ----
 # Some flags related to the compiler, like (-std=c++11 needed when linking
 # against the CPP2 libraries) will not be provided by this script. These flags
 # should be provided by the build system.
 #
 # Examples
-# ^^^^^^^^
+# --------
 # Simple Connext DDS application
 # ::
 #   cmake_minimum_required(VERSION 3.11)
@@ -414,7 +414,7 @@
 #   )
 #
 # Supported platforms
-# ^^^^^^^^^^^^^^^^^^^
+# -------------------
 # Oficially, this FindPackage supports the following platforms listed in the
 # RTI Connext DDS Core Libraries Platform Notes:
 #
@@ -426,8 +426,38 @@
 # Other platforms and architectures might work, but they are not oficially
 # supported.
 #
+# Toolchain examples
+# ^^^^^^^^^^^^^^^^^^
+# In order to build against cross-compiled architectures a toolchain file is
+# needed. This file will contain all the necessary information about the
+# compiler and other utility paths. To use a toolchain file in the build the
+# following variable must be provided in the command
+# ::
+#
+#     cmake -DCMAKE_TOOLCHAIN_FILE=<toolchain_file_path>.cmake <source_dir>/
+#
+# QNX
+# """
+# ARMv8 QNX 7.1 gpp sample toolchain file
+# ::
+#
+#     set(CMAKE_SYSTEM_NAME QNX)
+#     set(CMAKE_SYSTEM_VERSION 7.1)
+#     set(CMAKE_SYSTEM_PROCESSOR armv8)
+#
+#     set(tools_dir "$ENV{QNX_HOST}/usr/bin")
+#     set(CMAKE_C_COMPILER "${tools_dir}/qcc")
+#     set(CMAKE_CXX_COMPILER "${CMAKE_C_COMPILER}")
+#     set(CMAKE_C_COMPILER_TARGET "8.3.0,gcc_ntoaarch64le_gpp")
+#     set(CMAKE_CXX_COMPILER_TARGET "${CMAKE_C_COMPILER_TARGET}")
+#     set(CMAKE_LINKER "${CMAKE_C_COMPILER}" CACHE PATH "")
+#     set(CMAKE_AR "${tools_dir}/ntoaarch64-ar" CACHE PATH "")
+#
+#     set(PLATFORM_MODERN_CXX_STANDARD 11)
+#     set(CMAKE_CXX_EXTENSIONS TRUE)
+#
 # Logging in versions lower than CMake 3.15
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# -----------------------------------------
 # For versions lower than CMake 3.15, ``CONNEXTDDS_LOG_LEVEL`` variable should
 # be used to define logging levels lower than ``STATUS`` mode. All these modes
 # will show messages of current level and higher. The following modes are
