@@ -427,7 +427,7 @@
 # supported.
 #
 # Toolchain examples
-# ^^^^^^^^^^^^^^^^^^
+# ------------------
 # In order to build against cross-compiled architectures a toolchain file is
 # needed. This file will contain all the necessary information about the
 # compiler and other utility paths. To use a toolchain file in the build the
@@ -437,7 +437,7 @@
 #     cmake -DCMAKE_TOOLCHAIN_FILE=<toolchain_file_path>.cmake <source_dir>/
 #
 # QNX
-# """
+# ^^^
 # ARMv8 QNX 7.1 gpp sample toolchain file
 # ::
 #
