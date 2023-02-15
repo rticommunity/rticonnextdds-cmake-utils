@@ -1323,9 +1323,11 @@ elseif(CONNEXTDDS_ARCH MATCHES "Win")
         "_CRT_SECURE_NO_WARNING"
     )
 
-    # When building against ConnextDDS's shared libraries, users need to also
-    # add the CONNEXTDDS_DLL_EXPORT_MACRO to their definitions.
-    set(CONNEXTDDS_DLL_EXPORT_MACRO "NDDS_DLL_VARIABLE")
+    if(BUILD_SHARED_LIBS)
+        # When building against ConnextDDS's shared libraries, users need to also
+        # add the CONNEXTDDS_DLL_EXPORT_MACRO to their definitions.
+        set(CONNEXTDDS_DLL_EXPORT_MACRO "NDDS_DLL_VARIABLE")
+    endif()
 
 elseif(CONNEXTDDS_ARCH MATCHES "Darwin")
     # Darwin Platforms
@@ -1363,7 +1365,6 @@ else()
         "${CONNEXTDDS_ARCH} architecture is unsupported by this module"
     )
 endif()
-
 
 #####################################################################
 # Core Component Variables                                          #
@@ -1905,9 +1906,11 @@ if(cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     )
 
     if(CLOUD_DISCOVERY_SERVICE_API_C_FOUND)
-        list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO
-            "RTI_clouddiscoveryservice_core_DLL_VARIABLE"
-        )
+        if(WIN32 AND BUILD_SHARED_LIBS)
+            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO
+                "RTI_clouddiscoveryservice_core_DLL_VARIABLE"
+            )
+        endif()
         set(RTIConnextDDS_cloud_discovery_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_cloud_discovery_service_FOUND FALSE)
@@ -1932,7 +1935,11 @@ if(persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     )
 
     if(PERSISTENCE_SERVICE_API_C_FOUND)
-        list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO "RTI_persistence_DLL_VARIABLE")
+        if(WIN32 AND BUILD_SHARED_LIBS)
+            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO 
+                "RTI_persistence_DLL_VARIABLE"
+            )
+        endif()
         set(RTIConnextDDS_persistence_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_persistence_service_FOUND FALSE)
@@ -1963,7 +1970,9 @@ if(web_integration_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         # Add civetweb library to the list of CONNEXTDDS_EXTERNAL_LIBS
         list(APPEND CONNEXTDDS_EXTERNAL_LIBS "${RTICivetweb-cpp_LIBRARY}")
 
-        list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO "RTI_wsdds_DLL_VARIABLE")
+        if(WIN32 AND BUILD_SHARED_LIBS)
+            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO "RTI_wsdds_DLL_VARIABLE")
+        endif()
         set(RTIConnextDDS_web_integration_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_web_integration_service_FOUND FALSE)
