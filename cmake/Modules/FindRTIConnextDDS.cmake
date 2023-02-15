@@ -351,7 +351,7 @@
 #
 # Note
 # ----
-# Some flags related to the compiler, like (-std=c++11 needed when linking
+# Some flags related to the compiler, (such as -std=c++11, needed when linking
 # against the CPP2 libraries) will not be provided by this script. These flags
 # should be provided by the build system.
 #
