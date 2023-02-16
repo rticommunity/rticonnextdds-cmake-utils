@@ -13,12 +13,12 @@
 # FindRTIConnextDDS
 # =================
 #
-# Find RTI Connext DDS libraries.
+# Find RTI Connext libraries.
 #
 # Components
 # ----------
 # This module sets variables for the following components that are part of RTI
-# Connext DDS:
+# Connext:
 # - core (default, always provided)
 # - distributed_logger
 # - messaging_api
@@ -144,15 +144,15 @@
 # This module will set the following variables in your project:
 #
 # - ``CONNEXTDDS_COMPILE_DEFINITIONS``
-#   RTI Connext DDS Compiler definitions as a list.
+#   RTI Connext Compiler definitions as a list.
 # - ``CONNEXTDDS_DEFINITIONS``
-#   RTI Connext DDS Compiler definitions as a string (deprecated).
+#   RTI Connext Compiler definitions as a string (deprecated).
 # - ``CONNEXTDDS_EXTERNAL_LIBS``
-#   RTI Connext DDS external dependencies.
+#   RTI Connext external dependencies.
 # - ``CONNEXTDDS_INCLUDE_DIRS``
-#   RTI Connext DDS include directories.
+#   RTI Connext include directories.
 # - ``CONNEXTDDS_DLL_EXPORT_MACRO``
-#   Macros to compile against RTI Connext DDS shared libraries on Windows.
+#   Macros to compile against RTI Connext shared libraries on Windows.
 # - ``RTICODEGEN_DIR``
 #   Path to the directory where RTI Codegen is placed.
 # - ``RTICODEGEN``
@@ -302,7 +302,7 @@
 # Hints
 # -----
 # If the find_package invocation specifies a version, this module will try
-# to find your Connext DDS installation in the default installation
+# to find your Connext installation in the default installation
 # directories. Likewise, the module will try to guess the name of the
 # architecture you are trying to build against, by looking for it under the
 # rti_connext_dds-x.y.z/lib.
@@ -310,9 +310,9 @@
 # However, in some cases you must provide the following hints by defining some
 # variables in your cmake invocation:
 #
-# - If you don't specify a version or you have installed Connext DDS in a
+# - If you don't specify a version or you have installed Connext in a
 #   non-default location, you must set the ``CONNEXTDDS_DIR`` pointing to your
-#   RTI Connext DDS installation folder. For example:
+#   RTI Connext installation folder. For example:
 #       cmake -DCONNEXTDDS_DIR=/home/rti/rti_connext_dds-x.y.z
 #
 # - If you have installed more than one architecture on your system (i.e., more
@@ -357,7 +357,7 @@
 #
 # Examples
 # --------
-# Simple Connext DDS application
+# Simple Connext application
 # ::
 #   cmake_minimum_required(VERSION 3.11)
 #   project (example)
@@ -416,7 +416,7 @@
 # Supported platforms
 # -------------------
 # Oficially, this FindPackage supports the following platforms listed in the
-# RTI Connext DDS Core Libraries Platform Notes:
+# RTI Connext Core Libraries Platform Notes:
 #
 # - Linux platforms: x64
 # - Darwin platforms: macOS 10.13-10.15
@@ -577,7 +577,7 @@ endmacro()
 # Preconditions Check                                               #
 #####################################################################
 #
-# Find RTI Connext DDS installation. We provide some hints that include the
+# Find RTI Connext installation. We provide some hints that include the
 # CONNEXTDDS_DIR variable, the $NDDSHOME environment variable, and the
 # default installation directories.
 if(NOT CONNEXTDDS_DIR)
@@ -653,12 +653,12 @@ find_path(CONNEXTDDS_DIR
 if(NOT CONNEXTDDS_DIR)
     set(error
         "CONNEXTDDS_DIR not specified. Please set -DCONNEXTDDS_DIR= to "
-        "your RTI Connext DDS installation directory"
+        "your RTI Connext installation directory"
     )
     message(FATAL_ERROR ${error})
 endif()
 
-message(STATUS "RTI Connext DDS installation directory: ${CONNEXTDDS_DIR}")
+message(STATUS "RTI Connext installation directory: ${CONNEXTDDS_DIR}")
 
 set(codegen_name "rtiddsgen")
 if(WIN32)
@@ -711,10 +711,10 @@ else()
     connextdds_log_verbose("Codegen version: ${RTICODEGEN_VERSION}")
 endif()
 
-# Find RTI Connext DDS architecture if CONNEXTDDS_ARCH is unset
+# Find RTI Connext architecture if CONNEXTDDS_ARCH is unset
 if(NOT CONNEXTDDS_ARCH)
     connextdds_log_verbose("CONNEXTDDS_ARCH was not provided")
-    # Guess the RTI Connext DDS architecture
+    # Guess the RTI Connext architecture
 
     if(CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
         string(REGEX REPLACE "^([0-9]+).*$" "\\1"
@@ -834,13 +834,13 @@ if(NOT CONNEXTDDS_ARCH)
         if(NOT CONNEXTDDS_ARCH)
             message(WARNING
                 "CONNEXTDDS_ARCH not specified. Please set "
-                "-DCONNEXTDDS_ARCH= to specify your RTI Connext DDS "
+                "-DCONNEXTDDS_ARCH= to specify your RTI Connext "
                 " architecture")
         endif()
     endif()
 endif()
 
-message(STATUS "RTI Connext DDS architecture: ${CONNEXTDDS_ARCH}")
+message(STATUS "RTI Connext architecture: ${CONNEXTDDS_ARCH}")
 
 #####################################################################
 # Helper Functions                                                  #
@@ -960,7 +960,7 @@ function(connextdds_check_component_field_version
 endfunction()
 
 # This method searches the libraries indicated in `library_names` under
-# `<RTI Connext DDS directory>/lib/<architecture>. If one of the libraries in
+# `<RTI Connext directory>/lib/<architecture>. If one of the libraries in
 # one of the modes is not found, the variable <result_var_name>_FOUND is set
 # to `FALSE`.
 #
@@ -1372,7 +1372,7 @@ endif()
 
 # This script verifies the version of each of the following fields in
 # ${CONNEXTDDS_DIR}/rti_versions.xml, as they are the basic components of the
-# RTI Connext DDS core libraries, which are always part of an installation.
+# RTI Connext core libraries, which are always part of an installation.
 list(APPEND rti_versions_field_names_host
     "header_files"
     "host_files"
