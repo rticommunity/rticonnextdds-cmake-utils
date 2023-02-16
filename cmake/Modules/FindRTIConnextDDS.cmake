@@ -11,12 +11,12 @@
 # inability to use the software.
 #
 # FindRTIConnextDDS
-# =================
+# -----------------
 #
 # Find RTI Connext libraries.
 #
 # Components
-# ----------
+# ^^^^^^^^^^
 # This module sets variables for the following components that are part of RTI
 # Connext:
 # - core (default, always provided)
@@ -48,7 +48,7 @@
 # setting `ENABLE_VERSION_CONSISTENCY_CHECK` to `TRUE`.
 #
 # Imported Targets
-# ----------------
+# ^^^^^^^^^^^^^^^^
 # This module defines the following `IMPORTED` targets:
 #
 # - ``RTIConnextDDS::core``
@@ -140,7 +140,7 @@
 #   The CPP2 API for Web Integration Service if found (rtiwebintegrationservice,
 #   nddscore, nddsc, nddscpp, nddscpp2, rtiapputilsc, rtisqlite if found).
 # Result Variables
-# ----------------
+# ^^^^^^^^^^^^^^^^
 # This module will set the following variables in your project:
 #
 # - ``CONNEXTDDS_COMPILE_DEFINITIONS``
@@ -266,7 +266,7 @@
 # - ``web_integration_service`` component:
 #   - ``WEB_INTEGRATION_SERVICE_API_CPP2``
 #     (e.g., ``WEB_INTEGRATION_SERVICE_API_CPP2_LIBRARIES_RELEASE_STATIC``)
-
+#
 # - ``low_bandwidth_plugins`` component:
 #   - ``LOW_BANDWIDTH_DISCOVERY_STATIC``
 #     (e.g., ``LOW_BANDWIDTH_DISCOVERY_STATIC_LIBRARIES_RELEASE_STATIC``)
@@ -300,7 +300,7 @@
 # add the appropriate variables to your CMake script.
 #
 # Hints
-# -----
+# ^^^^^
 # If the find_package invocation specifies a version, this module will try
 # to find your Connext installation in the default installation
 # directories. Likewise, the module will try to guess the name of the
@@ -350,13 +350,13 @@
 #   ``CONNEXTDDS_IMPORTED_TARGETS_DEBUG`` will not have any effect.
 #
 # Note
-# ----
+# ^^^^
 # Some flags related to the compiler, (such as -std=c++11, needed when linking
 # against the CPP2 libraries) will not be provided by this script. These flags
 # should be provided by the build system.
 #
 # Examples
-# --------
+# ^^^^^^^^
 # Simple Connext application
 # ::
 #   cmake_minimum_required(VERSION 3.11)
@@ -414,7 +414,7 @@
 #   )
 #
 # Supported platforms
-# -------------------
+# ^^^^^^^^^^^^^^^^^^^
 # Oficially, this FindPackage supports the following platforms listed in the
 # RTI Connext Core Libraries Platform Notes:
 #
@@ -427,7 +427,7 @@
 # supported.
 #
 # Toolchain examples
-# ------------------
+# ^^^^^^^^^^^^^^^^^^
 # In order to build against cross-compiled architectures a toolchain file is
 # needed. This file will contain all the necessary information about the
 # compiler and other utility paths. To use a toolchain file in the build the
@@ -437,7 +437,7 @@
 #     cmake -DCMAKE_TOOLCHAIN_FILE=<toolchain_file_path>.cmake <source_dir>/
 #
 # QNX
-# ^^^
+# """
 # ARMv8 QNX 7.1 gpp sample toolchain file
 # ::
 #
@@ -457,7 +457,7 @@
 #     set(CMAKE_CXX_EXTENSIONS TRUE)
 #
 # Logging in versions lower than CMake 3.15
-# -----------------------------------------
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # For versions lower than CMake 3.15, the ``CONNEXTDDS_LOG_LEVEL`` variable
 # should be used to define logging levels lower than ``STATUS`` mode. All these
 # modes will show messages of current level and higher. The following modes are
