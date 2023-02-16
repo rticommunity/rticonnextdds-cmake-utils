@@ -13,12 +13,12 @@
 # FindRTIConnextDDS
 # -----------------
 #
-# Find RTI Connext DDS libraries.
+# Find RTI Connext libraries.
 #
 # Components
 # ^^^^^^^^^^
 # This module sets variables for the following components that are part of RTI
-# Connext DDS:
+# Connext:
 # - core (default, always provided)
 # - distributed_logger
 # - messaging_api
@@ -144,15 +144,15 @@
 # This module will set the following variables in your project:
 #
 # - ``CONNEXTDDS_COMPILE_DEFINITIONS``
-#   RTI Connext DDS Compiler definitions as a list.
+#   RTI Connext Compiler definitions as a list.
 # - ``CONNEXTDDS_DEFINITIONS``
-#   RTI Connext DDS Compiler definitions as a string (deprecated).
+#   RTI Connext Compiler definitions as a string (deprecated).
 # - ``CONNEXTDDS_EXTERNAL_LIBS``
-#   RTI Connext DDS external dependencies.
+#   RTI Connext external dependencies.
 # - ``CONNEXTDDS_INCLUDE_DIRS``
-#   RTI Connext DDS include directories.
+#   RTI Connext include directories.
 # - ``CONNEXTDDS_DLL_EXPORT_MACRO``
-#   Macros to compile against RTI Connext DDS shared libraries on Windows.
+#   Macros to compile against RTI Connext shared libraries on Windows.
 # - ``RTICODEGEN_DIR``
 #   Path to the directory where RTI Codegen is placed.
 # - ``RTICODEGEN``
@@ -266,7 +266,7 @@
 # - ``web_integration_service`` component:
 #   - ``WEB_INTEGRATION_SERVICE_API_CPP2``
 #     (e.g., ``WEB_INTEGRATION_SERVICE_API_CPP2_LIBRARIES_RELEASE_STATIC``)
-
+#
 # - ``low_bandwidth_plugins`` component:
 #   - ``LOW_BANDWIDTH_DISCOVERY_STATIC``
 #     (e.g., ``LOW_BANDWIDTH_DISCOVERY_STATIC_LIBRARIES_RELEASE_STATIC``)
@@ -302,7 +302,7 @@
 # Hints
 # ^^^^^
 # If the find_package invocation specifies a version, this module will try
-# to find your Connext DDS installation in the default installation
+# to find your Connext installation in the default installation
 # directories. Likewise, the module will try to guess the name of the
 # architecture you are trying to build against, by looking for it under the
 # rti_connext_dds-x.y.z/lib.
@@ -310,9 +310,9 @@
 # However, in some cases you must provide the following hints by defining some
 # variables in your cmake invocation:
 #
-# - If you don't specify a version or you have installed Connext DDS in a
+# - If you don't specify a version or you have installed Connext in a
 #   non-default location, you must set the ``CONNEXTDDS_DIR`` pointing to your
-#   RTI Connext DDS installation folder. For example:
+#   RTI Connext installation folder. For example:
 #       cmake -DCONNEXTDDS_DIR=/home/rti/rti_connext_dds-x.y.z
 #
 # - If you have installed more than one architecture on your system (i.e., more
@@ -351,13 +351,13 @@
 #
 # Note
 # ^^^^
-# Some flags related to the compiler, like (-std=c++11 needed when linking
+# Some flags related to the compiler, (such as -std=c++11, needed when linking
 # against the CPP2 libraries) will not be provided by this script. These flags
 # should be provided by the build system.
 #
 # Examples
 # ^^^^^^^^
-# Simple Connext DDS application
+# Simple Connext application
 # ::
 #   cmake_minimum_required(VERSION 3.11)
 #   project (example)
@@ -416,7 +416,7 @@
 # Supported platforms
 # ^^^^^^^^^^^^^^^^^^^
 # Oficially, this FindPackage supports the following platforms listed in the
-# RTI Connext DDS Core Libraries Platform Notes:
+# RTI Connext Core Libraries Platform Notes:
 #
 # - Linux platforms: x64
 # - Darwin platforms: macOS 10.13-10.15
@@ -426,11 +426,41 @@
 # Other platforms and architectures might work, but they are not oficially
 # supported.
 #
+# Toolchain examples
+# ^^^^^^^^^^^^^^^^^^
+# In order to build against cross-compiled architectures a toolchain file is
+# needed. This file will contain all the necessary information about the
+# compiler and other utility paths. To use a toolchain file in the build the
+# following variable must be provided in the command
+# ::
+#
+#     cmake -DCMAKE_TOOLCHAIN_FILE=<toolchain_file_path>.cmake <source_dir>/
+#
+# QNX
+# """
+# ARMv8 QNX 7.1 gpp sample toolchain file
+# ::
+#
+#     set(CMAKE_SYSTEM_NAME QNX)
+#     set(CMAKE_SYSTEM_VERSION 7.1)
+#     set(CMAKE_SYSTEM_PROCESSOR armv8)
+#
+#     set(tools_dir "$ENV{QNX_HOST}/usr/bin")
+#     set(CMAKE_C_COMPILER "${tools_dir}/qcc")
+#     set(CMAKE_CXX_COMPILER "${CMAKE_C_COMPILER}")
+#     set(CMAKE_C_COMPILER_TARGET "8.3.0,gcc_ntoaarch64le_gpp")
+#     set(CMAKE_CXX_COMPILER_TARGET "${CMAKE_C_COMPILER_TARGET}")
+#     set(CMAKE_LINKER "${CMAKE_C_COMPILER}" CACHE PATH "")
+#     set(CMAKE_AR "${tools_dir}/ntoaarch64-ar" CACHE PATH "")
+#
+#     set(PLATFORM_MODERN_CXX_STANDARD 11)
+#     set(CMAKE_CXX_EXTENSIONS TRUE)
+#
 # Logging in versions lower than CMake 3.15
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# For versions lower than CMake 3.15, ``CONNEXTDDS_LOG_LEVEL`` variable should
-# be used to define logging levels lower than ``STATUS`` mode. All these modes
-# will show messages of current level and higher. The following modes are
+# For versions lower than CMake 3.15, the ``CONNEXTDDS_LOG_LEVEL`` variable
+# should be used to define logging levels lower than ``STATUS`` mode. All these
+# modes will show messages of current level and higher. The following modes are
 # available:
 #
 # - ``STATUS``
@@ -547,7 +577,7 @@ endmacro()
 # Preconditions Check                                               #
 #####################################################################
 #
-# Find RTI Connext DDS installation. We provide some hints that include the
+# Find RTI Connext installation. We provide some hints that include the
 # CONNEXTDDS_DIR variable, the $NDDSHOME environment variable, and the
 # default installation directories.
 if(NOT CONNEXTDDS_DIR)
@@ -623,12 +653,12 @@ find_path(CONNEXTDDS_DIR
 if(NOT CONNEXTDDS_DIR)
     set(error
         "CONNEXTDDS_DIR not specified. Please set -DCONNEXTDDS_DIR= to "
-        "your RTI Connext DDS installation directory"
+        "your RTI Connext installation directory"
     )
     message(FATAL_ERROR ${error})
 endif()
 
-message(STATUS "RTI Connext DDS installation directory: ${CONNEXTDDS_DIR}")
+message(STATUS "RTI Connext installation directory: ${CONNEXTDDS_DIR}")
 
 set(codegen_name "rtiddsgen")
 if(WIN32)
@@ -681,10 +711,10 @@ else()
     connextdds_log_verbose("Codegen version: ${RTICODEGEN_VERSION}")
 endif()
 
-# Find RTI Connext DDS architecture if CONNEXTDDS_ARCH is unset
+# Find RTI Connext architecture if CONNEXTDDS_ARCH is unset
 if(NOT CONNEXTDDS_ARCH)
     connextdds_log_verbose("CONNEXTDDS_ARCH was not provided")
-    # Guess the RTI Connext DDS architecture
+    # Guess the RTI Connext architecture
 
     if(CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
         string(REGEX REPLACE "^([0-9]+).*$" "\\1"
@@ -804,13 +834,13 @@ if(NOT CONNEXTDDS_ARCH)
         if(NOT CONNEXTDDS_ARCH)
             message(WARNING
                 "CONNEXTDDS_ARCH not specified. Please set "
-                "-DCONNEXTDDS_ARCH= to specify your RTI Connext DDS "
+                "-DCONNEXTDDS_ARCH= to specify your RTI Connext "
                 " architecture")
         endif()
     endif()
 endif()
 
-message(STATUS "RTI Connext DDS architecture: ${CONNEXTDDS_ARCH}")
+message(STATUS "RTI Connext architecture: ${CONNEXTDDS_ARCH}")
 
 #####################################################################
 # Helper Functions                                                  #
@@ -930,7 +960,7 @@ function(connextdds_check_component_field_version
 endfunction()
 
 # This method searches the libraries indicated in `library_names` under
-# `<RTI Connext DDS directory>/lib/<architecture>. If one of the libraries in
+# `<RTI Connext directory>/lib/<architecture>. If one of the libraries in
 # one of the modes is not found, the variable <result_var_name>_FOUND is set
 # to `FALSE`.
 #
@@ -1293,9 +1323,11 @@ elseif(CONNEXTDDS_ARCH MATCHES "Win")
         "_CRT_SECURE_NO_WARNING"
     )
 
-    # When building against ConnextDDS's shared libraries, users need to also
-    # add the CONNEXTDDS_DLL_EXPORT_MACRO to their definitions.
-    set(CONNEXTDDS_DLL_EXPORT_MACRO "NDDS_DLL_VARIABLE")
+    if(BUILD_SHARED_LIBS)
+        # When building against ConnextDDS's shared libraries, users need to also
+        # add the CONNEXTDDS_DLL_EXPORT_MACRO to their definitions.
+        set(CONNEXTDDS_DLL_EXPORT_MACRO "NDDS_DLL_VARIABLE")
+    endif()
 
 elseif(CONNEXTDDS_ARCH MATCHES "Darwin")
     # Darwin Platforms
@@ -1334,14 +1366,13 @@ else()
     )
 endif()
 
-
 #####################################################################
 # Core Component Variables                                          #
 #####################################################################
 
 # This script verifies the version of each of the following fields in
 # ${CONNEXTDDS_DIR}/rti_versions.xml, as they are the basic components of the
-# RTI Connext DDS core libraries, which are always part of an installation.
+# RTI Connext core libraries, which are always part of an installation.
 list(APPEND rti_versions_field_names_host
     "header_files"
     "host_files"
@@ -1875,6 +1906,11 @@ if(cloud_discovery_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     )
 
     if(CLOUD_DISCOVERY_SERVICE_API_C_FOUND)
+        if(WIN32 AND BUILD_SHARED_LIBS)
+            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO
+                "RTI_clouddiscoveryservice_core_DLL_VARIABLE"
+            )
+        endif()
         set(RTIConnextDDS_cloud_discovery_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_cloud_discovery_service_FOUND FALSE)
@@ -1899,6 +1935,11 @@ if(persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     )
 
     if(PERSISTENCE_SERVICE_API_C_FOUND)
+        if(WIN32 AND BUILD_SHARED_LIBS)
+            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO 
+                "RTI_persistence_DLL_VARIABLE"
+            )
+        endif()
         set(RTIConnextDDS_persistence_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_persistence_service_FOUND FALSE)
@@ -1929,6 +1970,9 @@ if(web_integration_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
         # Add civetweb library to the list of CONNEXTDDS_EXTERNAL_LIBS
         list(APPEND CONNEXTDDS_EXTERNAL_LIBS "${RTICivetweb-cpp_LIBRARY}")
 
+        if(WIN32 AND BUILD_SHARED_LIBS)
+            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO "RTI_wsdds_DLL_VARIABLE")
+        endif()
         set(RTIConnextDDS_web_integration_service_FOUND TRUE)
     else()
         set(RTIConnextDDS_web_integration_service_FOUND FALSE)
