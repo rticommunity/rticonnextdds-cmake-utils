@@ -1073,8 +1073,7 @@ endfunction()
 # This macro adds the location property to a list of properties in order to
 # clean the ``create_connext_imported_target`` function.
 # Arguments:
-# - _list_var: Name of the variable in which the location properties will be
-#   appended.
+# - _list_var: List variable name to which to append the location properties.
 # - _location_property_name: The name of the location property to append to the
 #   list.
 # - _library_var: Library path variable name.
