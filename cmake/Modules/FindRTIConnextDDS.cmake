@@ -1073,7 +1073,8 @@ endfunction()
 # This macro adds the location property to a list of properties in order to
 # clean the ``create_connext_imported_target`` function.
 # Arguments:
-# - _list_var: List variable name to which append the location properties.
+# - _list_var: Name of the variable in which the location properties will be
+#   appended.
 # - _location_property_name: The name of the location property to append to the
 #   list.
 # - _library_var: Library path variable name.
@@ -1938,7 +1939,7 @@ if(persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
 
     if(PERSISTENCE_SERVICE_API_C_FOUND)
         if(WIN32 AND BUILD_SHARED_LIBS)
-            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO 
+            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO
                 "RTI_persistence_DLL_VARIABLE"
             )
         endif()
