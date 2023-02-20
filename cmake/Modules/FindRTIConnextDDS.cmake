@@ -477,6 +477,13 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
+# Starting with CMake 3.3, the support for the IN_LIST operator in the if block
+# was added. The OLD behaviour is to ignore this operator, so we set the policy
+# to NEW.
+if(POLICY CMP0057)
+    cmake_policy(SET CMP0057 NEW)
+endif()
+
 #####################################################################
 # Global Variables                                                  #
 #####################################################################
@@ -498,7 +505,7 @@ endif()
 if(NOT CONNEXT_LIBS_BUILD_TYPE IN_LIST CONNEXT_LIBS_BUILD_TYPE_LIST)
     message(FATAL_ERROR
         "Ensure the CONNEXT_LIBS_BUILD_TYPE value is one of Auto, Release or"
-        " Debug"
+        " Debug without quotes"
     )
 endif()
 
@@ -1063,6 +1070,20 @@ function(get_all_library_variables
     )
 endfunction()
 
+# This macro adds the location property to a list of properties in order to
+# clean the ``create_connext_imported_target`` function.
+# Arguments:
+# - _list_var: List variable name to which append the location properties.
+# - _location_property_name: The name of the location property to append to the
+#   list.
+# - _library_var: Library path variable name.
+macro(_append_location_property _list_var _location_property_name _library_var)
+    list(GET ${_library_var} 0 _imported_library)
+    connextdds_log_debug("\t${_location_property_name}=${_library_var}")
+    connextdds_log_debug("\t\t${_imported_library}")
+    list(APPEND ${_list_var} ${_location_property_name} "${_imported_library}")
+    unset(_imported_library)
+endmacro()
 
 # This function helps to create a ConnextDDS CMake imported target.
 # Arguments:
@@ -1148,34 +1169,25 @@ function(create_connext_imported_target)
     endif()
 
     set(import_location_properties)
+    set(build_mode "RELEASE")
+    if(CONNEXT_LIBS_BUILD_TYPE STREQUAL "Debug")
+        set(build_mode "DEBUG")
+    endif()
+
+    _append_location_property(
+        "import_location_properties"
+        "${location_property}"
+        "${imported_lib_base}_${build_mode}_${link_mode}"
+    )
+
     if(CONNEXT_LIBS_BUILD_TYPE STREQUAL "Auto")
         foreach(build_mode "RELEASE" "DEBUG")
-            list(GET ${imported_lib_base}_${build_mode}_${link_mode} 0
-                imported_library
-            )
-            connextdds_log_debug(
-                "\t${location_property}_${build_mode}="
+            _append_location_property(
+                "import_location_properties"
+                "${location_property}_${build_mode}"
                 "${imported_lib_base}_${build_mode}_${link_mode}"
             )
-            list(APPEND import_location_properties
-                ${location_property}_${build_mode} "${imported_library}"
-            )
         endforeach()
-    else()
-        set(build_mode "RELEASE")
-        if(CONNEXT_LIBS_BUILD_TYPE STREQUAL "Debug")
-            set(build_mode "DEBUG")
-        endif()
-        list(GET ${imported_lib_base}_${build_mode}_${link_mode} 0 
-            imported_library
-        )
-        connextdds_log_debug(
-            "\t${location_property}="
-            "${imported_lib_base}_${build_mode}_${link_mode}"
-        )
-        list(APPEND import_location_properties
-            ${location_property} "${imported_library}"
-        )
     endif()
 
     # Create the library
