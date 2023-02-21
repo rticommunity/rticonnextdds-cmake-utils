@@ -337,17 +337,13 @@
 #   you will use the variables ``CONNEXTDDS_WOLFSSL_DIR`` and
 #   ``CONNEXTDDS_WOLFSSL_VERSION``
 #
-# - By default the imported targets will be provided with the release build
-#   type. If you want to build against debug versions of the imported targets,
-#   you must enable ``CONNEXTDDS_IMPORTED_TARGETS_DEBUG``. Example:
-#       cmake -DCONNEXTDDS_IMPORTED_TARGETS_DEBUG=ON
-#
-# - On the other hand, if you want to link against the global build type
-#   imported targets (the one provided by the ``CMAKE_BUILD_TYPE`` variable) you
-#   will have to enable the option ``CONNEXT_USE_GLOBAL_BUILD_TYPE``. Example:
-#       cmake -DCONNEXT_USE_GLOBAL_BUILD_TYPE=ON
-#   Take into account that if this variable is set,
-#   ``CONNEXTDDS_IMPORTED_TARGETS_DEBUG`` will not have any effect.
+# - To control the Connext libraries build type you will need to use the
+#   ``CONNEXT_LIBS_BUILD_TYPE`` CMake variable. By default the imported target
+#   libraries will be provided with the build type in use (the ``Auto`` value).
+#   If you want to force a specific build type (Release or Debug) of the Connext
+#   libraries, you will have to set the ``CONNEXT_LIBS_BUILD_TYPE`` CMake
+#   variable. Example:
+#       cmake -DCONNEXT_LIBS_BUILD_TYPE=Release
 #
 # Note
 # ^^^^
@@ -481,31 +477,35 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
+# Starting with CMake 3.3, the support for the IN_LIST operator in the if block
+# was added. The OLD behaviour is to ignore this operator, so we set the policy
+# to NEW.
+if(POLICY CMP0057)
+    cmake_policy(SET CMP0057 NEW)
+endif()
+
 #####################################################################
 # Global Variables                                                  #
 #####################################################################
 
-option(CONNEXTDDS_IMPORTED_TARGETS_DEBUG
-    "Force the linker to use the Connext debug libraries"
-    OFF
-)
-option(CONNEXT_USE_GLOBAL_BUILD_TYPE
-    "Enforce the Connext libraries build type speficied by the global\
- CMAKE_BUILD_TYPE variable"
-    OFF
-)
-set(CONNEXTDDS_LOG_LEVEL
-    "STATUS"
-    CACHE
-    STRING
-    "Set the logging level for the script"
+set(CONNEXT_LIBS_BUILD_TYPE_LIST "Release" "Debug" "Auto")
+set(CONNEXT_LIBS_BUILD_TYPE "Auto" CACHE STRING
+    "Connext imported target libraries build type to use"
 )
 
-if(CONNEXT_USE_GLOBAL_BUILD_TYPE AND CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
-    message(WARNING
-        "WARNING When using the `CONNEXT_USE_GLOBAL_BUILD_TYPE`, the"
-        " `CONNEXTDDS_IMPORTED_TARGETS_DEBUG` variable will not have any"
-        " effect. Only the global CMAKE_BUILD_TYPE will be taken into account."
+if(CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
+    message(DEPRECATION
+        "CONNEXTDDS_IMPORTED_TARGETS_DEBUG variable will be deprecated in the"
+        " future. Set the CONNEXT_LIBS_BUILD_TYPE variable value to Debug"
+        "to get the same behavior."
+    )
+    set(CONNEXT_LIBS_BUILD_TYPE "Debug")
+endif()
+
+if(NOT CONNEXT_LIBS_BUILD_TYPE IN_LIST CONNEXT_LIBS_BUILD_TYPE_LIST)
+    message(FATAL_ERROR
+        "Ensure the CONNEXT_LIBS_BUILD_TYPE value is one of Auto, Release or"
+        " Debug without quotes"
     )
 endif()
 
@@ -1070,6 +1070,20 @@ function(get_all_library_variables
     )
 endfunction()
 
+# This macro adds the location property to a list of properties in order to
+# clean the ``create_connext_imported_target`` function.
+# Arguments:
+# - _list_var: List variable name to which to append the location properties.
+# - _location_property_name: The name of the location property to append to the
+#   list.
+# - _library_var: Library path variable name.
+macro(_append_location_property _list_var _location_property_name _library_var)
+    list(GET ${_library_var} 0 _imported_library)
+    connextdds_log_debug("\t${_location_property_name}=${_library_var}")
+    connextdds_log_debug("\t\t${_imported_library}")
+    list(APPEND ${_list_var} ${_location_property_name} "${_imported_library}")
+    unset(_imported_library)
+endmacro()
 
 # This function helps to create a ConnextDDS CMake imported target.
 # Arguments:
@@ -1136,16 +1150,9 @@ function(create_connext_imported_target)
         return() # Nothing to be done
     endif()
 
-    set(imported_lib "${_CONNEXT_VAR}_LIBRARIES")
-    connextdds_log_debug("\timported_lib=${imported_lib}")
+    set(imported_lib_base "${_CONNEXT_VAR}_LIBRARIES")
 
-    # Get the library for the non multiconfiguration generators
-    if(CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
-        set(imported_lib "${imported_lib}_DEBUG")
-    else()
-        set(imported_lib "${imported_lib}_RELEASE")
-    endif()
-
+    # Set the build type to use
     if(BUILD_SHARED_LIBS)
         set(link_mode "SHARED")
         set(extra_options IMPORTED_NO_SONAME TRUE)
@@ -1154,26 +1161,42 @@ function(create_connext_imported_target)
         set(extra_options)
     endif()
 
-    list(GET ${imported_lib}_${link_mode} 0
-        module_library
-    )
-
-    # Create the library
-    add_library(${target_name} ${link_mode} IMPORTED)
-
+    # Define the location property to use
     if(WIN32 AND BUILD_SHARED_LIBS)
         set(location_property IMPORTED_IMPLIB)
     else()
         set(location_property IMPORTED_LOCATION)
     endif()
 
-    connextdds_log_debug("\t${location_property}=${imported_lib}_${link_mode}:")
-    connextdds_log_debug("\t\t${module_library}")
+    set(import_location_properties)
+    set(build_mode "RELEASE")
+    if(CONNEXT_LIBS_BUILD_TYPE STREQUAL "Debug")
+        set(build_mode "DEBUG")
+    endif()
+
+    _append_location_property(
+        "import_location_properties"
+        "${location_property}"
+        "${imported_lib_base}_${build_mode}_${link_mode}"
+    )
+
+    if(CONNEXT_LIBS_BUILD_TYPE STREQUAL "Auto")
+        foreach(build_mode "RELEASE" "DEBUG")
+            _append_location_property(
+                "import_location_properties"
+                "${location_property}_${build_mode}"
+                "${imported_lib_base}_${build_mode}_${link_mode}"
+            )
+        endforeach()
+    endif()
+
+    # Create the library
+    add_library(${target_name} ${link_mode} IMPORTED)
 
     # Set properties for all the targets
     set_target_properties(${target_name}
         PROPERTIES
-            ${location_property} ${module_library}
+            ${import_location_properties}
             ${extra_options}
             MAP_IMPORTED_CONFIG_MINSIZEREL Release
             MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release
@@ -1186,27 +1209,6 @@ function(create_connext_imported_target)
                 INTERFACE_LINK_LIBRARIES
                    "${_CONNEXT_DEPENDENCIES}"
         )
-    endif()
-
-    if(CONNEXT_USE_GLOBAL_BUILD_TYPE)
-        # Set properties per configuration
-        foreach(build_mode "RELEASE" "DEBUG")
-            list(GET ${_CONNEXT_VAR}_LIBRARIES_${build_mode}_${link_mode} 0
-                imported_library
-            )
-
-            connextdds_log_debug(
-                "\t${location_property}_${build_mode}="
-                "${_CONNEXT_VAR}_LIBRARIES_${build_mode}_${link_mode}"
-            )
-            connextdds_log_debug("\t\t${imported_library}")
-
-            set_target_properties(${target_name}
-                PROPERTIES
-                    ${location_property}_${build_mode}
-                        "${imported_library}"
-            )
-        endforeach()
     endif()
 
     connextdds_log_debug(
@@ -1936,7 +1938,7 @@ if(persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
 
     if(PERSISTENCE_SERVICE_API_C_FOUND)
         if(WIN32 AND BUILD_SHARED_LIBS)
-            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO 
+            list(APPEND CONNEXTDDS_DLL_EXPORT_MACRO
                 "RTI_persistence_DLL_VARIABLE"
             )
         endif()
