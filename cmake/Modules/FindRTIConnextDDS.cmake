@@ -345,6 +345,14 @@
 #   variable. Example:
 #       cmake -DCONNEXT_LIBS_BUILD_TYPE=Release
 #
+#   Take into account that forcing Release or Debug libraries could result in
+#   errors on Windows when building the opposite build type (e.g.:
+#   using ``-DCONNEXT_LIBS_BUILD_TYPE=Release`` and building with
+#   ``cmake --build . --config Debug``). Also, if an executable ends with the
+#   Debug and Release libraries of Connext, some problems like double-freeing
+#   memmory could ocurr (once for the Debug symbol and other for the Release
+#   one).
+#
 # Note
 # ^^^^
 # Some flags related to the compiler, (such as -std=c++11, needed when linking
