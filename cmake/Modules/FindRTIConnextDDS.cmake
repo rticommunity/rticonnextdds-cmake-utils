@@ -346,12 +346,12 @@
 #       cmake -DCONNEXT_LIBS_BUILD_TYPE=Release
 #
 #   Take into account that forcing Release or Debug libraries could result in
-#   errors on Windows when building the opposite build type (e.g.:
-#   using ``-DCONNEXT_LIBS_BUILD_TYPE=Release`` and building with
-#   ``cmake --build . --config Debug``). Also, if an executable ends with the
-#   Debug and Release libraries of Connext, some problems like double-freeing
-#   memmory could occur (once for the Debug symbol and other for the Release
-#   one).
+#   errors when building the opposite build type (e.g.: using
+#   ``-DCONNEXT_LIBS_BUILD_TYPE=Release`` and building with
+#   ``cmake --build . --config Debug``). Mixing Connext Release and Debug
+#   libraries can result in build errors or application problems like
+#   double-freeing memory (once for the Debug symbol and another for the
+#   Release one).
 #
 # Note
 # ^^^^
