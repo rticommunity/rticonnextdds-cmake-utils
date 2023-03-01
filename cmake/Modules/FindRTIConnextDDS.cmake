@@ -350,7 +350,7 @@
 #   using ``-DCONNEXT_LIBS_BUILD_TYPE=Release`` and building with
 #   ``cmake --build . --config Debug``). Also, if an executable ends with the
 #   Debug and Release libraries of Connext, some problems like double-freeing
-#   memmory could ocurr (once for the Debug symbol and other for the Release
+#   memmory could occur (once for the Debug symbol and other for the Release
 #   one).
 #
 # Note
