@@ -20,6 +20,8 @@
 # This module sets variables for the following components that are part of RTI
 # Connext:
 # - core (default, always provided)
+# - test
+# - test_helpers
 # - distributed_logger
 # - messaging_api
 # - routing_service
@@ -69,6 +71,11 @@
 #   The APP Utils C library (rtiapputils).
 # - ``RTIConnextDDS::rtisqlite``.
 #   The RTI SQLite library (rtisqlite).
+# - ``RTIConnextDDS::test``.
+#   The RTI Test Framework library (rtitest).
+# - ``RTIConnextDDS::test_helpers``.
+#   The RTI Test Framework helpers libraries (includes nddsctesthelpers,
+#   nddsctransporttesthelpers, rtitest, and nddsc)
 # - ``RTIConnextDDS::distributed_logger_c``
 #   The C API library for Distributed Logger if found.
 # - ``RTIConnextDDS::distributed_logger_cpp``
@@ -202,6 +209,14 @@
 #     (e.g., ``RTIAPPUTILS_C_LIBRARIES_RELEASE_STATIC``)
 #   - ``RTISQLITE``
 #     (e.g., ``RTISQLITE_LIBRARIES_RELEASE_STATIC``)
+#
+# - ``test`` component:
+#   - ``RTITEST``
+#     (e.g., ``RTITEST_LIBRARIES_RELEASE_STATIC``)
+#
+# - ``test_helpers`` component:
+#   - ``NDDS_TEST_HELPERS``
+#     (e.g., ``NDDS_TEST_HELPERS_LIBRARIES_RELEASE_STATIC``)
 #
 # - ``distributed_loger`` component:
 #   - ``DISTRIBUTED_LOGGER_C``
@@ -1472,6 +1487,50 @@ else()
 endif()
 
 #####################################################################
+# RTI Test Framework Component Variables                            #
+#####################################################################
+if(test IN_LIST RTIConnextDDS_FIND_COMPONENTS
+    OR test_helpers IN_LIST RTIConnextDDS_FIND_COMPONENTS
+)
+    # Find all flavors of rtitest
+    set(rtitest_libs "rtitest")
+    get_all_library_variables("${rtitest_libs}"
+        "RTITEST"
+    )
+
+    set(RTIConnextDDS_test_FOUND FALSE)
+    if(RTITEST_FOUND)
+        set(RTIConnextDDS_test_FOUND TRUE)
+        list(APPEND CONNEXTDDS_INCLUDE_DIRS
+            "/home/luis/rti/connextdds/connextdds/test.1.0/include/"
+        )
+    endif()
+endif()
+
+#####################################################################
+# RTI Test Framework Helpers Component Variables                    #
+#####################################################################
+
+if(test_helpers IN_LIST RTIConnextDDS_FIND_COMPONENTS)
+    # Find all flavors of test_helpers
+    set(ndds_test_helpers_libs
+        "nddsctesthelpers"
+        "nddsctransporttesthelpers"
+        "nddscore"
+        "nddsc"
+        "rtitest"
+    )
+    get_all_library_variables("${ndds_test_helpers_libs}"
+        "NDDS_TEST_HELPERS"
+    )
+
+    set(RTIConnextDDS_test_helpers_FOUND FALSE)
+    if(NDDS_TEST_HELPERS_FOUND)
+        set(RTIConnextDDS_test_helpers_FOUND TRUE)
+    endif()
+endif()
+
+#####################################################################
 # Distributed Logger Component Variables                            #
 #####################################################################
 # Routing Service depends on Distributed Logger. Both Recording Service and
@@ -1519,7 +1578,6 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
     endif()
 endif()
 
-
 #####################################################################
 # Messaging Component Variables                                     #
 #####################################################################
@@ -1565,7 +1623,6 @@ if(messaging_api IN_LIST RTIConnextDDS_FIND_COMPONENTS
         set(RTIConnextDDS_messaging_api_FOUND FALSE)
     endif()
 endif()
-
 
 #####################################################################
 # Routing Service Component Variables                               #
@@ -1656,7 +1713,6 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     endif()
 
 endif()
-
 
 #####################################################################
 # Security Plugins Component Variables                              #
@@ -2119,7 +2175,6 @@ find_package_handle_standard_args(RTIConnextDDS
 #####################################################################
 # Create the imported targets                                       #
 #####################################################################
-
 if(RTIConnextDDS_FOUND)
     #################### Core and APIs imported targets #####################
     # Core
@@ -2210,6 +2265,21 @@ if(RTIConnextDDS_FOUND)
         VAR "RTISQLITE"
         DEPENDENCIES
             RTIConnextDDS::c_api
+    )
+
+    ######################## Test imported targets #########################
+
+    create_connext_imported_target(
+        TARGET "test"
+        VAR "RTITEST"
+    )
+
+    create_connext_imported_target(
+        TARGET "test_helpers"
+        VAR "NDDS_TEST_HELPERS"
+        DEPENDENCIES
+            RTIConnextDDS::c_api
+            RTIConnextDDS::test
     )
 
     ###################### Distributed Logger targets ######################
