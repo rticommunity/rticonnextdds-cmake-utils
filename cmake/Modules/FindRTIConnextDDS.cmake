@@ -1501,9 +1501,6 @@ if(test IN_LIST RTIConnextDDS_FIND_COMPONENTS
     set(RTIConnextDDS_test_FOUND FALSE)
     if(RTITEST_FOUND)
         set(RTIConnextDDS_test_FOUND TRUE)
-        list(APPEND CONNEXTDDS_INCLUDE_DIRS
-            "/home/luis/rti/connextdds/connextdds/test.1.0/include/"
-        )
     endif()
 endif()
 
