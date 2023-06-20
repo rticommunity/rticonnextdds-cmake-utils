@@ -75,7 +75,7 @@
 #   The RTI Test Framework library (rtitest).
 # - ``RTIConnextDDS::test_helpers``.
 #   The RTI Test Framework helpers libraries (includes nddsctesthelpers,
-#   nddsctransporttesthelpers, rtitest, and nddsc)
+#   rtitest, nddsc and nddscore)
 # - ``RTIConnextDDS::distributed_logger_c``
 #   The C API library for Distributed Logger if found.
 # - ``RTIConnextDDS::distributed_logger_cpp``
@@ -1512,7 +1512,6 @@ if(test_helpers IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     # Find all flavors of test_helpers
     set(ndds_test_helpers_libs
         "nddsctesthelpers"
-        "nddsctransporttesthelpers"
         "nddscore"
         "nddsc"
         "rtitest"
