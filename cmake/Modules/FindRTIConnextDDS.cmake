@@ -1364,7 +1364,7 @@ elseif(CONNEXTDDS_ARCH MATCHES "Darwin")
         "RTI_DARWIN10"
         "RTI_64BIT"
     )
-elseif(CONNEXTDDS_ARCH MATCHES "QNX7")
+elseif(CONNEXTDDS_ARCH MATCHES "QNX7|QOS")
     set(CONNEXTDDS_EXTERNAL_LIBS
         "-lm"
         "-lsocket"
