@@ -216,16 +216,14 @@ function(connextdds_add_example)
         set(prefix "${folder_name}")
     endif()
 
+    set(sub_name "subscriber")
     if (_CONNEXT_SUB_NAME)
         set(sub_name "${_CONNEXT_SUB_NAME}")
-    else()
-        set(sub_name "subscriber")
     endif()
 
+    set(pub_name "publisher")
     if (_CONNEXT_PUB_NAME)
         set(pub_name "${_CONNEXT_PUB_NAME}")
-    else()
-        set(pub_name "publisher")
     endif()
 
     # Generate the sources for the types
