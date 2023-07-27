@@ -18,6 +18,8 @@ Function to build the examples.
         IDL name
         LANG language
         [PREFIX prefix]
+        [SUB_NAME sub_name]
+        [PUB_NAME pub_name]
         [DISABLE_SUBSCRIBER]
         [NO_REQUIRE_QOS]
         [DEPENDENCIES ...]
@@ -35,6 +37,10 @@ CMake targets and set the dependencies.
 ``PREFIX``:
     Prefix name for the targets. If not present, the folder of the example name
     will be used as prefix.
+``SUB_NAME``:
+    Suffix for the subscriber application. If not present it's "subscriber".
+``PUB_NAME``:
+    Suffix for the publisher application. If not present it's "publisher".
 ``DISABLE_SUBSCRIBER``:
     Disable the subscriber build. The target for the subcriber will not be
     created.
@@ -173,7 +179,7 @@ include(ConnextDdsCodegen)
 
 function(connextdds_add_example)
     set(optional_args DISABLE_SUBSCRIBER NO_REQUIRE_QOS)
-    set(single_value_args IDL LANG PREFIX)
+    set(single_value_args IDL LANG PREFIX SUB_NAME PUB_NAME)
     set(multi_value_args CODEGEN_ARGS DEPENDENCIES)
     cmake_parse_arguments(_CONNEXT
         "${optional_args}"
@@ -208,6 +214,16 @@ function(connextdds_add_example)
             "${folder_name}"
             NAME)
         set(prefix "${folder_name}")
+    endif()
+
+    set(sub_name "subscriber")
+    if (_CONNEXT_SUB_NAME)
+        set(sub_name "${_CONNEXT_SUB_NAME}")
+    endif()
+
+    set(pub_name "publisher")
+    if (_CONNEXT_PUB_NAME)
+        set(pub_name "${_CONNEXT_PUB_NAME}")
     endif()
 
     # Generate the sources for the types
@@ -245,10 +261,10 @@ function(connextdds_add_example)
         endif()
 
         set(publisher_src
-            "${CMAKE_CURRENT_SOURCE_DIR}/${_CONNEXT_IDL}_publisher.${ex}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/${_CONNEXT_IDL}_${pub_name}.${ex}"
         )
         set(subscriber_src
-            "${CMAKE_CURRENT_SOURCE_DIR}/${_CONNEXT_IDL}_subscriber.${ex}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/${_CONNEXT_IDL}_${sub_name}.${ex}"
         )
     endif()
 
@@ -258,7 +274,7 @@ function(connextdds_add_example)
         LANG ${_CONNEXT_LANG}
         SOURCES ${publisher_src}
         PREFIX ${prefix}
-        OUTPUT_NAME "${_CONNEXT_IDL}_publisher"
+        OUTPUT_NAME "${_CONNEXT_IDL}_${pub_name}"
         ${no_require_qos}
         SOURCES
             $<TARGET_OBJECTS:${prefix}_${lang_var}_obj>
@@ -274,7 +290,7 @@ function(connextdds_add_example)
             LANG ${_CONNEXT_LANG}
             SOURCES ${subscriber_src}
             PREFIX ${prefix}
-            OUTPUT_NAME "${_CONNEXT_IDL}_subscriber"
+            OUTPUT_NAME "${_CONNEXT_IDL}_${sub_name}"
             ${no_require_qos}
             SOURCES
                 $<TARGET_OBJECTS:${prefix}_${lang_var}_obj>
