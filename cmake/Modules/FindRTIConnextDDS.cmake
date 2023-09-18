@@ -438,7 +438,7 @@
 # RTI Connext Core Libraries Platform Notes:
 #
 # - Linux platforms: x64
-# - Darwin platforms: macOS 10.13-10.15
+# - Darwin platforms: macOS 10.13-10.15, 11, 12, 13
 # - Windows platforms: x64
 # - QNX platforms (7.0 and 7.1): x64 and ARMv8
 #
@@ -751,9 +751,15 @@ if(NOT CONNEXTDDS_ARCH)
             kernel_version "${CMAKE_SYSTEM_VERSION}")
         connextdds_log_debug("Kernel version: ${kernel_version}")
 
-        set(guessed_architecture
-             "x64Darwin${kernel_version}${version_compiler}"
-        )
+        if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm64")
+            set(guessed_architecture
+                 "arm64Darwin${kernel_version}${version_compiler}"
+            )
+        else()
+            set(guessed_architecture
+                 "x64Darwin${kernel_version}${version_compiler}"
+            )
+        endif()
 
     elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
         if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86")
@@ -1268,14 +1274,11 @@ string(REGEX MATCH
 set(connextdds_host_arch "java")
 
 if(CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
-    # connextdds_host_arch is usually a prefix of the CONNEXTDDS_ARCH (e.g.,
-    # "x64Linux" is a prefix  of "x64Linux3gcc5.4.0"). However, in the case
-    # of Darwin, connextdds_host_arch is simply "darwin".
-    # To be able to match the CONNEXTDDS_ARCH in some parts of the script,
-    # we need to be able to consider connextdds_host_arch with both names
-    # "darwin" and the more natural "x64Darwin". Consequently, we assign a
-    # list of names to CONNEXT_HOST_ARCH in the case of darwin.
-    set(connextdds_host_arch ${connextdds_host_arch} "darwin" "x64Darwin")
+    if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm64")
+        set(connextdds_host_arch ${connextdds_host_arch} "arm64Darwin")
+    else()
+        set(connextdds_host_arch ${connextdds_host_arch} "x64Darwin")
+    endif()
 elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
     if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86")
         set(connextdds_host_arch ${connextdds_host_arch} "i86Win32")
@@ -1361,7 +1364,7 @@ elseif(CONNEXTDDS_ARCH MATCHES "Darwin")
     set(CONNEXTDDS_COMPILE_DEFINITIONS
         "RTI_UNIX"
         "RTI_DARWIN"
-        "RTI_DARWIN10"
+        "RTI_DARWIN20"
         "RTI_64BIT"
     )
 elseif(CONNEXTDDS_ARCH MATCHES "QNX7|QOS")
