@@ -77,9 +77,14 @@
 #   The RTI Test Framework helpers libraries (includes nddsctesthelpers,
 #   rtitest, nddsc and nddscore)
 # - ``RTIConnextDDS::distributed_logger_c``
-#   The C API library for Distributed Logger if found.
+#   The C API library for Distributed Logger if found (includes rtidlc,
+#   nddscore, and nddsc).
 # - ``RTIConnextDDS::distributed_logger_cpp``
-#   The CPP API library for Distributed Logger if found.
+#   The CPP API library for Distributed Logger if found (includes rtidlcpp,
+#   rtidlc, nddscore, nddsc and nddscpp).
+# - ``RTIConnextDDS::distributed_logger_cpp2``
+#   The CPP2 API library for Distributed Logger if found (includes rtidlcpp2,
+#   rtidlc, nddscore, nddsc and nddscpp2).
 # - ``RTIConnextDDS::messaging_c_api``
 #   The Request Reply C API library if found (rticonnextmsgc).
 # - ``RTIConnextDDS::messaging_cpp_api``
@@ -223,6 +228,8 @@
 #     (e.g., ``DISTRIBUTED_LOGGER_C_LIBRARIES_RELEASE_STATIC)
 #   - ``DISTRIBUTED_LOGGER_CPP``
 #     (e.g., ``DISTRIBUTED_LOGGER_CPP_LIBRARIES_RELEASE_STATIC)
+#   - ``DISTRIBUTED_LOGGER_CPP2``
+#     (e.g., ``DISTRIBUTED_LOGGER_CPP2_LIBRARIES_RELEASE_STATIC)
 #
 # - ``messaging_api`` component:
 #   - ``MESSAGING_C``
@@ -1545,7 +1552,6 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     OR persistence_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
 )
-
     # Find all flavors of rtidlc
     set(distributed_logger_c_libs "rtidlc" "nddsc" "nddscore")
     get_all_library_variables("${distributed_logger_c_libs}"
@@ -1555,7 +1561,7 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
     # Find all flavors of rtidlcpp
     set(distributed_logger_cpp_libs
         "rtidlcpp"
-        "librtidlc"
+        "rtidlc"
         "nddscpp"
         "nddsc"
         "nddscore"
@@ -1564,6 +1570,17 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
         "DISTRIBUTED_LOGGER_CPP"
     )
 
+    # Find all flavors of rtidlcpp2
+    set(distributed_logger_cpp2_libs
+        "rtidlcpp2"
+        "rtidlc"
+        "nddscpp2"
+        "nddsc"
+        "nddscore"
+    )
+    get_all_library_variables("${distributed_logger_cpp2_libs}"
+        "DISTRIBUTED_LOGGER_CPP2"
+    )
 
     if(DISTRIBUTED_LOGGER_C_FOUND AND DISTRIBUTED_LOGGER_CPP_FOUND)
         set(RTIConnextDDS_distributed_logger_FOUND TRUE)
@@ -1578,6 +1595,11 @@ if(distributed_logger IN_LIST RTIConnextDDS_FIND_COMPONENTS
             )
         endif()
     else()
+        set(RTIConnextDDS_distributed_logger_FOUND FALSE)
+    endif()
+
+    # Since the modern C++ library is only available after 7.2.0
+    if(RTICONNEXTDDS_VERSION VERSION_GREATER_EQUAL "7.2.0" AND NOT DISTRIBUTED_LOGGER_CPP2_FOUND)
         set(RTIConnextDDS_distributed_logger_FOUND FALSE)
     endif()
 endif()
@@ -2301,8 +2323,17 @@ if(RTIConnextDDS_FOUND)
         VAR "DISTRIBUTED_LOGGER_CPP"
         DEPENDENCIES
             RTIConnextDDS::distributed_logger_c
+            RTIConnextDDS::cpp_api
     )
 
+    # Distributed Logger CPP2 API
+    create_connext_imported_target(
+        TARGET "distributed_logger_cpp2"
+        VAR "DISTRIBUTED_LOGGER_CPP2"
+        DEPENDENCIES
+            RTIConnextDDS::distributed_logger_c
+            RTIConnextDDS::cpp2_api
+    )
 
     ############## Messaging (Request-Reply) imported targets ###############
     # C Messaging API
