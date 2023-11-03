@@ -15,12 +15,15 @@ Fixes #<issue id>
 <!-- :warning: Add one `details` tag for each required log file.
 
 <details>
-  <summary>Log name</summary>
-  <pre>
-  Sample log
-  with multiple
-  lines
-  </pre>
+
+<summary>Log name</summary>
+
+<samp>
+Sample log
+with multiple
+lines
+</samp>
+
 </details>
 
 -->
