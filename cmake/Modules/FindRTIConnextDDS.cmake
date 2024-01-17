@@ -438,7 +438,7 @@
 # RTI Connext Core Libraries Platform Notes:
 #
 # - Linux platforms: x64
-# - Darwin platforms: macOS 10.13-10.15, 11, 12, 13
+# - Darwin platforms: macOS x64 (10.13-10.15, 11-13) and ARMv8 (11-13)
 # - Windows platforms: x64
 # - QNX platforms (7.0 and 7.1): x64 and ARMv8
 #
