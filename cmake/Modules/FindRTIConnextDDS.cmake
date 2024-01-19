@@ -446,7 +446,7 @@
 #
 # - Linux platforms: x64
 # - Darwin platforms: macOS x64 (10.13-10.15, 11-13) and ARMv8 (11-13)
-# - Windows platforms: x64
+# - Windows platforms: x64, ARM64
 # - QNX platforms (7.0 and 7.1): x64 and ARMv8
 #
 # Other platforms and architectures might work, but they are not oficially
@@ -773,6 +773,8 @@ if(NOT CONNEXTDDS_ARCH)
             set(connextdds_host_arch "i86Win32")
         elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "AMD64")
             set(connextdds_host_arch "x64Win64")
+        elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "ARM64")
+            set(connextdds_host_arch "arm64Win64")
 
         else()
             message(FATAL_ERROR
@@ -844,8 +846,12 @@ if(NOT CONNEXTDDS_ARCH)
                             # Get the x86Win32 architecture
                             set(CONNEXTDDS_ARCH "${architecture_name}")
                         elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "AMD64" AND
-                                "${architecture_name}" MATCHES "Win64")
+                                "${architecture_name}" MATCHES "x64Win64")
                             # Get the x64Win64 architecture
+                            set(CONNEXTDDS_ARCH "${architecture_name}")
+                        elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "ARM64" AND
+                                "${architecture_name}" MATCHES "arm64Win64")
+                            # Get the arm64Win64 architecture
                             set(CONNEXTDDS_ARCH "${architecture_name}")
                         endif()
                     elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
@@ -1291,6 +1297,8 @@ elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
         set(connextdds_host_arch ${connextdds_host_arch} "i86Win32")
     elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "AMD64")
         set(connextdds_host_arch ${connextdds_host_arch} "x64Win64")
+    elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "ARM64")
+        set(connextdds_host_arch ${connextdds_host_arch} "arm64Win64")
     else()
         message(FATAL_ERROR
             "${CMAKE_HOST_SYSTEM} is not supported as host architecture"
