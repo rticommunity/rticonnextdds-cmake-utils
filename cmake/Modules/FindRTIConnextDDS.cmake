@@ -850,7 +850,7 @@ if(NOT CONNEXTDDS_ARCH)
                             # Get the x64Win64 architecture
                             set(CONNEXTDDS_ARCH "${architecture_name}")
                         elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "ARM64" AND
-                                "${architecture_name}" MATCHES "armWin64")
+                                "${architecture_name}" MATCHES "arm64Win64")
                             # Get the arm64Win64 architecture
                             set(CONNEXTDDS_ARCH "${architecture_name}")
                         endif()
