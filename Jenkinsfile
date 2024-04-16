@@ -28,9 +28,7 @@ Map architectureJobs() {
     return getYamlCi.architectures(ciYamlFile).collectEntries { architecture ->
         [
             "${architecture}": {
-                steps {
-                    parallel branchJobs(architecture)
-                }
+                parallel branchJobs(architecture)
             }
         ]
     }
@@ -47,9 +45,7 @@ Map branchJobs(String architecture) {
     return getYamlCi.branchReferences(ciYamlFile).collectEntries { branchReference ->
         [
             "${branchReference}": {
-                steps {
-                    runExamplesRepositoryJob(architecture, branchReference)
-                }
+                runExamplesRepositoryJob(architecture, branchReference)
             }
         ]
     }
@@ -84,9 +80,7 @@ pipeline {
 
     stages {
         stage('Run CI') {
-            steps {
-                parallel architectureJobs()
-            }
+            parallel architectureJobs()
         }
     }
 }
