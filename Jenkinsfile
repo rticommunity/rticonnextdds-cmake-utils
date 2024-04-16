@@ -29,9 +29,7 @@ Map architectureJobs() {
         [
             "${architecture}": {
                 stage("${architecture}") {
-                    steps {
-                        parallel branchJobs(architecture)
-                    }
+                    parallel branchJobs(architecture)
                 }
             }
         ]
@@ -88,9 +86,7 @@ pipeline {
 
     stages {
         stage('Run CI') {
-            steps {
-                parallel architectureJobs()
-            }
+            parallel architectureJobs()
         }
     }
 }
