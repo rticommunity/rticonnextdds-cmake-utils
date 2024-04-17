@@ -27,8 +27,8 @@ ciYamlFile = null
 Map architectureJobs() {
     return getYamlCi.architectures(ciYamlFile).collectEntries { architecture ->
         [
-            "${architecture}": {
-                stage("${architecture}") {
+            "Architecture: ${architecture}": {
+                stage("Architecture: ${architecture}") {
                     parallel branchJobs(architecture)
                 }
             }
@@ -46,8 +46,8 @@ Map architectureJobs() {
 Map branchJobs(String architecture) {
     return getYamlCi.branchReferences(ciYamlFile).collectEntries { branchReference ->
         [
-            "${branchReference}": {
-                stage("${branchReference}") {
+            "Branch reference: ${branchReference}": {
+                stage("Branch reference: ${branchReference}") {
                     runExamplesRepositoryJob(architecture, branchReference)
                 }
             }
