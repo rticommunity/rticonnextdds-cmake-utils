@@ -16,7 +16,7 @@
 /**
  * The YAML ci file path.
  */
-ciYamlFile = "${env.WORKSPACE}/ci.yaml"
+ciYamlFile = "${WORKSPACE}/ci.yaml"
 
 /**
  * Iterate over the list of architectures to build. In each architecture, this will launch a number
@@ -76,7 +76,7 @@ void runExamplesRepositoryJob(String architecture, String branchReference) {
  * latest version (master) and the development version (develop) in all the supported architectures.
  */
 pipeline {
-    agent any
+    agent none
 
     stages {
         stage('Run CI') {
