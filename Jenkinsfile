@@ -14,9 +14,9 @@
 @Library("rticommunity-jenkins-pipelines@feature/enhance-examples-jenkinsfile") _
 
 /**
- * The YAML ci file path.
+ * The YAML ci file path defined at the start of the pipeline.
  */
-ciYamlFile = "${WORKSPACE}/ci.yaml"
+ciYamlFile = null
 
 /**
  * Iterate over the list of architectures to build. In each architecture, this will launch a number
@@ -82,6 +82,7 @@ pipeline {
         stage('Run CI') {
             steps {
                 script {
+                    ciYamlFile = "${env.WORKSPACE}/ci.yaml"
                     parallel architectureJobs()
                 }
             }
