@@ -76,7 +76,7 @@ void runExamplesRepositoryJob(String architecture, String branchReference) {
  * latest version (master) and the development version (develop) in all the supported architectures.
  */
 pipeline {
-    agent none
+    agent any
 
     stages {
         stage('Run CI') {
