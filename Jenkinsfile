@@ -16,7 +16,7 @@
 /**
  * The YAML ci file path.
  */
-ciYamlFile = File("${env.WORKSPACE}/ci.yaml")
+ciYamlFile = "${env.WORKSPACE}/ci.yaml"
 
 /**
  * Iterate over the list of architectures to build. In each architecture, this will launch a number
