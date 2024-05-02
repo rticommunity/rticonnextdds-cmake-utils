@@ -53,17 +53,25 @@ Map branchJobs(String architecture) {
 /**
  * Build the desired job in the examples repository multibranch pipeline.
  *
- * @param architecture The multibranch pipeline selected for running the specified branchReference.
- * @param branchReference The branch or PR to build in the specified multibranch pipeline.
+ * @param architecture The architecture in which the job will be executed.
+ * @param examplesRepoBranch The branch or PR to build in the examples repository.
  */
-void runExamplesRepositoryJob(String architecture, String branchReference) {
+void runExamplesRepositoryJob(String architecture, String examplesRepoBranch) {
     build(
-        job: "ci/rticonnextdds-examples/${architecture}/${branchReference}",
+        job: 'ci/rticonnextdds-cmake-utils/build-single-mode',
         propagate: true,
         wait: true,
         parameters: [
             string(
-                name: 'CMAKE_UTILS_REFERENCE',
+                name: 'ARCHITECTURE',
+                value: architecture,
+            ),
+            string(
+                name: 'EXAMPLES_REPOSITORY_BRANCH',
+                value: examplesRepoBranch,
+            ),
+            string(
+                name: 'CMAKE_UTILS_REPOSITORY_BRANCH',
                 value: env.BRANCH_NAME,
             ),
         ]
