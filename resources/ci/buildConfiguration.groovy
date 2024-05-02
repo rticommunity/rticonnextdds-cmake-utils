@@ -141,6 +141,8 @@ pipeline {
                     nodeManager.runInsideExecutor(
                         params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
                     ) {
+                        // TODO: Improve virtual environment management
+                        command.run('python3 -m pip install scan-build')
                         command.run(
                             'python3 resources/ci_cd/linux_static_analysis.py'
                             + " --build-dir ${buildExamples.getBuildDirectory('release', 'dynamic')}"
