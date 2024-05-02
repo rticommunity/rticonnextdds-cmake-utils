@@ -58,7 +58,7 @@ void runBuildConfigurationJob(
  * @param examplesRepoBranch rticonnextdds-examples branch to build.
  * @param osMap `Architecture family - architecture string` map.
  */
-Map architectureJobs(String cmakeUtilsRepoBranch String examplesRepoBranch, Map<String, Map> osMap) {
+Map architectureJobs(String cmakeUtilsRepoBranch, String examplesRepoBranch, Map<String, Map> osMap) {
     return osMap.collectEntries { architectureFamily, architectureString ->
         [
             "Architecture family: ${architectureFamily}": {
