@@ -70,7 +70,7 @@ Map architectureJobs(String branch, Map<String, Map> osMap) {
  *
  * @param branches Map of the available branches.
  */
-Map branchJobs(Map branches) {
+def branchJobs(branches) {
     echo("branches: ${branches}")
     return branches.each { branch, osMap ->
         [
