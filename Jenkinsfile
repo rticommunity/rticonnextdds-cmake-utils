@@ -11,12 +11,7 @@
  */
 
 // TODO: Remove when merged
-@Library("rticommunity-jenkins-pipelines@feature/enhance-examples-jenkinsfile") _
-
-/**
- * The YAML ci file path defined at the start of the pipeline.
- */
-ciYamlFile = null
+@Library("rticommunity-jenkins-pipelines@feature/INSTALL-944") _
 
 /**
  * Iterate over the list of architectures to build. In each architecture, this will launch a number
@@ -85,10 +80,11 @@ pipeline {
     stages {
         stage('Run CI') {
             steps {
-                script {
-                    ciYamlFile = "${env.WORKSPACE}/ci.yaml"
-                    parallel architectureJobs()
-                }
+                echo('TODO')
+                // script {
+                //     ciYamlFile = "${env.WORKSPACE}/resources/ci/config.yaml"
+                //     parallel architectureJobs()
+                // }
             }
         }
     }

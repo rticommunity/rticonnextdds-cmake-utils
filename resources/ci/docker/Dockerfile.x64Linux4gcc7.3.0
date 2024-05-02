@@ -9,6 +9,7 @@
 
 FROM ubuntu:20.04
 
+ARG USER_NAME=jenkins
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV CONNEXTDDS_ARCH="x64Linux4gcc7.3.0"
 
@@ -24,4 +25,4 @@ RUN apt-get update && apt-get install -y \
     python3-distutils \
     && rm -rf /var/lib/apt/lists/*
 
-USER jenkins
+USER $USER_NAME
