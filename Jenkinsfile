@@ -42,9 +42,10 @@ void runBuildArchitectureConfigurationsJob(String examplesRepoBranch) {
  * @param branches List of branch names.
  */
 Map branchJobs(String[] branches) {
-    return branches.collect { branch ->
+    return branches.collectEntries { branch ->
         [
-            "Branch: ${branch}": {
+            "Branch: ${branch}",
+            {
                 stage("Branch: ${branch}") {
                     runBuildArchitectureConfigurationsJob(branch)
                 }
