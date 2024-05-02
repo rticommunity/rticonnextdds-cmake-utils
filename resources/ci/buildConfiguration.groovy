@@ -143,8 +143,8 @@ pipeline {
                     ) {
                         command.run(
                             'python3 resources/ci_cd/linux_static_analysis.py'
-                            + "--build-dir ${buildExamples.getBuildDirectory('release', 'dynamic')}"
-                            + "--connext-dir ${pipelineInfo.connextDir}"
+                            + " --build-dir ${buildExamples.getBuildDirectory('release', 'dynamic')}"
+                            + " --connext-dir ${pipelineInfo.connextDir}"
                         )
                     }
                 }
