@@ -81,6 +81,10 @@ Map architectureJobs(String cmakeUtilsRepoBranch, String examplesRepoBranch, Map
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout()
+    }
+
     parameters {
         string(
             name: 'CMAKE_UTILS_REPOSITORY_BRANCH',
@@ -110,6 +114,11 @@ pipeline {
                     )
                 }
             }
+        }
+    }
+    post {
+        cleanup {
+            cleanWs()
         }
     }
 }
