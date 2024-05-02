@@ -53,6 +53,7 @@ void runBuildSingleModeJob(String examplesRepoBranch, String architectureFamily,
  * @param osMap Architecture family - architecture string map.
  */
 Map architectureJobs(String branch, Map<String, Map> osMap) {
+    echo("osMap: ${osMap}")
     return osMap.each { architectureFamily, architectureString ->
         [
             "Architecture faimly: ${architectureFamily}": {
@@ -69,7 +70,8 @@ Map architectureJobs(String branch, Map<String, Map> osMap) {
  *
  * @param branches Map of the available branches.
  */
-Map branchJobs(Map<String, Map> branches) {
+Map branchJobs(Map branches) {
+    echo("branches: ${branches}")
     return branches.each { branch, osMap ->
         [
             "Branch: ${branch}": {
