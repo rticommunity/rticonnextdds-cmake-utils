@@ -24,3 +24,5 @@ void apply(String cmakeUtilsRepoRoot, String examplesRepoRoot) {
     )
     command.run("cp -r ${cmakeUtilsRepoRoot}/cmake/Modules/* ${examplesRepoRoot}/resources/cmake/")
 }
+
+return this

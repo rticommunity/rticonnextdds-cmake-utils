@@ -27,3 +27,5 @@ void apply(String cmakeUtilsRepoRoot, String examplesRepoRoot) {
         + " ${examplesRepoRoot}/resources/cmake/rticonnextdds-cmake-utils/"
     )
 }
+
+return this
