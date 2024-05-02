@@ -43,5 +43,6 @@ RUN mkdir -p /tmp/tools /opt/tools \
     && rm -rf /tmp/tools
 
 RUN useradd -u ${USER_UID} -m ${USER_NAME}
+ENV PATH=/home/$USER_NAME/.local/bin:$PATH
 
 USER $USER_NAME
