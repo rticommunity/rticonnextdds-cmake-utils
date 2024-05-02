@@ -16,7 +16,7 @@ Map pipelineInfo = [:]
 
 pipeline {
     agent {
-        label "${nodeManager.labelFromArchitecture(params.ARCHITECTURE)}"
+        label "${nodeManager.labelFromArchitectureFamily(params.ARCHITECTURE_FAMILY)}"
     }
 
     options {
@@ -43,16 +43,21 @@ pipeline {
 
     parameters {
         string(
-            name: 'ARCHITECTURE',
-            description: 'The architecture string to guess the node from: e.g.: linux, windows...',
+            name: 'ARCHITECTURE_FAMILY',
+            description: 'The architecture family to guess the node from (linux, windows, ...)',
+            trim: true
+        )
+        string(
+            name: 'ARCHITECTURE_STRING',
+            description: 'The architecture string (x64Linux4gcc7.3.0, x64Win64VS2015, ...)',
             trim: true
         )
         string(
             name: 'EXAMPLES_REPOSITORY_BRANCH',
-            description: '''
-                The rticonnextdds-examples repository branch to build. E.g.: "master",
-                "release/7.3.0", "PR-123"
-            ''',
+            description: (
+                'The rticonnextdds-examples repository branch to build. E.g.: "master",'
+                + ' "release/7.3.0", "PR-123"'
+            ),
             trim: true,
         )
         string(
@@ -68,20 +73,28 @@ pipeline {
     }
 
     stages {
-        stage('Clone repositories') {
+        stage('Repository configuration') {
             steps {
-                checkoutCommunityRepoBranch('rticonnextdds-examples', params.EXAMPLES_REPOSITORY_BRANCH, true)
+                checkoutCommunityRepoBranch(
+                    'rticonnextdds-examples', params.EXAMPLES_REPOSITORY_BRANCH, true
+                )
                 dir(env.CMAKE_UTILS_REPO) {
-                    checkoutCommunityRepoBranch('rticonnextdds-cmake-utils', params.CMAKE_UTILS_REPOSITORY_BRANCH)
+                    checkoutCommunityRepoBranch(
+                        'rticonnextdds-cmake-utils', params.CMAKE_UTILS_REPOSITORY_BRANCH
+                    )
                 }
-                applyCmakeUtilsPatch(env.CMAKE_UTILS_REPO, env.WORKSPACE, env.EXAMPLES_REPOSITORY_BRANCH)
+                applyCmakeUtilsPatch(
+                    env.CMAKE_UTILS_REPO, env.WORKSPACE, env.EXAMPLES_REPOSITORY_BRANCH
+                )
             }
         }
         stage('Download Packages') {
             steps {
                 script {
-                    nodeManager.runInsideExecutor(params.ARCHITECTURE) {
-                        pipelineInfo.connextDir = installConnext(env.CONNEXTDDS_ARCH, env.WORKSPACE)
+                    nodeManager.runInsideExecutor(params.ARCHITECTURE_STRING) {
+                        pipelineInfo.connextDir = installConnext(
+                            env.CONNEXTDDS_ARCH, env.WORKSPACE
+                        )
                     }
                 }
             }
@@ -102,7 +115,7 @@ pipeline {
                     stage('Build single mode') {
                         steps {
                             script{
-                                nodeManager.runInsideExecutor(params.ARCHITECTURE) {
+                                nodeManager.runInsideExecutor(params.ARCHITECTURE_STRING) {
                                     echo("Building ${buildMode}/${linkMode}")
                                     buildExamples(
                                         env.WORKSPACE,
@@ -120,7 +133,7 @@ pipeline {
         stage('Static Analysis') {
             steps {
                 script {
-                    nodeManager.runInsideExecutor(params.ARCHITECTURE) {
+                    nodeManager.runInsideExecutor(params.ARCHITECTURE_STRING) {
                         command.run("""
                             python3 resources/ci_cd/linux_static_analysis.py \
                             --build-dir ${buildExamples.getBuildDirectory('release', 'dynamic')}
