@@ -17,64 +17,36 @@
  * Build the desired job in the examples repository multibranch pipeline.
  *
  * @param examplesRepoBranch The branch or PR to build in the examples repository.
- * @param architectureFamily The architecture family of the job.
- * @param architectureString The architecture string of the job.
  */
-void runBuildSingleModeJob(String examplesRepoBranch, String architectureFamily, String architectureString) {
+void runBuildArchitectureConfigurationsJob(String examplesRepoBranch) {
     build(
-        job: 'ci/rticonnextdds-cmake-utils/build-cfg',
+        job: 'ci/rticonnextdds-cmake-utils/build-arch-cfgs',
         propagate: true,
         wait: true,
         parameters: [
             string(
-                name: 'ARCHITECTURE_FAMILY',
-                value: architectureFamily,
-            ),
-            string(
-                name: 'ARCHITECTURE_STRING',
-                value: architectureString,
+                name: 'CMAKE_UTILS_REPOSITORY_BRANCH',
+                value: env.BRANCH_NAME,
             ),
             string(
                 name: 'EXAMPLES_REPOSITORY_BRANCH',
                 value: examplesRepoBranch,
-            ),
-            string(
-                name: 'CMAKE_UTILS_REPOSITORY_BRANCH',
-                value: env.BRANCH_NAME,
             ),
         ]
     )
 }
 
 /**
- * Create a set of jobs over each architecture for a specific rticonnextdds-examples branch.
- *
- * @param branch rticonnextdds-examples branch to build.
- * @param osMap Architecture family - architecture string map.
- */
-Map architectureJobs(String branch, Map<String, Map> osMap) {
-    return osMap.collectEntries { architectureFamily, architectureString ->
-        [
-            "Architecture faimly: ${architectureFamily}": {
-                stage("Architecture faimly: ${architectureFamily}") {
-                    runBuildSingleModeJob(branch, architectureFamily, architectureString)
-                }
-            }
-        ]
-    }
-}
-
-/**
  * Create a set of jobs over each rticonnextdds-examples branch.
  *
- * @param branches Map of the available branches.
+ * @param branches List of branch names.
  */
-Map branchJobs(Map<String, Map> branches) {
-    return branches.collectEntries { branch, osMap ->
+Map branchJobs(String[] branches) {
+    return branches.collect { branch ->
         [
             "Branch: ${branch}": {
                 stage("Branch: ${branch}") {
-                    parallel architectureJobs(branch, osMap)
+                    runBuildArchitectureConfigurationsJob(branch)
                 }
             }
         ]
@@ -92,9 +64,10 @@ pipeline {
         stage('Run CI') {
             steps {
                 script {
-                    parallel branchJobs(
-                        readYaml(file: "${env.WORKSPACE}/resources/ci/config.yaml").branches
-                    )
+                    String[] examplesBranches = readYaml(
+                        file: "${env.WORKSPACE}/resources/ci/config.yaml"
+                    ).branches.keySet()
+                    parallel branchJobs(examplesBranches)
                 }
             }
         }

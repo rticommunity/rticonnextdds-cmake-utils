@@ -3,10 +3,12 @@ branches:
   #   linux: x64Linux3gcc4.8.2
   #   windows: x64Win64VS2015
   develop:
-    linux: x64Linux3gcc4.8.2
+    # linux: x64Linux3gcc4.8.2
+    linux: x64Linux4gcc7.3.0
   #   windows: x64Win64VS2015
   release/7.3.0:
-    linux: x64Linux3gcc4.8.2
+    # linux: x64Linux3gcc4.8.2
+    linux: x64Linux4gcc7.3.0
     # windows: x64Win64VS2015
   # release/6.1.2:
   #   linux: x64Linux2.6gcc4.4.5
