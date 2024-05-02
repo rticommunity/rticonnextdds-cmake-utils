@@ -2,8 +2,8 @@ branches:
   # master:
   #   linux: x64Linux3gcc4.8.2
   #   windows: x64Win64VS2015
-  # develop:
-  #   linux: x64Linux3gcc4.8.2
+  develop:
+    linux: x64Linux3gcc4.8.2
   #   windows: x64Win64VS2015
   release/7.3.0:
     linux: x64Linux3gcc4.8.2
