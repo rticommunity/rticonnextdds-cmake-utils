@@ -1,4 +1,4 @@
-versions:
+branches:
   # master:
   #   linux: x64Linux3gcc4.8.2
   #   windows: x64Win64VS2015

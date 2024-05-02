@@ -141,10 +141,11 @@ pipeline {
                     nodeManager.runInsideExecutor(
                         params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
                     ) {
-                        command.run("""
-                            python3 resources/ci_cd/linux_static_analysis.py \
-                            --build-dir ${buildExamples.getBuildDirectory('release', 'dynamic')}
-                        """)
+                        command.run(
+                            'python3 resources/ci_cd/linux_static_analysis.py'
+                            + "--build-dir ${buildExamples.getBuildDirectory('release', 'dynamic')}"
+                            + "--connext-dir ${pipelineInfo.connextDir}"
+                        )
                     }
                 }
             }

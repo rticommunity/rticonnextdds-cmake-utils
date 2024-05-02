@@ -14,57 +14,25 @@
 @Library("rticommunity-jenkins-pipelines@feature/INSTALL-944") _
 
 /**
- * Iterate over the list of architectures to build. In each architecture, this will launch a number
- * of branch jobs.
- *
- * @return The list of stages to run in parallel.
- */
-Map architectureJobs() {
-    return getYamlCi.architectures(ciYamlFile).collectEntries { architecture ->
-        [
-            "Architecture: ${architecture}": {
-                stage("Architecture: ${architecture}") {
-                    parallel branchJobs(architecture)
-                }
-            }
-        ]
-    }
-}
-
-/**
- * Iterate over the list of branches to build. In each branch, this will launch the specified
- * rticonnextdds-examples pipeline.
- *
- * @param architecture The architecture string to build.
- * @return The list of stages to run in parallel.
- */
-Map branchJobs(String architecture) {
-    return getYamlCi.branchReferences(ciYamlFile).collectEntries { branchReference ->
-        [
-            "Branch reference: ${branchReference}": {
-                stage("Branch reference: ${branchReference}") {
-                    runExamplesRepositoryJob(architecture, branchReference)
-                }
-            }
-        ]
-    }
-}
-
-/**
  * Build the desired job in the examples repository multibranch pipeline.
  *
- * @param architecture The architecture in which the job will be executed.
  * @param examplesRepoBranch The branch or PR to build in the examples repository.
+ * @param architectureFamily The architecture family of the job.
+ * @param architectureString The architecture string of the job.
  */
-void runExamplesRepositoryJob(String architecture, String examplesRepoBranch) {
+void runBuildSingleModeJob(String examplesRepoBranch, String architectureFamily, String architectureString) {
     build(
-        job: 'ci/rticonnextdds-cmake-utils/build-single-mode',
+        job: 'ci/rticonnextdds-cmake-utils/build-cfg',
         propagate: true,
         wait: true,
         parameters: [
             string(
-                name: 'ARCHITECTURE',
-                value: architecture,
+                name: 'ARCHITECTURE_FAMILY',
+                value: architectureFamily,
+            ),
+            string(
+                name: 'ARCHITECTURE_STRING',
+                value: architectureString,
             ),
             string(
                 name: 'EXAMPLES_REPOSITORY_BRANCH',
@@ -79,8 +47,43 @@ void runExamplesRepositoryJob(String architecture, String examplesRepoBranch) {
 }
 
 /**
- * Run the rticonnextdds-examples CI for each active Connext LTS versions (release branches), the
- * latest version (master) and the development version (develop) in all the supported architectures.
+ * Create a set of jobs over each architecture for a specific rticonnextdds-examples branch.
+ *
+ * @param branch rticonnextdds-examples branch to build.
+ * @param osMap Architecture family - architecture string map.
+ */
+Map architectureJobs(String branch, Map<String, Map> osMap) {
+    return osMap.each { architectureFamily, architectureString ->
+        [
+            "Architecture faimly: ${architectureFamily}": {
+                stage("Architecture faimly: ${architectureFamily}") {
+                    runBuildSingleModeJob(branch, architectureFamily, architectureString)
+                }
+            }
+        ]
+    }
+}
+
+/**
+ * Create a set of jobs over each rticonnextdds-examples branch.
+ *
+ * @param branches Map of the available branches.
+ */
+Map branchJobs(Map<String, Map> branches) {
+    return branches.each { branch, osMap ->
+        [
+            "Branch: ${branch}": {
+                stage("Branch: ${branch}") {
+                    parallel architectureJobs(branch, osMap)
+                }
+            }
+        ]
+    }
+}
+
+/**
+ * Run a complete set of tests for all the Connext versions and architectures the FindPackage
+ * supports.
  */
 pipeline {
     agent any
@@ -88,11 +91,11 @@ pipeline {
     stages {
         stage('Run CI') {
             steps {
-                echo('TODO')
-                // script {
-                //     ciYamlFile = "${env.WORKSPACE}/resources/ci/config.yaml"
-                //     parallel architectureJobs()
-                // }
+                script {
+                    parallel branchJobs(
+                        readYaml(file: "${env.WORKSPACE}/resources/ci/config.yaml").branches
+                    )
+                }
             }
         }
     }
