@@ -70,6 +70,7 @@ pipeline {
 
     environment {
         CMAKE_UTILS_REPO = "${env.WORKSPACE}/cmake-utils"
+        CMAKE_UTILS_DOCKER_DIR = "${env.WORKSPACE}/cmake-utils/resources/ci/docker/"
     }
 
     stages {
@@ -91,9 +92,11 @@ pipeline {
         stage('Download Packages') {
             steps {
                 script {
-                    nodeManager.runInsideExecutor(params.ARCHITECTURE_STRING) {
+                    nodeManager.runInsideExecutor(
+                        params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
+                    ) {
                         pipelineInfo.connextDir = installConnext(
-                            env.CONNEXTDDS_ARCH, env.WORKSPACE
+                            env.ARCHITECTURE_STRING, env.WORKSPACE
                         )
                     }
                 }
@@ -115,7 +118,9 @@ pipeline {
                     stage('Build single mode') {
                         steps {
                             script{
-                                nodeManager.runInsideExecutor(params.ARCHITECTURE_STRING) {
+                                nodeManager.runInsideExecutor(
+                                    params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
+                                ) {
                                     echo("Building ${buildMode}/${linkMode}")
                                     buildExamples(
                                         env.WORKSPACE,
@@ -133,7 +138,9 @@ pipeline {
         stage('Static Analysis') {
             steps {
                 script {
-                    nodeManager.runInsideExecutor(params.ARCHITECTURE_STRING) {
+                    nodeManager.runInsideExecutor(
+                        params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
+                    ) {
                         command.run("""
                             python3 resources/ci_cd/linux_static_analysis.py \
                             --build-dir ${buildExamples.getBuildDirectory('release', 'dynamic')}
