@@ -23,6 +23,7 @@ void apply(String cmakeUtilsRepoRoot, String examplesRepoRoot) {
         + ' directory inside the rticonnextdds-examples repository'
     )
     command.run("cp -r ${cmakeUtilsRepoRoot}/cmake/Modules/* ${examplesRepoRoot}/resources/cmake/")
+    writeFile(file: 'VERSION', text: '6.1.2')
 }
 
 return this
