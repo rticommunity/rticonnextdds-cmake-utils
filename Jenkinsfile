@@ -44,9 +44,9 @@ void runBuildArchitectureConfigurationsJob(String examplesRepoBranch) {
 Map branchJobs(String[] branches) {
     return branches.collectEntries { branch ->
         [
-            "Branch: ${branch}",
+            "${branch}",
             {
-                stage("Branch: ${branch}") {
+                stage("${branch}") {
                     runBuildArchitectureConfigurationsJob(branch)
                 }
             }
@@ -62,12 +62,12 @@ pipeline {
     agent any
 
     stages {
-        stage('Run CI') {
+        stage('Versions') {
             steps {
                 script {
                     String[] examplesBranches = readYaml(
                         file: "${env.WORKSPACE}/resources/ci/config.yaml"
-                    ).branches.keySet()
+                    ).versions.keySet()
                     parallel branchJobs(examplesBranches)
                 }
             }

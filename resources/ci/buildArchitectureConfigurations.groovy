@@ -61,8 +61,8 @@ void runBuildConfigurationJob(
 Map architectureJobs(String cmakeUtilsRepoBranch, String examplesRepoBranch, Map<String, Map> osMap) {
     return osMap.collectEntries { architectureFamily, architectureString ->
         [
-            "Architecture family: ${architectureFamily}": {
-                stage("Architecture family: ${architectureFamily}") {
+            "${architectureFamily}": {
+                stage("${architectureFamily}") {
                     runBuildConfigurationJob(
                         cmakeUtilsRepoBranch,
                         examplesRepoBranch,
@@ -99,7 +99,7 @@ pipeline {
     }
 
     stages {
-        stage('Run CI') {
+        stage('Build architectures') {
             steps {
                 checkoutCommunityRepoBranch(
                     'rticonnextdds-cmake-utils', params.CMAKE_UTILS_REPOSITORY_BRANCH
@@ -110,7 +110,7 @@ pipeline {
                         params.EXAMPLES_REPOSITORY_BRANCH,
                         readYaml(
                             file: "${env.WORKSPACE}/resources/ci/config.yaml"
-                        ).branches[params.EXAMPLES_REPOSITORY_BRANCH]
+                        ).versions[params.EXAMPLES_REPOSITORY_BRANCH]
                     )
                 }
             }
