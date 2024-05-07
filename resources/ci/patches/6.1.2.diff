@@ -54,9 +54,101 @@ index 00000000..51b5c915
 +if(CONNEXTDDS_BUILD_ROUTING_SERVICE_EXAMPLES)
 +    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/routing_service")
 +endif()
+diff --git a/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt b/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt
+index 29626a52..143c1463 100644
+--- a/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt
++++ b/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt
+@@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
+     "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../resources/cmake"
+ )
+ 
++find_package(RTIConnextDDS
++    "6.1.2"
++    REQUIRED
++    COMPONENTS
++        security_plugins
++)
++
++if(NOT RTIConnextDDS::security_plugins)
++    message(WARNING "RTIConnextDDS::security_plugins component is missing. Skipping example")
++    return()
++endif()
++
+ # Include ConnextDdsAddExample.cmake from resources/cmake
+ include(ConnextDdsAddExample)
+ 
+diff --git a/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt b/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt
+index 08d3d275..9ff14fdf 100644
+--- a/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt
++++ b/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt
+@@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
+     "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../resources/cmake"
+ )
+ 
++find_package(RTIConnextDDS
++    "6.1.2"
++    REQUIRED
++    COMPONENTS
++        security_plugins
++)
++
++if(NOT RTIConnextDDS::security_plugins)
++    message(WARNING "RTIConnextDDS::security_plugins component is missing. Skipping example")
++    return()
++endif()
++
+ # Include ConnextDdsAddExample.cmake from resources/cmake
+ include(ConnextDdsAddExample)
+ 
+diff --git a/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt b/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt
+index 7d2e2394..18867ce9 100644
+--- a/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt
++++ b/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt
+@@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
+     "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../resources/cmake"
+ )
+ 
++find_package(RTIConnextDDS
++    "6.1.2"
++    REQUIRED
++    COMPONENTS
++        security_plugins
++)
++
++if(NOT RTIConnextDDS::security_plugins)
++    message(WARNING "RTIConnextDDS::security_plugins component is missing. Skipping example")
++    return()
++endif()
++
+ # Include ConnextDdsAddExample.cmake from resources/cmake
+ include(ConnextDdsAddExample)
+ 
+diff --git a/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt b/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt
+index 740d6007..e85422b8 100644
+--- a/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt
++++ b/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt
+@@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
+     "${CMAKE_CURRENT_SOURCE_DIR}/../../../../resources/cmake"
+ )
+ 
++find_package(RTIConnextDDS
++    "6.1.2"
++    REQUIRED
++    COMPONENTS
++        security_plugins
++)
++
++if(NOT RTIConnextDDS::security_plugins)
++    message(WARNING "RTIConnextDDS::security_plugins component is missing. Skipping example")
++    return()
++endif()
++
+ # Include ConnextDdsAddExample.cmake from resources/cmake
+ include(ConnextDdsAddExample)
+ 
 diff --git a/examples/recording_service/CMakeLists.txt b/examples/recording_service/CMakeLists.txt
 new file mode 100644
-index 00000000..0ec449c3
+index 00000000..0cc81e07
 --- /dev/null
 +++ b/examples/recording_service/CMakeLists.txt
 @@ -0,0 +1,30 @@
@@ -90,15 +182,104 @@ index 00000000..0ec449c3
 +    EXAMPLES
 +        ${CONNEXTDDS_RECORDING_SERVICE_EXAMPLES}
 +)
-\ No newline at end of file
+diff --git a/examples/recording_service/pluggable_storage/c/CMakeLists.txt b/examples/recording_service/pluggable_storage/c/CMakeLists.txt
+index bc65fb4c..e5b3caa2 100644
+--- a/examples/recording_service/pluggable_storage/c/CMakeLists.txt
++++ b/examples/recording_service/pluggable_storage/c/CMakeLists.txt
+@@ -15,18 +15,20 @@ project (PluggableStorage)
+ set(CMAKE_DEBUG_POSTFIX "d")
+ 
+ if(NOT BUILD_SHARED_LIBS)
+-    set(msg
++    message(WARNING
+         "Static linking is not supported for this example. You can build it "
+-        "using the -DBUILD_SHARED_LIBS=ON CMake parameter")
+-    message(FATAL_ERROR ${msg})
++        "using the -DBUILD_SHARED_LIBS=ON CMake parameter"
++    )
++    return()
+ endif()
+ 
+ if(NOT CMAKE_BUILD_TYPE)
+-    set(msg
++    message(WARNING
+         "Not specifying CMAKE_BUILD_TYPE can lead to undefined behaviour and "
+         "is not supported for this example. Please provide a valid value for "
+-        "the CMAKE_BUILD_TYPE parameter")
+-    message(FATAL_ERROR ${msg})
++        "the CMAKE_BUILD_TYPE parameter"
++    )
++    return()
+ endif()
+ 
+ if(CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
+diff --git a/examples/recording_service/pluggable_storage/cpp/CMakeLists.txt b/examples/recording_service/pluggable_storage/cpp/CMakeLists.txt
+index 9cd5e2e6..5dde3757 100644
+--- a/examples/recording_service/pluggable_storage/cpp/CMakeLists.txt
++++ b/examples/recording_service/pluggable_storage/cpp/CMakeLists.txt
+@@ -15,18 +15,20 @@ project (PluggableStorage)
+ set(CMAKE_DEBUG_POSTFIX "d")
+ 
+ if(NOT BUILD_SHARED_LIBS)
+-    set(msg
++    message(WARNING
+         "Static linking is not supported for this example. You can build it "
+-        "using the -DBUILD_SHARED_LIBS=ON CMake parameter")
+-    message(FATAL_ERROR ${msg})
++        "using the -DBUILD_SHARED_LIBS=ON CMake parameter"
++    )
++    return()
+ endif()
+ 
+ if(NOT CMAKE_BUILD_TYPE)
+-    set(msg
++    message(WARNING
+         "Not specifying CMAKE_BUILD_TYPE can lead to undefined behaviour and "
+         "is not supported for this example. Please provide a valid value for "
+-        "the CMAKE_BUILD_TYPE parameter")
+-    message(FATAL_ERROR ${msg})
++        "the CMAKE_BUILD_TYPE parameter"
++    )
++    return()
+ endif()
+ 
+ if(CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
+diff --git a/examples/recording_service/service_as_lib/cpp/CMakeLists.txt b/examples/recording_service/service_as_lib/cpp/CMakeLists.txt
+index 7d4a76e7..b7585551 100644
+--- a/examples/recording_service/service_as_lib/cpp/CMakeLists.txt
++++ b/examples/recording_service/service_as_lib/cpp/CMakeLists.txt
+@@ -13,10 +13,11 @@ cmake_minimum_required(VERSION 3.11)
+ project(ServiceAsLib)
+ 
+ if(NOT BUILD_SHARED_LIBS)
+-    set(msg
++    message(WARNING
+         "Static linking is not supported for this example. You can build it "
+-        "using the -DBUILD_SHARED_LIBS=ON CMake parameter")
+-    message(FATAL_ERROR ${msg})
++        "using the -DBUILD_SHARED_LIBS=ON CMake parameter"
++    )
++    return()
+ endif()
+ 
+ if(NOT CMAKE_BUILD_TYPE)
+@@ -24,7 +25,7 @@ if(NOT CMAKE_BUILD_TYPE)
+         "Not specifying CMAKE_BUILD_TYPE can lead to undefined behaviour and "
+         "is not supported for this example. Please provide a valid value for "
+         "the CMAKE_BUILD_TYPE parameter")
+-    message(FATAL_ERROR ${msg})
++    message(WARNING ${msg})
+ endif()
+ 
+ # Find RTI Connext dependencies
 diff --git a/examples/routing_service/CMakeLists.txt b/examples/routing_service/CMakeLists.txt
 new file mode 100644
-index 00000000..8167fb37
+index 00000000..9fdb8b4d
 --- /dev/null
 +++ b/examples/routing_service/CMakeLists.txt
 @@ -0,0 +1,44 @@
 +#
-+# (c) 2022 Copyright, Real-Time Innovations, Inc.  All rights reserved.
++# (c) 2024 Copyright, Real-Time Innovations, Inc.  All rights reserved.
 +#
 +# RTI grants Licensee a license to use, modify, compile, and create derivative
 +# works of the Software.  Licensee has the right to distribute object form
@@ -141,7 +322,82 @@ index 00000000..8167fb37
 +    EXAMPLES
 +        ${CONNEXTDDS_ROUTING_SERVICE_EXAMPLES}
 +)
-\ No newline at end of file
+diff --git a/examples/routing_service/routing_service_file_adapter/c/CMakeLists.txt b/examples/routing_service/routing_service_file_adapter/c/CMakeLists.txt
+index a468dac2..caaa7b5e 100644
+--- a/examples/routing_service/routing_service_file_adapter/c/CMakeLists.txt
++++ b/examples/routing_service/routing_service_file_adapter/c/CMakeLists.txt
+@@ -12,22 +12,19 @@
+ cmake_minimum_required(VERSION 3.11)
+ project(FileAdapterC)
+ 
+-if(NOT DEFINED CONNEXTDDS_DIR)
+-    set(msg
+-        "Please set the CMake variable CONNEXTDDS_DIR "
+-        "to point to your installation of RTI Connext DDS")
+-    message(FATAL_ERROR ${msg})
+-endif()
+-
+ if (NOT UNIX)
+-    set(msg
++    message(STATUS
+         "This example uses the pthreads library "
+-        "which is only available on UNIX-like systems")
+-    message(FATAL_ERROR ${msg})
++        "which is only available on UNIX-like systems"
++    )
++    return()
+ endif()
+ 
+ # Find RTI Connext dependencies
+-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CONNEXTDDS_DIR}/resource/cmake")
++set(CMAKE_MODULE_PATH
++    ${CMAKE_MODULE_PATH}
++    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../resources/cmake"
++)
+ find_package(
+     RTIConnextDDS "6.1.2"
+     REQUIRED
+diff --git a/examples/routing_service/routing_service_file_adapter/cpp/CMakeLists.txt b/examples/routing_service/routing_service_file_adapter/cpp/CMakeLists.txt
+index 6246405e..18efb807 100644
+--- a/examples/routing_service/routing_service_file_adapter/cpp/CMakeLists.txt
++++ b/examples/routing_service/routing_service_file_adapter/cpp/CMakeLists.txt
+@@ -12,15 +12,11 @@
+ cmake_minimum_required(VERSION 3.11)
+ project(FileAdapterC++11)
+ 
+-if(NOT DEFINED CONNEXTDDS_DIR)
+-    set(msg 
+-        "Please set the CMake variable CONNEXTDDS_DIR "
+-        "to point to your installation of RTI Connext DDS")
+-    message(FATAL_ERROR ${msg})
+-endif()
+-
+ # Find RTI Connext dependencies
+-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CONNEXTDDS_DIR}/resource/cmake")
++set(CMAKE_MODULE_PATH
++    ${CMAKE_MODULE_PATH}
++    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../resources/cmake"
++)
+ find_package(
+     RTIConnextDDS "6.1.2"
+     REQUIRED
+diff --git a/examples/routing_service/routing_service_mongo_db/cpp/CMakeLists.txt b/examples/routing_service/routing_service_mongo_db/cpp/CMakeLists.txt
+index 2911d848..544a1e84 100644
+--- a/examples/routing_service/routing_service_mongo_db/cpp/CMakeLists.txt
++++ b/examples/routing_service/routing_service_mongo_db/cpp/CMakeLists.txt
+@@ -13,7 +13,11 @@ cmake_minimum_required(VERSION 3.11)
+ project (MongoDBAdapter)
+ 
+ # Find RTI Connext dependencies
+-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CONNEXTDDS_DIR}/resource/cmake")
++set(CMAKE_MODULE_PATH
++    ${CMAKE_MODULE_PATH}
++    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../resources/cmake"
++)
++
+ find_package(
+     RTIConnextDDS "6.1.2"
+     REQUIRED
 diff --git a/examples/routing_service/routing_service_remote_admin/c++11/CMakeLists.txt b/examples/routing_service/routing_service_remote_admin/c++11/CMakeLists.txt
 index 96f5c1a4..280ecd55 100644
 --- a/examples/routing_service/routing_service_remote_admin/c++11/CMakeLists.txt
@@ -211,3 +467,38 @@ index 96f5c1a4..280ecd55 100644
      "${CONNEXTDDS_INCLUDE_DIRS}"
      "${IDL_GEN_CODE_OUTPUT_DIR}"
  )
+diff --git a/examples/routing_service/routing_service_shapes_processor/cpp/CMakeLists.txt b/examples/routing_service/routing_service_shapes_processor/cpp/CMakeLists.txt
+index 2a132ecf..c3a15f18 100644
+--- a/examples/routing_service/routing_service_shapes_processor/cpp/CMakeLists.txt
++++ b/examples/routing_service/routing_service_shapes_processor/cpp/CMakeLists.txt
+@@ -13,11 +13,11 @@ cmake_minimum_required(VERSION 3.11)
+ project(ShapesProcessor)
+ 
+ if(NOT BUILD_SHARED_LIBS)
+-    set(msg
++    message(STATUS
+         "Static linking is not supported for this example. You can build it "
+         "using the -DBUILD_SHARED_LIBS=ON CMake parameter"
+     )
+-    message(FATAL_ERROR ${msg})
++    return()
+ endif()
+ 
+ if(CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
+diff --git a/examples/routing_service/routing_service_struct_array_transf/cpp/CMakeLists.txt b/examples/routing_service/routing_service_struct_array_transf/cpp/CMakeLists.txt
+index f5d48bd5..41d88fc3 100644
+--- a/examples/routing_service/routing_service_struct_array_transf/cpp/CMakeLists.txt
++++ b/examples/routing_service/routing_service_struct_array_transf/cpp/CMakeLists.txt
+@@ -14,10 +14,10 @@ cmake_minimum_required(VERSION 3.11)
+ project (StructArrayTransformation)
+ 
+ if(NOT BUILD_SHARED_LIBS)
+-    set(msg
++    message(STATUS
+         "Static linking is not supported for this example. You can build it "
+         "using the -DBUILD_SHARED_LIBS=ON CMake parameter")
+-    message(FATAL_ERROR ${msg})
++    return()
+ endif()
+ 
+ if(CONNEXTDDS_IMPORTED_TARGETS_DEBUG)
