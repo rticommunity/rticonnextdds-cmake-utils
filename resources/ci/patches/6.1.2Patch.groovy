@@ -27,7 +27,7 @@ void apply(String cmakeUtilsRepoRoot, String examplesRepoRoot) {
     command.run("cp -r ${cmakeUtilsRepoRoot}/cmake/Modules/* ${examplesRepoRoot}/resources/cmake/")
     writeFile(file: 'VERSION', text: '6.1.2')
     command.run(
-        "git apply ${cmakeUtilsRepoRoot}/resources/ci/patches/6.1.2.diff -C ${examplesRepoRoot}"
+        "git -C ${examplesRepoRoot} apply ${cmakeUtilsRepoRoot}/resources/ci/patches/6.1.2.diff"
     )
 }
 
