@@ -148,6 +148,18 @@ pipeline {
                     }
                 }
             }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: true,
+                        reportDir: "${buildExamples.getBuildDirectory('release', 'dynamic')}/scan-build-*",
+                        reportFiles: 'index.html',
+                        reportName: 'LLVM Scan build static analysis',
+                    ])
+                }
+            }
         }
     }
     post {
