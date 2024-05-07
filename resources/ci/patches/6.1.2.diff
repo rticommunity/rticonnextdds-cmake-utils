@@ -1,0 +1,213 @@
+diff --git a/examples/CMakeLists.txt b/examples/CMakeLists.txt
+new file mode 100644
+index 00000000..51b5c915
+--- /dev/null
++++ b/examples/CMakeLists.txt
+@@ -0,0 +1,50 @@
++#
++# (c) 2024 Copyright, Real-Time Innovations, Inc.  All rights reserved.
++#
++# RTI grants Licensee a license to use, modify, compile, and create derivative
++# works of the Software.  Licensee has the right to distribute object form
++# only for use with RTI products.  The Software is provided "as is", with no
++# warranty of any type, including any warranty for fitness for any purpose.
++# RTI is under no obligation to maintain or support the Software.  RTI shall
++# not be liable for any incidental or consequential damages arising out of the
++# use or inability to use the software.
++#
++cmake_minimum_required(VERSION 3.12)
++project(rticonnextdds-examples)
++
++option(CONNEXTDDS_BUILD_PERSISTENCE_SERVICE_EXAMPLES
++    "Build Persistence Service examples"
++    OFF
++)
++option(CONNEXTDDS_BUILD_RECORDING_SERVICE_EXAMPLES
++    "Build Recording Service examples"
++    OFF
++)
++option(CONNEXTDDS_BUILD_ROUTING_SERVICE_EXAMPLES
++    "Build Routing Service examples"
++    OFF
++)
++option(CONNEXTDDS_BUILD_CLOUD_DISCOVERY_SERVICE_EXAMPLES
++    "Build Cloud Discovery Service examples"
++    OFF
++)
++
++option(CONNEXTDDS_BUILD_WEB_INTEGRATION_SERVICE_EXAMPLES
++    "Build Web Integration Service examples"
++    OFF
++)
++
++option(CONNEXTDDS_BUILD_CONNEXT_SECURE_EXAMPLES
++    "Build Connext Secure examples"
++    OFF
++)
++
++add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/connext_dds")
++
++if(CONNEXTDDS_BUILD_RECORDING_SERVICE_EXAMPLES)
++    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/recording_service")
++endif()
++
++if(CONNEXTDDS_BUILD_ROUTING_SERVICE_EXAMPLES)
++    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/routing_service")
++endif()
+diff --git a/examples/recording_service/CMakeLists.txt b/examples/recording_service/CMakeLists.txt
+new file mode 100644
+index 00000000..0ec449c3
+--- /dev/null
++++ b/examples/recording_service/CMakeLists.txt
+@@ -0,0 +1,30 @@
++#
++# (c) 2024 Copyright, Real-Time Innovations, Inc.  All rights reserved.
++#
++# RTI grants Licensee a license to use, modify, compile, and create derivative
++# works of the Software.  Licensee has the right to distribute object form
++# only for use with RTI products.  The Software is provided "as is", with no
++# warranty of any type, including any warranty for fitness for any purpose.
++# RTI is under no obligation to maintain or support the Software.  RTI shall
++# not be liable for any incidental or consequential damages arising out of the
++# use or inability to use the software.
++#
++cmake_minimum_required(VERSION 3.11)
++project(rticonnextdds-examples-recording-service)
++list(APPEND CMAKE_MODULE_PATH
++    "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/cmake"
++)
++include(ConnextDdsAddExamplesSubdirectories)
++
++if(NOT DEFINED CONNEXTDDS_RECORDING_SERVICE_EXAMPLES)
++    set(CONNEXTDDS_RECORDING_SERVICE_EXAMPLES
++        "pluggable_storage"
++        "service_admin"
++        "service_as_lib"
++    )
++endif()
++
++connextdds_add_examples_subdirectories(
++    EXAMPLES
++        ${CONNEXTDDS_RECORDING_SERVICE_EXAMPLES}
++)
+\ No newline at end of file
+diff --git a/examples/routing_service/CMakeLists.txt b/examples/routing_service/CMakeLists.txt
+new file mode 100644
+index 00000000..8167fb37
+--- /dev/null
++++ b/examples/routing_service/CMakeLists.txt
+@@ -0,0 +1,44 @@
++#
++# (c) 2022 Copyright, Real-Time Innovations, Inc.  All rights reserved.
++#
++# RTI grants Licensee a license to use, modify, compile, and create derivative
++# works of the Software.  Licensee has the right to distribute object form
++# only for use with RTI products.  The Software is provided "as is", with no
++# warranty of any type, including any warranty for fitness for any purpose.
++# RTI is under no obligation to maintain or support the Software.  RTI shall
++# not be liable for any incidental or consequential damages arising out of the
++# use or inability to use the software.
++#
++cmake_minimum_required(VERSION 3.11)
++project(rticonnextdds-examples-routing-service)
++list(APPEND CMAKE_MODULE_PATH
++    "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/cmake"
++)
++include(ConnextDdsAddExamplesSubdirectories)
++
++# Mongo DB C++ Driver may not be installed, so we don't build it by default
++option(CONNEXTDDS_BUILD_MONGODB_EXAMPLE
++    "Build the Mongo DB C++ Routing Service example"
++    OFF
++)
++set(routing_service_mongo_db_example_dir)
++if(CONNEXTDDS_BUILD_MONGODB_EXAMPLE)
++    set(routing_service_mongo_db_example_dir "routing_service_mongo_db")
++endif()
++
++if(NOT DEFINED CONNEXTDDS_ROUTING_SERVICE_EXAMPLES)
++    set(CONNEXTDDS_ROUTING_SERVICE_EXAMPLES
++        "routing_service_file_adapter"
++        "routing_service_file_to_dds_configuration"
++        "${routing_service_mongo_db_example_dir}"
++        "routing_service_monitoring"
++        "routing_service_remote_admin"
++        "routing_service_shapes_processor"
++        "routing_service_struct_array_transf"
++    )
++endif()
++
++connextdds_add_examples_subdirectories(
++    EXAMPLES
++        ${CONNEXTDDS_ROUTING_SERVICE_EXAMPLES}
++)
+\ No newline at end of file
+diff --git a/examples/routing_service/routing_service_remote_admin/c++11/CMakeLists.txt b/examples/routing_service/routing_service_remote_admin/c++11/CMakeLists.txt
+index 96f5c1a4..280ecd55 100644
+--- a/examples/routing_service/routing_service_remote_admin/c++11/CMakeLists.txt
++++ b/examples/routing_service/routing_service_remote_admin/c++11/CMakeLists.txt
+@@ -29,40 +29,40 @@ find_package(
+ 
+ # Flags for code generation
+ set(CODEGEN_FLAGS UNBOUNDED)
+-set(IDL_GEN_CODE_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/build/${RTI_ARCH}/generated/")
++set(IDL_GEN_CODE_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/${RTI_ARCH}/generated/")
+ # Include the CodegenRTIConnextDDS cmake module
+ include(ConnextDdsCodegen)
+ 
+ connextdds_rtiddsgen_run(
+     IDL_FILE
+-      "$ENV{NDDSHOME}/resource/idl/ServiceCommon.idl"
++      "${CONNEXTDDS_DIR}/resource/idl/ServiceCommon.idl"
+     LANG
+       "C++11"
+     OUTPUT_DIRECTORY
+       "${IDL_GEN_CODE_OUTPUT_DIR}"
+     INCLUDE_DIRS
+-      "${CMAKE_SOURCE_DIR}"
++      "${CMAKE_CURRENT_SOURCE_DIR}"
+     ${CODEGEN_FLAGS}
+ )
+ 
+ connextdds_rtiddsgen_run(
+     IDL_FILE
+-      "$ENV{NDDSHOME}/resource/idl/ServiceAdmin.idl"
++      "${CONNEXTDDS_DIR}/resource/idl/ServiceAdmin.idl"
+     LANG
+       "C++11"
+     OUTPUT_DIRECTORY
+       "${IDL_GEN_CODE_OUTPUT_DIR}"
+     INCLUDE_DIRS
+-      "${CMAKE_SOURCE_DIR}"
++      "${CMAKE_CURRENT_SOURCE_DIR}"
+     ${CODEGEN_FLAGS}
+ )
+ 
+ add_custom_command(
+     OUTPUT ${CMAKE_BINARY_DIR}/USER_QOS_PROFILES.xml
+     COMMAND ${CMAKE_COMMAND} -E copy
+-        "${CMAKE_SOURCE_DIR}/../USER_QOS_PROFILES.xml"
++        "${CMAKE_CURRENT_SOURCE_DIR}/../USER_QOS_PROFILES.xml"
+         "${CMAKE_BINARY_DIR}/USER_QOS_PROFILES.xml"
+-    DEPENDS "${CMAKE_SOURCE_DIR}/../USER_QOS_PROFILES.xml"
++    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../USER_QOS_PROFILES.xml"
+ )
+ 
+ add_custom_target(
+@@ -76,13 +76,13 @@ add_executable(
+     Requester
+     "${ServiceCommon_CXX11_SOURCES}"
+     "${ServiceAdmin_CXX11_SOURCES}"
+-    "${CMAKE_SOURCE_DIR}/src/ArgumentsParser.cxx"
+-    "${CMAKE_SOURCE_DIR}/src/Requester.cxx"
++    "${CMAKE_CURRENT_SOURCE_DIR}/src/ArgumentsParser.cxx"
++    "${CMAKE_CURRENT_SOURCE_DIR}/src/Requester.cxx"
+ )
+ 
+ target_include_directories(Requester
+   PRIVATE
+-    "${CMAKE_SOURCE_DIR}/include"
++    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+     "${CONNEXTDDS_INCLUDE_DIRS}"
+     "${IDL_GEN_CODE_OUTPUT_DIR}"
+ )

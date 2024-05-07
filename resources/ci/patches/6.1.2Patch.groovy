@@ -18,12 +18,17 @@
  */
 void apply(String cmakeUtilsRepoRoot, String examplesRepoRoot) {
     echo(
-        'Applying 6.1.2 patch. This patch consists in dumping the contents of the'
+        'Applying 6.1.2 patch:\n- Dump the contents of the'
         + ' rticonnextdds-cmake-utils:/cmake/Modules/ repository directory into the CMake resource'
-        + ' directory inside the rticonnextdds-examples repository'
+        + ' directory inside the rticonnextdds-examples repository\n- Create a VERSION file'
+        + ' containing the text 6.1.2\n- Add missing CMakeLists.txt files and apply a minor git'
+        + ' path'
     )
     command.run("cp -r ${cmakeUtilsRepoRoot}/cmake/Modules/* ${examplesRepoRoot}/resources/cmake/")
     writeFile(file: 'VERSION', text: '6.1.2')
+    command.run(
+        "git apply ${cmakeUtilsRepoRoot}/resources/ci/patches/6.1.2.diff -C ${examplesRepoRoot}"
+    )
 }
 
 return this

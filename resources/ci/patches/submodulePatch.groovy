@@ -18,7 +18,7 @@
  */
 void apply(String cmakeUtilsRepoRoot, String examplesRepoRoot) {
     echo(
-        'Applying submodule patch. This patch consists in dumping the contents of the'
+        'Applying submodule patch:\n- Dump the contents of the'
         + ' rticonnextdds-cmake-utils repository into its submodule location inside the'
         + ' rticonnextdds-examples repository'
     )
