@@ -12,6 +12,8 @@
 
 @Library("rticommunity-jenkins-pipelines@feature/INSTALL-944") _
 
+Map pipelineInfo = [:]
+
 pipeline {
     agent {
         label "${runInsideExecutor.labelFromArchitectureFamily(params.ARCHITECTURE_FAMILY)}"
@@ -69,8 +71,6 @@ pipeline {
     environment {
         CMAKE_UTILS_REPO = "${env.WORKSPACE}/cmake-utils"
         CMAKE_UTILS_DOCKER_DIR = "${env.WORKSPACE}/cmake-utils/resources/ci/docker/"
-        CONNEXT_DIR = ''
-        STATIC_ANALYSIS_RESULTS_DIR = "${env.WORKSPACE}/static_analysis_report"
     }
 
     stages {
@@ -95,7 +95,7 @@ pipeline {
                     params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR,
                 ) {
                     script {
-                        env.CONNEXT_DIR = installConnext(
+                        pipelineInfo.connextDir = installConnext(
                             env.ARCHITECTURE_STRING, env.WORKSPACE,
                         )
                     }
@@ -123,7 +123,7 @@ pipeline {
                                 echo("Building ${buildMode}/${linkMode}")
                                 buildExamples(
                                     env.WORKSPACE,
-                                    env.CONNEXT_DIR,
+                                    pipelineInfo.connextDir,
                                     buildMode,
                                     linkMode,
                                 )
@@ -138,10 +138,13 @@ pipeline {
                 runInsideExecutor(
                     params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
                 ) {
+                    script {
+                        pipelineInfo.staticAnalysisDir = "${env.WORKSPACE}/static_analysis_report"
+                    }
                     runStaticAnalysis(
                         buildExamples.getBuildDirectory('release', 'dynamic'),
-                        env.CONNEXT_DIR,
-                        env.STATIC_ANALYSIS_RESULTS_DIR,
+                        pipelineInfo.connextDir,
+                        pipelineInfo.staticAnalysisDir,
                     )
                 }
             }
@@ -151,7 +154,7 @@ pipeline {
                         allowMissing: true,
                         alwaysLinkToLastBuild: false,
                         keepAll: true,
-                        reportDir: env.STATIC_ANALYSIS_RESULTS_DIR,
+                        reportDir: pipelineInfo.staticAnalysisDir,
                         reportFiles: 'index.html',
                         reportName: 'LLVM Scan build static analysis',
                     ])
