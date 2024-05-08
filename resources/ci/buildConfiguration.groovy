@@ -87,6 +87,9 @@ pipeline {
                 applyCmakeUtilsPatch(
                     env.CMAKE_UTILS_REPO, env.WORKSPACE, env.EXAMPLES_REPOSITORY_BRANCH,
                 )
+                script {
+                    pipelineInfo.staticAnalysisDir = "${env.WORKSPACE}/static_analysis_report"
+                }
             }
         }
         stage('Download Packages') {
@@ -96,7 +99,7 @@ pipeline {
                 ) {
                     script {
                         pipelineInfo.connextDir = installConnext(
-                            env.ARCHITECTURE_STRING, env.WORKSPACE,
+                            params.ARCHITECTURE_STRING, env.WORKSPACE,
                         )
                     }
                 }
@@ -138,9 +141,6 @@ pipeline {
                 runInsideExecutor(
                     params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
                 ) {
-                    script {
-                        pipelineInfo.staticAnalysisDir = "${env.WORKSPACE}/static_analysis_report"
-                    }
                     runStaticAnalysis(
                         buildExamples.getBuildDirectory('release', 'dynamic'),
                         pipelineInfo.connextDir,
