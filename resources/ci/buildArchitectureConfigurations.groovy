@@ -61,8 +61,8 @@ void runBuildConfigurationJob(
 Map architectureJobs(String cmakeUtilsRepoBranch, String examplesRepoBranch, Map<String, Map> osMap) {
     return osMap.collectEntries { architectureFamily, architectureString ->
         [
-            "${architectureFamily}": {
-                stage("${architectureFamily}") {
+            "${architectureFamily}-${architectureString}": {
+                stage("${architectureFamily}-${architectureString}") {
                     runBuildConfigurationJob(
                         cmakeUtilsRepoBranch,
                         examplesRepoBranch,
