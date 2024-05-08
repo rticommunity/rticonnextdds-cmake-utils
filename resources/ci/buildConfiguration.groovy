@@ -12,11 +12,9 @@
 
 @Library("rticommunity-jenkins-pipelines@feature/INSTALL-944") _
 
-Map pipelineInfo = [:]
-
 pipeline {
     agent {
-        label "${nodeManager.labelFromArchitectureFamily(params.ARCHITECTURE_FAMILY)}"
+        label "${runInsideExecutor.labelFromArchitectureFamily(params.ARCHITECTURE_FAMILY)}"
     }
 
     options {
@@ -45,12 +43,12 @@ pipeline {
         string(
             name: 'ARCHITECTURE_FAMILY',
             description: 'The architecture family to guess the node from (linux, windows, ...)',
-            trim: true
+            trim: true,
         )
         string(
             name: 'ARCHITECTURE_STRING',
             description: 'The architecture string (x64Linux4gcc7.3.0, x64Win64VS2015, ...)',
-            trim: true
+            trim: true,
         )
         string(
             name: 'EXAMPLES_REPOSITORY_BRANCH',
@@ -71,32 +69,34 @@ pipeline {
     environment {
         CMAKE_UTILS_REPO = "${env.WORKSPACE}/cmake-utils"
         CMAKE_UTILS_DOCKER_DIR = "${env.WORKSPACE}/cmake-utils/resources/ci/docker/"
+        CONNEXT_DIR = ''
+        STATIC_ANALYSIS_RESULTS_DIR = "${env.WORKSPACE}/static_analysis_report"
     }
 
     stages {
         stage('Repository configuration') {
             steps {
                 checkoutCommunityRepoBranch(
-                    'rticonnextdds-examples', params.EXAMPLES_REPOSITORY_BRANCH, true
+                    'rticonnextdds-examples', params.EXAMPLES_REPOSITORY_BRANCH, true,
                 )
                 dir(env.CMAKE_UTILS_REPO) {
                     checkoutCommunityRepoBranch(
-                        'rticonnextdds-cmake-utils', params.CMAKE_UTILS_REPOSITORY_BRANCH
+                        'rticonnextdds-cmake-utils', params.CMAKE_UTILS_REPOSITORY_BRANCH,
                     )
                 }
                 applyCmakeUtilsPatch(
-                    env.CMAKE_UTILS_REPO, env.WORKSPACE, env.EXAMPLES_REPOSITORY_BRANCH
+                    env.CMAKE_UTILS_REPO, env.WORKSPACE, env.EXAMPLES_REPOSITORY_BRANCH,
                 )
             }
         }
         stage('Download Packages') {
             steps {
-                script {
-                    nodeManager.runInsideExecutor(
-                        params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
-                    ) {
-                        pipelineInfo.connextDir = installConnext(
-                            env.ARCHITECTURE_STRING, env.WORKSPACE
+                runInsideExecutor(
+                    params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR,
+                ) {
+                    script {
+                        env.CONNEXT_DIR = installConnext(
+                            env.ARCHITECTURE_STRING, env.WORKSPACE,
                         )
                     }
                 }
@@ -117,18 +117,16 @@ pipeline {
                 stages {
                     stage('Build single mode') {
                         steps {
-                            script{
-                                nodeManager.runInsideExecutor(
-                                    params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
-                                ) {
-                                    echo("Building ${buildMode}/${linkMode}")
-                                    buildExamples(
-                                        env.WORKSPACE,
-                                        pipelineInfo.connextDir,
-                                        buildMode,
-                                        linkMode
-                                    )
-                                }
+                            runInsideExecutor(
+                                params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
+                            ) {
+                                echo("Building ${buildMode}/${linkMode}")
+                                buildExamples(
+                                    env.WORKSPACE,
+                                    env.CONNEXT_DIR,
+                                    buildMode,
+                                    linkMode,
+                                )
                             }
                         }
                     }
@@ -137,24 +135,23 @@ pipeline {
         }
         stage('Static Analysis') {
             steps {
-                script {
-                    nodeManager.runInsideExecutor(
-                        params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
-                    ) {
-                        runStaticAnalysis(
-                            buildExamples.getBuildDirectory('release', 'dynamic'),
-                            pipelineInfo.connextDir
-                        )
-                    }
+                runInsideExecutor(
+                    params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
+                ) {
+                    runStaticAnalysis(
+                        buildExamples.getBuildDirectory('release', 'dynamic'),
+                        env.CONNEXT_DIR,
+                        env.STATIC_ANALYSIS_RESULTS_DIR,
+                    )
                 }
             }
             post {
-                always {
+                failure {
                     publishHTML(target: [
                         allowMissing: true,
                         alwaysLinkToLastBuild: false,
                         keepAll: true,
-                        reportDir: "${buildExamples.getBuildDirectory('release', 'dynamic')}/scan-build-*",
+                        reportDir: env.STATIC_ANALYSIS_RESULTS_DIR,
                         reportFiles: 'index.html',
                         reportName: 'LLVM Scan build static analysis',
                     ])
