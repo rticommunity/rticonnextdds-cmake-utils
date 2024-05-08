@@ -68,38 +68,42 @@ pipeline {
         )
     }
 
-    environment {
-        CMAKE_UTILS_REPO = "${env.WORKSPACE}/cmake-utils"
-        CMAKE_UTILS_DOCKER_DIR = "${env.WORKSPACE}/cmake-utils/resources/ci/docker/"
-    }
-
     stages {
         stage('Repository configuration') {
             steps {
+                script {
+                    pipelineInfo.cmakeUtilsRepoDir = "${env.WORKSPACE}/cmake-utils"
+                    pipelineInfo.cmakeUtilsDockerDir = "${pipelineInfo.cmakeUtilsRepoDir}/resources/ci/docker/"
+                    pipelineInfo.staticAnalysisDir = "${env.WORKSPACE}/static_analysis_report"
+                }
                 checkoutCommunityRepoBranch(
-                    'rticonnextdds-examples', params.EXAMPLES_REPOSITORY_BRANCH, true,
+                    'rticonnextdds-examples',
+                    params.EXAMPLES_REPOSITORY_BRANCH,
+                    true,
                 )
-                dir(env.CMAKE_UTILS_REPO) {
+                dir(pipelineInfo.cmakeUtilsRepoDir) {
                     checkoutCommunityRepoBranch(
-                        'rticonnextdds-cmake-utils', params.CMAKE_UTILS_REPOSITORY_BRANCH,
+                        'rticonnextdds-cmake-utils',
+                        params.CMAKE_UTILS_REPOSITORY_BRANCH,
                     )
                 }
                 applyCmakeUtilsPatch(
-                    env.CMAKE_UTILS_REPO, env.WORKSPACE, env.EXAMPLES_REPOSITORY_BRANCH,
+                    pipelineInfo.cmakeUtilsRepoDir,
+                    env.WORKSPACE,
+                    params.EXAMPLES_REPOSITORY_BRANCH,
                 )
-                script {
-                    pipelineInfo.staticAnalysisDir = "${env.WORKSPACE}/static_analysis_report"
-                }
             }
         }
         stage('Download Packages') {
             steps {
                 runInsideExecutor(
-                    params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR,
+                    params.ARCHITECTURE_STRING,
+                    pipelineInfo.cmakeUtilsDockerDir,
                 ) {
                     script {
                         pipelineInfo.connextDir = installConnext(
-                            params.ARCHITECTURE_STRING, env.WORKSPACE,
+                            params.ARCHITECTURE_STRING,
+                            env.WORKSPACE,
                         )
                     }
                 }
@@ -121,7 +125,8 @@ pipeline {
                     stage('Build single mode') {
                         steps {
                             runInsideExecutor(
-                                params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
+                                params.ARCHITECTURE_STRING,
+                                pipelineInfo.cmakeUtilsDockerDir,
                             ) {
                                 echo("Building ${buildMode}/${linkMode}")
                                 buildExamples(
@@ -139,7 +144,8 @@ pipeline {
         stage('Static Analysis') {
             steps {
                 runInsideExecutor(
-                    params.ARCHITECTURE_STRING, env.CMAKE_UTILS_DOCKER_DIR
+                    params.ARCHITECTURE_STRING,
+                    pipelineInfo.cmakeUtilsDockerDir,
                 ) {
                     runStaticAnalysis(
                         buildExamples.getBuildDirectory('release', 'dynamic'),
@@ -168,4 +174,3 @@ pipeline {
         }
     }
 }
-
