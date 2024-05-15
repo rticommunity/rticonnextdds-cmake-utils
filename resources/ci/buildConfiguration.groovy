@@ -12,7 +12,29 @@
 
 @Library("rticommunity-jenkins-pipelines@feature/INSTALL-944") _
 
+/**
+ * Hold information about the pipeline. E.g.: cmakeUtilsRepoDir, cmakeUtilsDockerDir,
+ * staticAnalysisDir, connextDir.
+ */
 Map pipelineInfo = [:]
+
+/**
+ * Apply a patch to the examples repository depending on the branch. The patch consinsts in files
+ * replacing and additions.
+ *
+ * @param cmakeUtilsRepoRoot Path to the root of the cmake-utils repository.
+ * @param examplesRepoRoot Path to the root of the examples repository.
+ * @param examplesRepoBranch The examples repository branch.
+ */
+void applyExamplesRepoPatch(String cmakeUtilsRepoRoot, String examplesRepoRoot, String examplesRepoBranch) {
+    Map patches = [
+        'release/6.1.2': '6.1.2'
+    ]
+    String selectedPatch = patches[examplesRepoBranch] ?: 'submodule'
+
+    def patch = load("${cmakeUtilsRepoRoot}/resources/ci/patches/${selectedPatch}Patch.groovy")
+    patch.apply(cmakeUtilsRepoRoot, examplesRepoRoot)
+}
 
 pipeline {
     agent {
@@ -87,7 +109,7 @@ pipeline {
                         params.CMAKE_UTILS_REPOSITORY_BRANCH,
                     )
                 }
-                applyCmakeUtilsPatch(
+                applyExamplesRepoPatch(
                     pipelineInfo.cmakeUtilsRepoDir,
                     env.WORKSPACE,
                     params.EXAMPLES_REPOSITORY_BRANCH,
