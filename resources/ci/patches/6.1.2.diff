@@ -55,7 +55,7 @@ index 00000000..51b5c915
 +    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/routing_service")
 +endif()
 diff --git a/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt b/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt
-index 29626a52..143c1463 100644
+index 29626a52..62a04833 100644
 --- a/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt
 +++ b/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt
 @@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
@@ -69,7 +69,7 @@ index 29626a52..143c1463 100644
 +        security_plugins
 +)
 +
-+if(NOT RTIConnextDDS::security_plugins)
++if(NOT TARGET RTIConnextDDS::security_plugins)
 +    message(WARNING "RTIConnextDDS::security_plugins component is missing. Skipping example")
 +    return()
 +endif()
@@ -78,7 +78,7 @@ index 29626a52..143c1463 100644
  include(ConnextDdsAddExample)
  
 diff --git a/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt b/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt
-index 08d3d275..9ff14fdf 100644
+index 08d3d275..e27ca452 100644
 --- a/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt
 +++ b/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt
 @@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
@@ -92,7 +92,7 @@ index 08d3d275..9ff14fdf 100644
 +        security_plugins
 +)
 +
-+if(NOT RTIConnextDDS::security_plugins)
++if(NOT TARGET RTIConnextDDS::security_plugins)
 +    message(WARNING "RTIConnextDDS::security_plugins component is missing. Skipping example")
 +    return()
 +endif()
@@ -101,7 +101,7 @@ index 08d3d275..9ff14fdf 100644
  include(ConnextDdsAddExample)
  
 diff --git a/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt b/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt
-index 7d2e2394..18867ce9 100644
+index 7d2e2394..f447bebf 100644
 --- a/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt
 +++ b/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt
 @@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
@@ -115,7 +115,7 @@ index 7d2e2394..18867ce9 100644
 +        security_plugins
 +)
 +
-+if(NOT RTIConnextDDS::security_plugins)
++if(NOT TARGET RTIConnextDDS::security_plugins)
 +    message(WARNING "RTIConnextDDS::security_plugins component is missing. Skipping example")
 +    return()
 +endif()
@@ -124,7 +124,7 @@ index 7d2e2394..18867ce9 100644
  include(ConnextDdsAddExample)
  
 diff --git a/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt b/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt
-index 740d6007..e85422b8 100644
+index 740d6007..709337a2 100644
 --- a/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt
 +++ b/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt
 @@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
@@ -138,7 +138,7 @@ index 740d6007..e85422b8 100644
 +        security_plugins
 +)
 +
-+if(NOT RTIConnextDDS::security_plugins)
++if(NOT TARGET RTIConnextDDS::security_plugins)
 +    message(WARNING "RTIConnextDDS::security_plugins component is missing. Skipping example")
 +    return()
 +endif()
