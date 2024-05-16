@@ -1,3 +1,10 @@
+diff --git a/VERSION b/VERSION
+new file mode 100644
+index 00000000..5e325424
+--- /dev/null
++++ b/VERSION
+@@ -0,0 +1 @@
++6.1.2
 diff --git a/examples/CMakeLists.txt b/examples/CMakeLists.txt
 new file mode 100644
 index 00000000..51b5c915
