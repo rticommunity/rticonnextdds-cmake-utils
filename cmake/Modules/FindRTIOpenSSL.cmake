@@ -693,7 +693,7 @@ if(RTIOPENSSL_FOUND)
             REGEX MATCH
             "1.1.1[a-z]?"
             match_version
-            ${OPENSSL_VERSION}
+            "${OPENSSL_VERSION}"
         )
         if(match_version)
             find_package(Threads)
