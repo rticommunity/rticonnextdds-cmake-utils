@@ -158,10 +158,11 @@ pipeline {
                             ) {
                                 echo("Building ${buildMode}/${linkMode}")
                                 buildExamples(
-                                    env.WORKSPACE,
+                                    params.ARCHITECTURE_STRING,
                                     pipelineInfo.connextDir,
                                     buildMode,
                                     linkMode,
+                                    env.WORKSPACE,
                                 )
                             }
                         }
