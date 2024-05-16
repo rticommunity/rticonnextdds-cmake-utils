@@ -26,7 +26,11 @@ Map pipelineInfo = [:]
  * @param examplesRepoRoot Path to the root of the examples repository.
  * @param examplesRepoBranch The examples repository branch.
  */
-void applyExamplesRepoPatch(String cmakeUtilsRepoRoot, String examplesRepoRoot, String examplesRepoBranch) {
+void applyExamplesRepoPatch(
+    String cmakeUtilsRepoRoot,
+    String examplesRepoRoot,
+    String examplesRepoBranch
+) {
     Map patches = [
         'release/6.1.2': '6.1.2'
     ]
@@ -95,7 +99,9 @@ pipeline {
             steps {
                 script {
                     pipelineInfo.cmakeUtilsRepoDir = "${env.WORKSPACE}/cmake-utils"
-                    pipelineInfo.cmakeUtilsDockerDir = "${pipelineInfo.cmakeUtilsRepoDir}/resources/ci/docker/"
+                    pipelineInfo.cmakeUtilsDockerDir = (
+                        "${pipelineInfo.cmakeUtilsRepoDir}/resources/ci/docker/"
+                    )
                     pipelineInfo.staticAnalysisDir = "${env.WORKSPACE}/static_analysis_report"
                 }
                 checkoutCommunityRepoBranch(
