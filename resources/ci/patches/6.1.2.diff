@@ -62,10 +62,10 @@ index 00000000..51b5c915
 +    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/routing_service")
 +endif()
 diff --git a/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt b/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt
-index 29626a52..62a04833 100644
+index 29626a52..d17701d0 100644
 --- a/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt
 +++ b/examples/connext_dds/network_capture/02_tcp/c/CMakeLists.txt
-@@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
+@@ -10,12 +10,26 @@ set(CMAKE_MODULE_PATH
      "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../resources/cmake"
  )
  
@@ -84,11 +84,19 @@ index 29626a52..62a04833 100644
  # Include ConnextDdsAddExample.cmake from resources/cmake
  include(ConnextDdsAddExample)
  
+ connextdds_add_example(
+     IDL "network_capture"
+     LANG "C"
++    DEPENDENCIES
++        RTIConnextDDS::security_plugins
+ )
+ 
+ include (ConnextDdsGenerateSecurityArtifacts)
 diff --git a/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt b/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt
-index 08d3d275..e27ca452 100644
+index 08d3d275..2a568c02 100644
 --- a/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt
 +++ b/examples/connext_dds/network_capture/03_security/c/CMakeLists.txt
-@@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
+@@ -10,12 +10,26 @@ set(CMAKE_MODULE_PATH
      "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../resources/cmake"
  )
  
@@ -107,11 +115,19 @@ index 08d3d275..e27ca452 100644
  # Include ConnextDdsAddExample.cmake from resources/cmake
  include(ConnextDdsAddExample)
  
+ connextdds_add_example(
+     IDL "network_capture"
+     LANG "C"
++    DEPENDENCIES
++        RTIConnextDDS::security_plugins
+ )
+ 
+ include (ConnextDdsGenerateSecurityArtifacts)
 diff --git a/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt b/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt
-index 7d2e2394..f447bebf 100644
+index 7d2e2394..895aec8e 100644
 --- a/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt
 +++ b/examples/connext_dds/network_capture/04_advanced_api/c/CMakeLists.txt
-@@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
+@@ -10,12 +10,26 @@ set(CMAKE_MODULE_PATH
      "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../resources/cmake"
  )
  
@@ -130,11 +146,19 @@ index 7d2e2394..f447bebf 100644
  # Include ConnextDdsAddExample.cmake from resources/cmake
  include(ConnextDdsAddExample)
  
+ connextdds_add_example(
+     IDL "network_capture"
+     LANG "C"
++    DEPENDENCIES
++        RTIConnextDDS::security_plugins
+ )
+ 
+ include (ConnextDdsGenerateSecurityArtifacts)
 diff --git a/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt b/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt
-index 740d6007..709337a2 100644
+index 740d6007..fe33e985 100644
 --- a/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt
 +++ b/examples/connext_dds/real_time_wan_transport/c++98/CMakeLists.txt
-@@ -10,6 +10,18 @@ set(CMAKE_MODULE_PATH
+@@ -10,12 +10,26 @@ set(CMAKE_MODULE_PATH
      "${CMAKE_CURRENT_SOURCE_DIR}/../../../../resources/cmake"
  )
  
@@ -153,6 +177,14 @@ index 740d6007..709337a2 100644
  # Include ConnextDdsAddExample.cmake from resources/cmake
  include(ConnextDdsAddExample)
  
+ connextdds_add_example(
+     IDL "real_time_wan_transport"
+     LANG "C++"
++    DEPENDENCIES
++        RTIConnextDDS::security_plugins
+ )
+ 
+ configure_file(
 diff --git a/examples/recording_service/CMakeLists.txt b/examples/recording_service/CMakeLists.txt
 new file mode 100644
 index 00000000..0cc81e07
