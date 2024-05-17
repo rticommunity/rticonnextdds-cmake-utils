@@ -59,7 +59,7 @@ Map branchJobs(String[] branches) {
  * supports.
  */
 pipeline {
-    agent any
+    agent none
 
     stages {
         stage('Versions') {
