@@ -79,7 +79,9 @@ Map architectureJobs(String cmakeUtilsRepoBranch, String examplesRepoBranch, Map
  * Run all the architectures available for a single examples branch.
  */
 pipeline {
-    agent none
+    agent {
+        label 'docker'
+    }
 
     options {
         skipDefaultCheckout()

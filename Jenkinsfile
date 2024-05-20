@@ -61,10 +61,14 @@ pipeline {
     stages {
         stage('Versions') {
             when {
+                beforeAgent true
                 changeset(
                     pattern: 'cmake/Modules/FindRTIConnextDDS.cmake',
                     comparator: 'EQUALS',
                 )
+            }
+            agent {
+                label 'docker'
             }
             steps {
                 script {
@@ -74,11 +78,11 @@ pipeline {
                     parallel branchJobs(examplesBranches)
                 }
             }
-        }
-    }
-    post {
-        cleanup {
-            cleanWs()
+            post {
+                cleanup {
+                    cleanWs()
+                }
+            }
         }
     }
 }
