@@ -10,9 +10,6 @@
  * to use the software.
  */
 
-// TODO: Remove when merged
-@Library("rticommunity-jenkins-pipelines@feature/INSTALL-944") _
-
 /**
  * Build the desired job in the examples repository multibranch pipeline.
  *
@@ -63,6 +60,12 @@ pipeline {
 
     stages {
         stage('Versions') {
+            when {
+                changeset(
+                    pattern: 'cmake/Modules/FindRTIConnextDDS.cmake',
+                    comparator: 'EQUALS',
+                )
+            }
             steps {
                 script {
                     String[] examplesBranches = readYaml(
