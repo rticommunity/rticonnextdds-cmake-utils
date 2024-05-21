@@ -1,0 +1,48 @@
+# (c) 2024 Copyright, Real-Time Innovations, Inc.  All rights reserved.
+# RTI grants Licensee a license to use, modify, compile, and create derivative
+# works of the Software.  Licensee has the right to distribute object form only
+# for use with RTI products.  The Software is provided "as is", with no warranty
+# of any type, including any warranty for fitness for any purpose. RTI is under
+# no obligation to maintain or support the Software.  RTI shall not be liable
+# for any incidental or consequential damages arising out of the use or
+# inability to use the software.
+
+from ubuntu:14.04
+
+ARG USER_NAME=jenkins
+ARG USER_UID
+
+ENV DEBIAN_FRONTEND="noninteractive"
+ENV CONNEXTDDS_ARCH="x64Linux3gcc4.8.2"
+
+RUN apt-get update && apt-get install -y \
+        gcc g++ clang libssl-dev make cmake python3 build-essential \
+        libreadline-gplv2-dev libncursesw5-dev libssl-dev \
+        libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev \
+        zlib1g-dev wget \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /tmp/tools /opt/tools \
+    && cd /tmp/tools  \
+    # Install Openssl
+    && wget https://www.openssl.org/source/old/1.0.2/openssl-1.0.2u.tar.gz \
+    && tar xvzf openssl-1.0.2u.tar.gz \
+    && cd openssl-1.0.2u \
+    && ./config --prefix=/opt/tools/ --openssldir=/opt/tools/openssl shared \
+    && make -j 2 \
+    && make install \
+    # Install Python
+    && cd /tmp/tools \
+    && wget https://www.python.org/ftp/python/3.8.19/Python-3.8.19.tgz \
+    && tar xzf Python-3.8.19.tgz \
+    && cd Python-3.8.19 \
+    && LDFLAGS="${LDFLAGS} -Wl,-rpath=/opt/tools/lib" CFLAGS="${CFLAGS} -I/opt/tools/include" ./configure --with-openssl=/opt/tools/ \
+    && make -j \
+    && make install \
+    && cd /tmp \
+    && rm -rf /tmp/tools
+
+RUN useradd -u ${USER_UID} -m ${USER_NAME}
+ENV PATH=/home/$USER_NAME/.local/bin:$PATH
+
+USER $USER_NAME
