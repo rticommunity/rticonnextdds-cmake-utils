@@ -60,13 +60,6 @@ pipeline {
 
     stages {
         stage('Versions') {
-            when {
-                beforeAgent true
-                changeset(
-                    pattern: 'cmake/Modules/FindRTIConnextDDS.cmake',
-                    comparator: 'EQUALS',
-                )
-            }
             agent {
                 label 'docker'
             }
