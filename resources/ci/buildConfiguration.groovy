@@ -10,6 +10,8 @@
  * to use the software.
  */
 
+@Library('rticommunity-jenkins-pipelines@feature/INSTALL-1063') _
+
 /**
  * Hold information about the pipeline. E.g.: cmakeUtilsRepoDir, cmakeUtilsDockerDir,
  * staticAnalysisDir, connextDir.
@@ -34,8 +36,10 @@ void applyExamplesRepoPatch(
     ]
     String selectedPatch = patches[examplesRepoBranch] ?: 'submodule'
 
-    def patch = load("${cmakeUtilsRepoRoot}/resources/ci/patches/${selectedPatch}Patch.groovy")
-    patch.apply(cmakeUtilsRepoRoot, examplesRepoRoot)
+    load("${cmakeUtilsRepoRoot}/resources/ci/patches/${selectedPatch}Patch.groovy").apply(
+        cmakeUtilsRepoRoot,
+        examplesRepoRoot,
+    )
 }
 
 pipeline {
@@ -139,12 +143,12 @@ pipeline {
             matrix {
                 axes {
                     axis {
-                        name 'buildMode'
-                        values 'release', 'debug'
+                        name 'buildType'
+                        values 'release'  // TODO: Recover debug build type
                     }
                     axis {
                         name 'linkMode'
-                        values 'static', 'dynamic'
+                        values 'dynamic'  // TODO: Recover static link mode
                     }
                 }
                 stages {
@@ -154,11 +158,11 @@ pipeline {
                                 params.ARCHITECTURE_STRING,
                                 pipelineInfo.cmakeUtilsDockerDir,
                             ) {
-                                echo("Building ${buildMode}/${linkMode}")
+                                echo("Building ${buildType}/${linkMode}")
                                 buildExamples(
                                     params.ARCHITECTURE_STRING,
                                     pipelineInfo.connextDir,
-                                    buildMode,
+                                    buildType,
                                     linkMode,
                                     env.WORKSPACE,
                                 )
@@ -179,18 +183,13 @@ pipeline {
                         pipelineInfo.connextDir,
                         pipelineInfo.staticAnalysisDir,
                     )
-                }
-            }
-            post {
-                failure {
-                    publishHTML(target: [
-                        allowMissing: true,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: pipelineInfo.staticAnalysisDir,
-                        reportFiles: 'index.html',
-                        reportName: 'LLVM Scan build static analysis',
-                    ])
+                    recordIssues(
+                        tool: clangAnalyzer(
+                            parserId: "clangAnalyzer-${params.EXAMPLES_REPOSITORY_BRANCH}",
+                            pattern: "${pipelineInfo.staticAnalysisDir}/*.plist",
+                        ),
+                        qualityGates: [[threshold: 1, type: 'TOTAL', criticality: 'FAILURE']],
+                    )
                 }
             }
         }

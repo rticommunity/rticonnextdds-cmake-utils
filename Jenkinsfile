@@ -16,9 +16,9 @@
  * @param examplesRepoBranch The branch or PR to build in the examples repository.
  */
 void runBuildArchitectureConfigurationsJob(String examplesRepoBranch) {
-    build(
+    String buildResult = build(
         job: 'ci/rticonnextdds-cmake-utils/build-arch-cfgs',
-        propagate: true,
+        propagate: false,
         wait: true,
         parameters: [
             string(
@@ -30,7 +30,16 @@ void runBuildArchitectureConfigurationsJob(String examplesRepoBranch) {
                 value: examplesRepoBranch,
             ),
         ]
-    )
+    ).getResult()
+    if (buildResult == 'UNSTABLE') {
+        unstable('Check the static analysis report')
+        return
+    }
+    if (buildResult == 'FAILURE') {
+        error('There where some errors in the build')
+        return
+    }
+    currentBuild.result = buildResult
 }
 
 /**

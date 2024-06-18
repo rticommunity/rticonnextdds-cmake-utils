@@ -24,9 +24,9 @@ void runBuildConfigurationJob(
     String architectureFamily,
     String architectureString
 ) {
-    build(
+    String buildResult = build(
         job: 'ci/rticonnextdds-cmake-utils/build-cfg',
-        propagate: true,
+        propagate: false,
         wait: true,
         parameters: [
             string(
@@ -47,6 +47,15 @@ void runBuildConfigurationJob(
             ),
         ]
     )
+    if (buildResult == 'UNSTABLE') {
+        unstable("Check the static analysis of the `${examplesRepoBranch}` examples branch")
+        return
+    }
+    if (buildResult == 'FAILURE') {
+        error("There where some errors in the `${examplesRepoBranch}` examples branch build")
+        return
+    }
+    currentBuild.result = buildResult
 }
 
 /**
