@@ -1,10 +1,10 @@
 versions:
-  master:
-  #   linux: x64Linux3gcc4.8.2
-    linux: x64Linux4gcc7.3.0
-  develop:
-  #   linux: x64Linux3gcc4.8.2
-    linux: x64Linux4gcc7.3.0
+  # master:
+  # #   linux: x64Linux3gcc4.8.2
+  #   linux: x64Linux4gcc7.3.0
+  # develop:
+  # #   linux: x64Linux3gcc4.8.2
+  #   linux: x64Linux4gcc7.3.0
   release/7.3.0:
   #   linux: x64Linux3gcc4.8.2
     linux: x64Linux4gcc7.3.0
