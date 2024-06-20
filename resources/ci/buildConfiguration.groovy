@@ -185,7 +185,7 @@ pipeline {
                     )
                     sh("ls ${pipelineInfo.staticAnalysisDir}")
                     publishIssues(
-                        name: 'Analyze build - static analysis'
+                        name: 'Analyze build - static analysis',
                         issues: [
                             scanForIssues(
                                 tool: clangAnalyzer(
