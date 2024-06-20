@@ -183,11 +183,16 @@ pipeline {
                         pipelineInfo.connextDir,
                         pipelineInfo.staticAnalysisDir,
                     )
-                    recordIssues(
-                        tool: clangAnalyzer(
-                            parserId: "clangAnalyzer-${params.EXAMPLES_REPOSITORY_BRANCH}",
-                            pattern: "${pipelineInfo.staticAnalysisDir}/*.plist",
-                        ),
+                    sh("ls ${pipelineInfo.staticAnalysisDir}")
+                    publishIssues(
+                        name: 'Analyze build - static analysis'
+                        issues: [
+                            scanForIssues(
+                                tool: clangAnalyzer(
+                                    pattern: "${pipelineInfo.staticAnalysisDir}/*.plist",
+                                ),
+                            )
+                        ],
                         qualityGates: [[threshold: 1, type: 'TOTAL', criticality: 'FAILURE']],
                     )
                 }
