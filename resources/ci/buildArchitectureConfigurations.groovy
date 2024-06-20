@@ -24,8 +24,9 @@ void runBuildConfigurationJob(
     String architectureFamily,
     String architectureString
 ) {
+    String examplesVersion = getVersionFromBranch(examplesRepoBranch)
     String buildResult = build(
-        job: 'ci/rticonnextdds-cmake-utils/build-cfg',
+        job: "ci/rticonnextdds-cmake-utils/version/${examplesVersion}/${architectureFamily}",
         propagate: false,
         wait: true,
         parameters: [
@@ -56,6 +57,16 @@ void runBuildConfigurationJob(
         return
     }
     currentBuild.result = buildResult
+}
+
+/**
+ * Remove the branch prefix from the Connext version.
+ *
+ * @param repositoryBranch The rticonnextdds-examples branch to build.
+ * @returns The Connext version to build.
+ */
+String getVersionFromBranch(String repositoryBranch) {
+    return repositoryBranch - 'release/'
 }
 
 /**
