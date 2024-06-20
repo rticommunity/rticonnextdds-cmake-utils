@@ -183,18 +183,19 @@ pipeline {
                         pipelineInfo.connextDir,
                         pipelineInfo.staticAnalysisDir,
                     )
-                    sh("ls ${pipelineInfo.staticAnalysisDir}")
-                    publishIssues(
-                        name: 'Analyze build - static analysis',
-                        issues: [
-                            scanForIssues(
-                                tool: clangAnalyzer(
-                                    pattern: "${pipelineInfo.staticAnalysisDir}/*.plist",
-                                ),
-                            )
-                        ],
-                        qualityGates: [[threshold: 1, type: 'TOTAL', criticality: 'FAILURE']],
-                    )
+                    dir(pipelineInfo.staticAnalysisDir) {
+                        publishIssues(
+                            name: 'Analyze build - static analysis',
+                            issues: [
+                                scanForIssues(
+                                    tool: clangAnalyzer(
+                                        pattern: '*.plist',
+                                    ),
+                                )
+                            ],
+                            qualityGates: [[threshold: 1, type: 'TOTAL', criticality: 'FAILURE']],
+                        )
+                    }
                 }
             }
         }
