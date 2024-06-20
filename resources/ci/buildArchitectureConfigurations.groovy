@@ -25,9 +25,9 @@ void runBuildConfigurationJob(
     String architectureString
 ) {
     String examplesVersion = getVersionFromBranch(examplesRepoBranch)
-    String buildResult = build(
+    build(
         job: "ci/rticonnextdds-cmake-utils/version/${examplesVersion}/${architectureFamily}",
-        propagate: false,
+        propagate: true,
         wait: true,
         parameters: [
             string(
@@ -48,15 +48,6 @@ void runBuildConfigurationJob(
             ),
         ]
     )
-    if (buildResult == 'UNSTABLE') {
-        unstable("Check the static analysis of the `${examplesRepoBranch}` examples branch")
-        return
-    }
-    if (buildResult == 'FAILURE') {
-        error("There where some errors in the `${examplesRepoBranch}` examples branch build")
-        return
-    }
-    currentBuild.result = buildResult
 }
 
 /**
