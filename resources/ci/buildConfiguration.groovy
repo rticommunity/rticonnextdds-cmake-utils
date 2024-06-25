@@ -41,6 +41,14 @@ void applyExamplesRepoPatch(
         examplesRepoRoot,
     )
 }
+/**
+ * Obtain the reference branch name for the publishIssues function.
+ *
+ * @returns The jenkins job path to the current job.
+ */
+String currentJobPath() {
+    return (env.JOB_URL - env.JENKINS_URL).replace('job/', '')[0..-2]
+}
 
 pipeline {
     agent {
@@ -193,7 +201,12 @@ pipeline {
                                     ),
                                 )
                             ],
-                            qualityGates: [[threshold: 1, type: 'TOTAL', criticality: 'FAILURE']],
+                            qualityGates: [[
+                                threshold: 1,
+                                type: 'TOTAL',
+                                unstable: true,
+                            ]],
+                            referenceJobName: currentJobPath(),
                         )
                     }
                 }
