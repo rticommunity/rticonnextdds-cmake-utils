@@ -1382,15 +1382,18 @@ elseif(CONNEXTDDS_ARCH MATCHES "Darwin")
         "RTI_DARWIN20"
         "RTI_64BIT"
     )
-elseif(CONNEXTDDS_ARCH MATCHES "QNX7|QOS")
+elseif(CONNEXTDDS_ARCH MATCHES "QNX|QOS")
     set(CONNEXTDDS_EXTERNAL_LIBS
         "-lm"
         "-lsocket"
     )
     set(CONNEXTDDS_COMPILE_DEFINITIONS
         "RTI_QNX"
-        "RTI_QNX7"
     )
+
+    if(CONNEXTDDS_ARCH MATCHES "QNX7")
+        list(APPEND CONNEXTDDS_COMPILE_DEFINITIONS "RTI_QNX7")
+    endif()
 
     if(CONNEXTDDS_ARCH MATCHES "cxx")
         set(CONNEXTDDS_COMPILE_OPTIONS "-Y_cxx")
