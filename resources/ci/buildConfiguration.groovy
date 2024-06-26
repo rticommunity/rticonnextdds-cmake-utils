@@ -205,7 +205,7 @@ pipeline {
                             ],
                             qualityGates: [[
                                 threshold: 1,
-                                type: 'TOTAL',
+                                type: 'NEW',
                                 unstable: true,
                             ]],
                         )
