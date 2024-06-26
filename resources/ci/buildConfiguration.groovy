@@ -191,7 +191,9 @@ pipeline {
                         pipelineInfo.connextDir,
                         pipelineInfo.staticAnalysisDir,
                     )
+
                     dir(pipelineInfo.staticAnalysisDir) {
+                        discoverReferenceBuild(referenceJob: currentJobPath())
                         publishIssues(
                             name: 'Analyze build - static analysis',
                             issues: [
@@ -206,7 +208,6 @@ pipeline {
                                 type: 'TOTAL',
                                 unstable: true,
                             ]],
-                            referenceJobName: currentJobPath(),
                         )
                     }
                 }
