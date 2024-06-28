@@ -11,6 +11,11 @@
  */
 
 /**
+ * Map of architectures that will be tested for a single Connext version.
+ */
+Map architectureMap = [:]
+
+/**
  * Build the desired job in the examples repository multibranch pipeline.
  *
  * @param cmakeUtilsRepoBranch The cmake-utils repository branch or PR to use.
@@ -65,10 +70,9 @@ String getVersionFromBranch(String repositoryBranch) {
  *
  * @param cmakeUtilsRepoBranch rticonnextdds-cmake-utils branch to use.
  * @param examplesRepoBranch rticonnextdds-examples branch to build.
- * @param osMap `Architecture family - architecture string` map.
  */
-Map architectureJobs(String cmakeUtilsRepoBranch, String examplesRepoBranch, Map<String, Map> osMap) {
-    return osMap.collectEntries { architectureFamily, architectureString ->
+Map architectureJobs(String cmakeUtilsRepoBranch, String examplesRepoBranch) {
+    return architectureMap.collectEntries { architectureFamily, architectureString ->
         [
             "${architectureFamily}-${architectureString}": {
                 stage("${architectureFamily}-${architectureString}") {
@@ -88,9 +92,7 @@ Map architectureJobs(String cmakeUtilsRepoBranch, String examplesRepoBranch, Map
  * Run all the architectures available for a single examples branch.
  */
 pipeline {
-    agent {
-        label 'docker'
-    }
+    agent none
 
     options {
         skipDefaultCheckout()
@@ -110,18 +112,32 @@ pipeline {
     }
 
     stages {
-        stage('Build architectures') {
+        stage('Read architecture information') {
+            agent {
+                label 'docker'
+            }
             steps {
                 checkoutCommunityRepoBranch(
                     'rticonnextdds-cmake-utils', params.CMAKE_UTILS_REPOSITORY_BRANCH
                 )
                 script {
+                    architectureMap = readYaml(
+                        file: "${env.WORKSPACE}/resources/ci/config.yaml"
+                    ).versions[params.EXAMPLES_REPOSITORY_BRANCH]
+                }
+            }
+            post {
+                cleanup {
+                    cleanWs()
+                }
+            }
+        }
+        stage('Launch architecture jobs') {
+            steps {
+                script {
                     parallel architectureJobs(
                         params.CMAKE_UTILS_REPOSITORY_BRANCH,
                         params.EXAMPLES_REPOSITORY_BRANCH,
-                        readYaml(
-                            file: "${env.WORKSPACE}/resources/ci/config.yaml"
-                        ).versions[params.EXAMPLES_REPOSITORY_BRANCH]
                     )
                 }
             }
