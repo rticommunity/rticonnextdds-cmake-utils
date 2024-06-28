@@ -14,7 +14,7 @@
  * List of Connext versions that will be tested (the versions are the branch names of the
  * rticonnextdds-examples repository)
  */
-List<String> connextVersions = []
+CONNEXT_VERSIONS = []
 
 /**
  * Build the desired job in the examples repository multibranch pipeline.
@@ -43,7 +43,7 @@ void runBuildArchitectureConfigurationsJob(String examplesRepoBranch) {
  * Create a set of jobs over each rticonnextdds-examples version (branch).
  */
 Map branchJobs() {
-    return connextVersions.collectEntries { version ->
+    return CONNEXT_VERSIONS.collectEntries { version ->
         [
             "${version}",
             {
@@ -76,7 +76,7 @@ pipeline {
                     'rticonnextdds-cmake-utils', env.BRANCH_NAME
                 )
                 script {
-                    connextVersions.addAll(
+                    CONNEXT_VERSIONS.addAll(
                         readYaml(
                             file: "${env.WORKSPACE}/resources/ci/config.yaml"
                         ).versions.keySet()

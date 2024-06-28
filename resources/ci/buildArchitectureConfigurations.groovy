@@ -13,7 +13,7 @@
 /**
  * Map of architectures that will be tested for a single Connext version.
  */
-Map architectureMap = [:]
+Map ARCHITECTURE_MAP = [:]
 
 /**
  * Build the desired job in the examples repository multibranch pipeline.
@@ -72,7 +72,7 @@ String getVersionFromBranch(String repositoryBranch) {
  * @param examplesRepoBranch rticonnextdds-examples branch to build.
  */
 Map architectureJobs(String cmakeUtilsRepoBranch, String examplesRepoBranch) {
-    return architectureMap.collectEntries { architectureFamily, architectureString ->
+    return ARCHITECTURE_MAP.collectEntries { architectureFamily, architectureString ->
         [
             "${architectureFamily}-${architectureString}": {
                 stage("${architectureFamily}-${architectureString}") {
@@ -121,7 +121,7 @@ pipeline {
                     'rticonnextdds-cmake-utils', params.CMAKE_UTILS_REPOSITORY_BRANCH
                 )
                 script {
-                    architectureMap = readYaml(
+                    ARCHITECTURE_MAP = readYaml(
                         file: "${env.WORKSPACE}/resources/ci/config.yaml"
                     ).versions[params.EXAMPLES_REPOSITORY_BRANCH]
                 }

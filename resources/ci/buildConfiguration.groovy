@@ -16,7 +16,7 @@
  * Hold information about the pipeline. E.g.: cmakeUtilsRepoDir, cmakeUtilsDockerDir,
  * staticAnalysisDir, connextDir.
  */
-Map pipelineInfo = [:]
+Map PIPELINE_INFO = [:]
 
 /**
  * Apply a patch to the examples repository depending on the branch. The patch consinsts in files
@@ -108,25 +108,25 @@ pipeline {
         stage('Repository configuration') {
             steps {
                 script {
-                    pipelineInfo.cmakeUtilsRepoDir = "${env.WORKSPACE}/cmake-utils"
-                    pipelineInfo.cmakeUtilsDockerDir = (
-                        "${pipelineInfo.cmakeUtilsRepoDir}/resources/ci/docker/"
+                    PIPELINE_INFO.cmakeUtilsRepoDir = "${env.WORKSPACE}/cmake-utils"
+                    PIPELINE_INFO.cmakeUtilsDockerDir = (
+                        "${PIPELINE_INFO.cmakeUtilsRepoDir}/resources/ci/docker/"
                     )
-                    pipelineInfo.staticAnalysisDir = "${env.WORKSPACE}/static_analysis_report"
+                    PIPELINE_INFO.staticAnalysisDir = "${env.WORKSPACE}/static_analysis_report"
                 }
                 checkoutCommunityRepoBranch(
                     'rticonnextdds-examples',
                     params.EXAMPLES_REPOSITORY_BRANCH,
                     true,
                 )
-                dir(pipelineInfo.cmakeUtilsRepoDir) {
+                dir(PIPELINE_INFO.cmakeUtilsRepoDir) {
                     checkoutCommunityRepoBranch(
                         'rticonnextdds-cmake-utils',
                         params.CMAKE_UTILS_REPOSITORY_BRANCH,
                     )
                 }
                 applyExamplesRepoPatch(
-                    pipelineInfo.cmakeUtilsRepoDir,
+                    PIPELINE_INFO.cmakeUtilsRepoDir,
                     env.WORKSPACE,
                     params.EXAMPLES_REPOSITORY_BRANCH,
                 )
@@ -136,10 +136,10 @@ pipeline {
             steps {
                 runInsideExecutor(
                     params.ARCHITECTURE_STRING,
-                    pipelineInfo.cmakeUtilsDockerDir,
+                    PIPELINE_INFO.cmakeUtilsDockerDir,
                 ) {
                     script {
-                        pipelineInfo.connextDir = installConnext(
+                        PIPELINE_INFO.connextDir = installConnext(
                             params.ARCHITECTURE_STRING,
                             env.WORKSPACE,
                         )
@@ -164,12 +164,12 @@ pipeline {
                         steps {
                             runInsideExecutor(
                                 params.ARCHITECTURE_STRING,
-                                pipelineInfo.cmakeUtilsDockerDir,
+                                PIPELINE_INFO.cmakeUtilsDockerDir,
                             ) {
                                 echo("Building ${buildType}/${linkMode}")
                                 buildExamples(
                                     params.ARCHITECTURE_STRING,
-                                    pipelineInfo.connextDir,
+                                    PIPELINE_INFO.connextDir,
                                     buildType,
                                     linkMode,
                                     env.WORKSPACE,
@@ -184,15 +184,15 @@ pipeline {
             steps {
                 runInsideExecutor(
                     params.ARCHITECTURE_STRING,
-                    pipelineInfo.cmakeUtilsDockerDir,
+                    PIPELINE_INFO.cmakeUtilsDockerDir,
                 ) {
                     runStaticAnalysis(
                         buildExamples.getBuildDirectory('release', 'dynamic'),
-                        pipelineInfo.connextDir,
-                        pipelineInfo.staticAnalysisDir,
+                        PIPELINE_INFO.connextDir,
+                        PIPELINE_INFO.staticAnalysisDir,
                     )
 
-                    dir(pipelineInfo.staticAnalysisDir) {
+                    dir(PIPELINE_INFO.staticAnalysisDir) {
                         discoverReferenceBuild(referenceJob: currentJobPath())
                         publishIssues(
                             name: 'Analyze build - static analysis',
