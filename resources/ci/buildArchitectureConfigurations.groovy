@@ -13,7 +13,7 @@
 /**
  * Map of architectures that will be tested for a single Connext version.
  */
-Map ARCHITECTURE_MAP = [:]
+ARCHITECTURE_MAP = [:]
 
 /**
  * Build the desired job in the examples repository multibranch pipeline.

@@ -16,7 +16,7 @@
  * Hold information about the pipeline. E.g.: cmakeUtilsRepoDir, cmakeUtilsDockerDir,
  * staticAnalysisDir, connextDir.
  */
-Map PIPELINE_INFO = [:]
+PIPELINE_INFO = [:]
 
 /**
  * Apply a patch to the examples repository depending on the branch. The patch consinsts in files
