@@ -152,11 +152,11 @@ pipeline {
                 axes {
                     axis {
                         name 'buildType'
-                        values 'release'  // TODO: Recover debug build type
+                        values 'debug', 'release'
                     }
                     axis {
                         name 'linkMode'
-                        values 'dynamic'  // TODO: Recover static link mode
+                        values 'static', 'dynamic'
                     }
                 }
                 stages {
