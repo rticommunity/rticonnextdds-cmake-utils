@@ -11,6 +11,12 @@
  */
 
 /**
+ * List of Connext versions that will be tested (the versions are the branch names of the
+ * rticonnextdds-examples repository)
+ */
+CONNEXT_VERSIONS = []
+
+/**
  * Build the desired job in the examples repository multibranch pipeline.
  *
  * @param examplesRepoBranch The branch or PR to build in the examples repository.
@@ -34,17 +40,15 @@ void runBuildArchitectureConfigurationsJob(String examplesRepoBranch) {
 }
 
 /**
- * Create a set of jobs over each rticonnextdds-examples branch.
- *
- * @param branches List of branch names.
+ * Create a set of jobs over each rticonnextdds-examples version (branch).
  */
-Map branchJobs(String[] branches) {
-    return branches.collectEntries { branch ->
+Map branchJobs() {
+    return CONNEXT_VERSIONS.collectEntries { version ->
         [
-            "${branch}",
+            "${version}",
             {
-                stage("${branch}") {
-                    runBuildArchitectureConfigurationsJob(branch)
+                stage("${version}") {
+                    runBuildArchitectureConfigurationsJob(version)
                 }
             }
         ]
@@ -58,22 +62,37 @@ Map branchJobs(String[] branches) {
 pipeline {
     agent none
 
+    options {
+        skipDefaultCheckout()
+    }
+
     stages {
-        stage('Versions') {
+        stage('Read version information') {
             agent {
                 label 'docker'
             }
             steps {
+                checkoutCommunityRepoBranch(
+                    'rticonnextdds-cmake-utils', env.BRANCH_NAME
+                )
                 script {
-                    String[] examplesBranches = readYaml(
-                        file: "${env.WORKSPACE}/resources/ci/config.yaml"
-                    ).versions.keySet()
-                    parallel branchJobs(examplesBranches)
+                    CONNEXT_VERSIONS.addAll(
+                        readYaml(
+                            file: "${env.WORKSPACE}/resources/ci/config.yaml"
+                        ).versions.keySet()
+                    )
                 }
             }
             post {
                 cleanup {
                     cleanWs()
+                }
+            }
+        }
+        stage('Launch version jobs') {
+            steps {
+                script {
+                    parallel branchJobs()
                 }
             }
         }
