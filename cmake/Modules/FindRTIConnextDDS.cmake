@@ -1698,6 +1698,17 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
         "ROUTING_SERVICE_INFRASTRUCTURE"
     )
 
+    set(rtiserviceadmincpp_libs
+        "rtiserviceadmincpp"
+        "nddscpp2"
+        "nddsc"
+        "nddscore"
+    )
+    get_all_library_variables(
+        "${rtiserviceadmincpp_libs}"
+        "ROUTING_SERVICE_ADMIN"
+    )
+
     set(addon_dependencies)
     if(METP_LIBRARIES)
         list(APPEND addon_dependencies "nddsmetp")
@@ -1719,6 +1730,7 @@ if(routing_service IN_LIST RTIConnextDDS_FIND_COMPONENTS
     set(routing_service_libs
         "rtiroutingservice"
         "rtirsinfrastructure"
+        "rtiserviceadmincpp"
         ${addon_dependencies}
         "rticonnextmsgc"
         "nddsc"
@@ -1968,6 +1980,7 @@ if(recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     list(APPEND recording_service_libs
         "rtiroutingservice"
         "rtirsinfrastructure"
+        "rtiserviceadmincpp"
         "nddscpp2"
         "rtidlc"
         "nddsmetp"
@@ -2516,6 +2529,13 @@ if(RTIConnextDDS_FOUND)
         VAR "ROUTING_SERVICE_INFRASTRUCTURE"
         DEPENDENCIES
             RTIConnextDDS::c_api
+    )
+
+    create_connext_imported_target(
+        TARGET "service_admin_cpp2"
+        VAR "ROUTING_SERVICE_ADMIN"
+        DEPENDENCIES
+            RTIConnextDDS::cpp2_api
     )
 
     # Routing Service C API
