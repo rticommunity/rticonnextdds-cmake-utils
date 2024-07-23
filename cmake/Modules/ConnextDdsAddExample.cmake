@@ -319,11 +319,13 @@ function(connextdds_call_codegen)
         _CONNEXT_PREFIX
     )
 
-    if(NOT DEFINED _CONNEXT_IDL AND NOT DEFINED _CONNEXT_TYPE_PATH)
+    if(
+        (NOT DEFINED _CONNEXT_IDL AND NOT DEFINED _CONNEXT_TYPE_PATH)
+        OR (DEFINED _CONNEXT_IDL AND DEFINED _CONNEXT_TYPE_PATH)
+    )
         message(
-            FATAL_ERROR
-            "It is necessary to specify a type path or IDL file to the"
-            " connextdds_call_codegen function"
+            FATAL_ERROR "It is necessary to specify one (and only one) of IDL /"
+            " TYPE_PATH variables in the connextdds_call_codegen function"
         )
     endif()
 
@@ -441,7 +443,11 @@ function(connextdds_copy_qos_profile)
     set(qos_file "${CMAKE_CURRENT_SOURCE_DIR}/${user_qos_profile_name}")
 
     if(NOT EXISTS ${qos_file})
-        message(FATAL_ERROR "The ${user_qos_profile_name} (${qos_file}) was not found")
+        get_filename_component(user_qos_profile_directory "${qos_file}" DIRECTORY)
+        message(
+            FATAL_ERROR "The ${user_qos_profile_name} was not found in"
+            " ${user_qos_profile_directory}"
+        )
     endif()
 
     set(output_qos "${CMAKE_CURRENT_BINARY_DIR}/${user_qos_profile_name}")
