@@ -75,7 +75,7 @@ Function to generate the source code from codegen.
 ::
 
     connextdds_call_codegen(
-        IDL name
+        (IDL name | TYPE_FILE type_file_path)
         LANG language
         [PREFIX prefix]
         [CODEGEN_ARGS ...]
@@ -84,8 +84,10 @@ Function to generate the source code from codegen.
 Add a new example to be built. This method will call Codegen, create the
 CMake targets and set the dependencies.
 
-``IDL`` (required):
-    Name of the IDL file (without extension).
+``IDL`` or ``TYPE_FILE`` (required):
+    One of the legacy ``IDL`` or ``TYPE_FILE``  must be provided. The IDL
+    argument expects the an IDL file name without extension. The new
+    ``TYPE_FILE`` is to the type file path (could be IDL, XML, ...).
 ``LANG`` (required):
     Example language. Valid values are ``C``, ``C++``, ``C++03`` and ``C++11``.
 ``PREFIX``:
@@ -304,7 +306,7 @@ endfunction()
 
 function(connextdds_call_codegen)
     set(optional_args)
-    set(single_value_args IDL LANG PREFIX)
+    set(single_value_args IDL TYPE_PATH LANG PREFIX)
     set(multi_value_args CODEGEN_ARGS)
     cmake_parse_arguments(_CONNEXT
         "${optional_args}"
@@ -313,17 +315,30 @@ function(connextdds_call_codegen)
         ${ARGN}
     )
     connextdds_check_required_arguments(
-        _CONNEXT_IDL
         _CONNEXT_LANG
         _CONNEXT_PREFIX
     )
 
+    if(NOT DEFINED _CONNEXT_IDL AND NOT DEFINED _CONNEXT_TYPE_PATH)
+        message(
+            FATAL_ERROR
+            "It is necessary to specify a type path or IDL file to the"
+            " connextdds_call_codegen function"
+        )
+    endif()
+
+    set(_type_file_name "${_CONNEXT_IDL}")
+    set(_type_file_path "${CMAKE_CURRENT_SOURCE_DIR}/${_type_file_name}.idl")
+    if(_CONNEXT_TYPE_PATH)
+        get_filename_component(_type_file_name "${_CONNEXT_TYPE_PATH}" NAME_WE)
+        get_filename_component(_type_file_path "${_CONNEXT_TYPE_PATH}" REALPATH)
+    endif()
 
     # Get the list of the source files to genrate and configure the command
     # to cal Codegen
     connextdds_rtiddsgen_run(
         IDL_FILE
-            "${CMAKE_CURRENT_SOURCE_DIR}/${_CONNEXT_IDL}.idl"
+            "${_type_file_path}"
         OUTPUT_DIRECTORY
             "${CMAKE_CURRENT_BINARY_DIR}/src"
         LANG ${_CONNEXT_LANG}
@@ -332,12 +347,12 @@ function(connextdds_call_codegen)
 
     # Get the path to the generated publisher and subscriber source code
     connextdds_sanitize_language(LANG ${_CONNEXT_LANG} VAR lang_var)
-    set(${_CONNEXT_IDL}_${lang_var}_PUBLISHER_SOURCE
-        "${${_CONNEXT_IDL}_${lang_var}_PUBLISHER_SOURCE}"
+    set(${_type_file_name}_${lang_var}_PUBLISHER_SOURCE
+        "${${_type_file_name}_${lang_var}_PUBLISHER_SOURCE}"
         PARENT_SCOPE
     )
-    set(${_CONNEXT_IDL}_${lang_var}_SUBSCRIBER_SOURCE
-        "${${_CONNEXT_IDL}_${lang_var}_SUBSCRIBER_SOURCE}"
+    set(${_type_file_name}_${lang_var}_SUBSCRIBER_SOURCE
+        "${${_type_file_name}_${lang_var}_SUBSCRIBER_SOURCE}"
         PARENT_SCOPE
     )
 
@@ -345,7 +360,7 @@ function(connextdds_call_codegen)
     # created
     add_custom_target(${_CONNEXT_PREFIX}_${lang_var}_sources
         DEPENDS
-            ${${_CONNEXT_IDL}_${lang_var}_GENERATED_SOURCES}
+            ${${_type_file_name}_${lang_var}_GENERATED_SOURCES}
     )
 
     # If we don't use a object library to generate our publisher and subsciber
@@ -364,7 +379,7 @@ function(connextdds_call_codegen)
     set(obj_library ${_CONNEXT_PREFIX}_${lang_var}_obj)
     add_library(${obj_library}
         OBJECT
-        ${${_CONNEXT_IDL}_${lang_var}_SOURCES}
+        ${${_type_file_name}_${lang_var}_SOURCES}
     )
 
     set(api "c")
@@ -426,7 +441,7 @@ function(connextdds_copy_qos_profile)
     set(qos_file "${CMAKE_CURRENT_SOURCE_DIR}/${user_qos_profile_name}")
 
     if(NOT EXISTS ${qos_file})
-        message(FATAL_ERROR "The ${user_qos_profile_name} was not found")
+        message(FATAL_ERROR "The ${user_qos_profile_name} (${qos_file}) was not found")
     endif()
 
     set(output_qos "${CMAKE_CURRENT_BINARY_DIR}/${user_qos_profile_name}")
