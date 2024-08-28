@@ -1980,7 +1980,6 @@ if(recording_service IN_LIST RTIConnextDDS_FIND_COMPONENTS)
     list(APPEND recording_service_libs
         "rtiroutingservice"
         "rtirsinfrastructure"
-        "rtiserviceadmincpp"
         "nddscpp2"
         "rtidlc"
         "nddsmetp"
