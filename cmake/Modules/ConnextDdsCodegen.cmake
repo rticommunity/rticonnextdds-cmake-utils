@@ -60,7 +60,7 @@ Arguments:
 
 ``LANG`` (mandatory)
     The language to generate source files for. Expected values are:
-    C, C++, C++98, C++03, C++11, C++/CLI, C# and Java.
+    C, C++, C++98, C++03, C++11, C++/CLI, C#, Java and Python.
 
 ``VAR``
     Use ``VAR`` as a prefix instead of using the IDL basename to name return
@@ -321,7 +321,7 @@ macro(_connextdds_codegen_find_codegen use_codegen1)
 endmacro()
 
 # Helper function to determine the generated files based on the language
-# Supported languages are: C C++ Java C++/CLI C++03 C++11 C#
+# Supported languages are: C, C++, Java, C++/CLI, C++03, C++11, C#, and Python
 function(_connextdds_codegen_get_generated_file_list)
     set(options STANDALONE DEBUG NO_CODE_GENERATION GENERATE_EXAMPLE)
     set(single_value_args VAR LANG PACKAGE IDL_BASENAME OUTPUT_DIR)
@@ -465,6 +465,20 @@ function(_connextdds_codegen_get_generated_file_list)
         if(_CODEGEN_PACKAGE)
             set(timestamp_dir "${_CODEGEN_OUTPUT_DIR}/${_CODEGEN_PACKAGE}")
         endif()
+    elseif("${_CODEGEN_LANG}" STREQUAL "Python")
+        if(RTICONNEXTDDS_VERSION VERSION_LESS "7.0.0")
+            message(FATAL_ERROR "Python code generation only supported since 7.0.0")
+        endif()
+        set(sources "${path_base}.py")
+        if ("examplefiles" IN_LIST _CODEGEN_EXTRA_ARGS)
+            list(APPEND sources
+                "${path_base}_program.py")
+        endif()
+        if(_CODEGEN_GENERATE_SERVICE_FILES)
+            list(APPEND sources
+                "${path_base}_service.py")
+        endif()
+        set(${_CODEGEN_VAR}_SOURCES ${sources} PARENT_SCOPE)
     else()
         message(FATAL_ERROR "Language ${_CODEGEN_LANG} is not supported")
     endif()
