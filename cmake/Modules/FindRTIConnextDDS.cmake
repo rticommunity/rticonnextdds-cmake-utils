@@ -48,6 +48,9 @@
 # checked. If the version between the components missmatch,
 # `RTIConnextDDS_FOUND` will be set to `FALSE`. This feature can be enabled
 # setting `ENABLE_VERSION_CONSISTENCY_CHECK` to `TRUE`.
+# The check reads ``rti_versions.xml`` from the Pro installation directory,
+# or its immediate parent when the local file is absent, as in Drive installs.
+# XML is not required when version consistency checking is disabled.
 #
 # Imported Targets
 # ^^^^^^^^^^^^^^^^
@@ -328,6 +331,11 @@
 # directories. Likewise, the module will try to guess the name of the
 # architecture you are trying to build against, by looking for it under the
 # rti_connext_dds-x.y.z/lib.
+#
+# The installation is identified by
+# ``include/ndds/core_version/core_version_buildid.h``. For Drive, point the
+# installation hints to the nested Pro directory, not the parent containing
+# ``rti_versions.xml``.
 #
 # However, in some cases you must provide the following hints by defining some
 # variables in your cmake invocation:
@@ -662,11 +670,10 @@ if(NOT CONNEXTDDS_DIR)
     connextdds_log_debug("Root paths: ${connextdds_root_paths_expanded}")
 endif()
 
-# We require having an rti_versions file under the installation directory
-# as we will use it to verify that the version is appropriate.
+# Identify the installation by the header used to extract the Pro version.
 find_path(CONNEXTDDS_DIR
     NAMES
-        "rti_versions.xml"
+        "include/ndds/core_version/core_version_buildid.h"
     HINTS
         "${NDDSHOME}"
         ENV CONNEXTDDS_DIR
@@ -1417,7 +1424,7 @@ endif()
 #####################################################################
 
 # This script verifies the version of each of the following fields in
-# ${CONNEXTDDS_DIR}/rti_versions.xml, as they are the basic components of the
+# rti_versions.xml, as they are the basic components of the
 # RTI Connext core libraries, which are always part of an installation.
 list(APPEND rti_versions_field_names_host
     "header_files"
@@ -2184,8 +2191,23 @@ endif()
 # Version checks                                                    #
 #####################################################################
 if(ENABLE_VERSION_CONSISTENCY_CHECK)
+    set(connextdds_versions_file "${CONNEXTDDS_DIR}/rti_versions.xml")
+    if(NOT EXISTS "${connextdds_versions_file}")
+        get_filename_component(connextdds_parent_dir
+            "${CONNEXTDDS_DIR}/.." ABSOLUTE)
+        set(connextdds_versions_file "${connextdds_parent_dir}/rti_versions.xml")
+        if(NOT EXISTS "${connextdds_versions_file}")
+            message(FATAL_ERROR
+                "rti_versions.xml is required when "
+                "ENABLE_VERSION_CONSISTENCY_CHECK is enabled. Looked in "
+                "'${CONNEXTDDS_DIR}' and its immediate parent "
+                "'${connextdds_parent_dir}'."
+            )
+        endif()
+    endif()
+
     # Verify that all the components specified have the same version
-    file(READ "${CONNEXTDDS_DIR}/rti_versions.xml" xml_file)
+    file(READ "${connextdds_versions_file}" xml_file)
     # Verify host components
     foreach(field IN LISTS rti_versions_field_names_host)
         connextdds_check_component_field_version(
