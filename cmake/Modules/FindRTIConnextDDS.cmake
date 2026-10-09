@@ -51,6 +51,8 @@
 # The check reads ``rti_versions.xml`` from the Pro installation directory,
 # or its immediate parent when the local file is absent, as in Drive installs.
 # XML is not required when version consistency checking is disabled.
+# For Connext 7.7.0 and newer, requesting this check emits a warning and skips
+# it because the newer XML component names are not supported.
 #
 # Imported Targets
 # ^^^^^^^^^^^^^^^^
@@ -2190,7 +2192,15 @@ endif()
 #####################################################################
 # Version checks                                                    #
 #####################################################################
-if(ENABLE_VERSION_CONSISTENCY_CHECK)
+if(ENABLE_VERSION_CONSISTENCY_CHECK AND
+        RTICONNEXTDDS_VERSION VERSION_GREATER_EQUAL "7.7.0")
+    message(WARNING
+        "ENABLE_VERSION_CONSISTENCY_CHECK is not supported for Connext "
+        "${RTICONNEXTDDS_VERSION} (7.7.0 and newer): the rti_versions.xml "
+        "component names are not supported by this check. "
+        "Skipping version consistency checking."
+    )
+elseif(ENABLE_VERSION_CONSISTENCY_CHECK)
     set(connextdds_versions_file "${CONNEXTDDS_DIR}/rti_versions.xml")
     if(NOT EXISTS "${connextdds_versions_file}")
         get_filename_component(connextdds_parent_dir
