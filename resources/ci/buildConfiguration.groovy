@@ -10,8 +10,6 @@
  * to use the software.
  */
 
-@Library('rticommunity-jenkins-pipelines@feature/INSTALL-1063') _
-
 /**
  * Hold information about the pipeline. E.g.: cmakeUtilsRepoDir, cmakeUtilsDockerDir,
  * staticAnalysisDir, connextDir.
@@ -108,6 +106,23 @@ pipeline {
         stage('Repository configuration') {
             steps {
                 script {
+                    List parameterNames = [
+                        'ARCHITECTURE_FAMILY',
+                        'ARCHITECTURE_STRING',
+                        'EXAMPLES_REPOSITORY_BRANCH',
+                        'CMAKE_UTILS_REPOSITORY_BRANCH',
+                    ]
+                    String parameterItems = parameterNames.collect { name ->
+                        String value = params[name]
+                            .replace('&', '&amp;')
+                            .replace('<', '&lt;')
+                            .replace('>', '&gt;')
+                            .replace('"', '&quot;')
+                            .replace("'", '&#39;')
+                        "<li><b>${name}:</b> ${value}</li>"
+                    }.join('')
+                    currentBuild.description = "<b>Parameters:</b><ul>${parameterItems}</ul>"
+
                     PIPELINE_INFO.cmakeUtilsRepoDir = "${env.WORKSPACE}/cmake-utils"
                     PIPELINE_INFO.cmakeUtilsDockerDir = (
                         "${PIPELINE_INFO.cmakeUtilsRepoDir}/resources/ci/docker/"
