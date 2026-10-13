@@ -117,6 +117,22 @@ pipeline {
                 label 'docker'
             }
             steps {
+                script {
+                    List parameterNames = [
+                        'CMAKE_UTILS_REPOSITORY_BRANCH',
+                        'EXAMPLES_REPOSITORY_BRANCH',
+                    ]
+                    String parameterItems = parameterNames.collect { name ->
+                        String value = params[name]
+                            .replace('&', '&amp;')
+                            .replace('<', '&lt;')
+                            .replace('>', '&gt;')
+                            .replace('"', '&quot;')
+                            .replace("'", '&#39;')
+                        "<li><b>${name}:</b> ${value}</li>"
+                    }.join('')
+                    currentBuild.description = "<b>Parameters:</b><ul>${parameterItems}</ul>"
+                }
                 checkoutCommunityRepoBranch(
                     'rticonnextdds-cmake-utils', params.CMAKE_UTILS_REPOSITORY_BRANCH
                 )
